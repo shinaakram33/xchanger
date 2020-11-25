@@ -1,10 +1,10 @@
 const express = require('express');
-const dummyRouter = require('./routes/dummyRoute');
+const routes = require('./routes/index');
 
 const app = express();
 
 app.use(express.json());
 
-app.use('/api/v1/dummy', dummyRouter);
+app.use('/api/v1', routes);
 
 module.exports = app;
