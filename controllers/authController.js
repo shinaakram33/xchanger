@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const bycript = require('bcryptjs');
 const User = require('../models/userModal');
+const sendEmail = require('../utils/sendEmail');
+const { stat } = require('fs');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_TOKEN, {
@@ -37,7 +41,8 @@ exports.login = async (req, res) => {
         message: 'Please provide email and password',
       });
     }
-    const user = await User.findOne({ email }).select('+password');
+    console.log(email, password);
+    const user = await User.findOne({ email: email }).select('password');
     const correctPassword = await user.correctPassword(password, user.password);
     if (!user || !correctPassword) {
       res.status(401).json({
@@ -49,6 +54,148 @@ exports.login = async (req, res) => {
     res.status(200).json({
       status: 'success',
       token,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.protected = async (req, res, next) => {
+  try {
+    //1) Getting token and check of its there
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    if (!token) {
+      res.status(401).json({
+        status: 'fail',
+        message: 'unauthorized access',
+      });
+    }
+    //Verification of a token
+    const wrongToken = jwt.decode(token);
+    if (!wrongToken) {
+      res.status(401).json({
+        status: 'fail',
+        message: 'unauthorized access',
+      });
+    }
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_TOKEN);
+    if (!decoded.id) {
+      res.status(401).json({
+        status: 'fail',
+        message: 'unauthorized access',
+      });
+    }
+    next();
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(404).json({
+        status: 'fail',
+        message: 'There is no user of this email',
+      });
+    }
+    const resetToken = await user.createResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    const message = `Forget your password? Submit a patch request with your new password and password Confirm to ${resetToken}.\n If you don't forget your password then ignore this email!`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Your password reset token (Valid for 10 mints)',
+        message,
+      });
+      res.status(200).json({
+        status: 'success',
+        message: 'Token sent to email',
+      });
+    } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      res.status(500).json({
+        status: 'fail',
+        message: 'Error in sending an email. Try again later!',
+        error: err,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.pinCodeCompare = async (req, res) => {
+  try {
+    const { pin } = req.body;
+    const user = await User.findOne({
+      passwordResetToken: pin,
+      passwordResetTokenExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'invalid Pin or pin expired',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      message: 'Pin is valid',
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { pin } = req.params;
+    const { password, confirmPassword } = req.body;
+    if (!confirmPassword) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Please give the confirm password',
+      });
+    }
+    const user = await User.findOne({
+      passwordResetToken: pin,
+      passwordResetTokenExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'invalid Pin or pin expired',
+      });
+    }
+    user.password = password;
+    user.confirmPassword = undefined;
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpire = undefined;
+    await user.save();
+    res.status(200).json({
+      status: 'success',
+      message: 'Password Changed Successfully!',
     });
   } catch (err) {
     res.status(400).json({
