@@ -43,7 +43,7 @@ userSchema.methods.correctPassword = async function (candidatePassword, userPass
   return await bycript.compare(candidatePassword, userPassword);
 };
 
-userSchema.methods.createResetPasswordToken = async function () {
+userSchema.methods.createResetPasswordToken = function () {
   const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
   this.passwordResetToken = resetToken;
   // this.passwordResetToken = await bycript.hash(resetToken, 12);

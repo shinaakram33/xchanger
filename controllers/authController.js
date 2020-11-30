@@ -111,7 +111,7 @@ exports.forgetPassword = async (req, res) => {
       });
     }
     const resetToken = await user.createResetPasswordToken();
-    await user.save({ validateBeforeSave: false });
+    await user.save();
 
     const message = `Forget your password? Submit a patch request with your new password and password Confirm to ${resetToken}.\n If you don't forget your password then ignore this email!`;
 
