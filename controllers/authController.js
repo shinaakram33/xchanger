@@ -3,7 +3,6 @@ const { promisify } = require('util');
 const bycript = require('bcryptjs');
 const User = require('../models/userModal');
 const sendEmail = require('../utils/sendEmail');
-const { stat } = require('fs');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_TOKEN, {
@@ -13,17 +12,21 @@ const signToken = (id) => {
 
 exports.signup = async (req, res) => {
   try {
-    const newUser = await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-    });
-    const token = signToken(newUser._id);
-    res.status(201).json({
-      status: 'success',
-      token,
-      user: newUser,
-    });
+    const alreadyExistEmail = await User.findOne({ email: req.body.email });
+    if (alreadyExistEmail) {
+      res.status(404).json({
+        status: 'fail',
+        message: 'This email is already Exist!',
+      });
+    } else {
+      const newUser = await User.create(req.body);
+      const token = signToken(newUser._id);
+      res.status(201).json({
+        status: 'success',
+        token,
+        user: newUser,
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -63,6 +66,24 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.updateUser = async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: updatedUser,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.protected = async (req, res, next) => {
   try {
     //1) Getting token and check of its there
@@ -91,6 +112,8 @@ exports.protected = async (req, res, next) => {
         message: 'unauthorized access',
       });
     }
+    const currentUser = await User.findById(decoded.id);
+    req.user = currentUser;
     next();
   } catch (err) {
     res.status(400).json({
@@ -98,6 +121,18 @@ exports.protected = async (req, res, next) => {
       message: err,
     });
   }
+};
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.roles)) {
+      res.status(403).json({
+        status: 'fail',
+        message: "You don't have a permission to perform this action",
+      });
+    }
+    next();
+  };
 };
 
 exports.forgetPassword = async (req, res) => {

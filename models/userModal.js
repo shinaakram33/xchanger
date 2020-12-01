@@ -6,11 +6,17 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
+    validate: [validator.isAlpha, 'Name only accept alphabets'],
   },
   email: {
     type: String,
     required: [true, 'Email is required'],
     validate: [validator.isEmail, 'Please enter a valid email'],
+  },
+  notification_email: {
+    type: String,
+    validate: [validator.isEmail, 'Please enter a valid email'],
+    default: null,
   },
   password: {
     type: String,
@@ -29,6 +35,27 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Passwords are not same',
     },
+  },
+  roles: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  gender: {
+    type: String,
+    default: null,
+  },
+  image: {
+    type: String,
+    default: null,
+  },
+  date_of_birth: {
+    type: Date,
+    default: null,
+  },
+  phone: {
+    type: String,
+    default: null,
   },
   passwordResetToken: String,
   passwordResetTokenExpire: Date,
