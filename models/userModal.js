@@ -13,11 +13,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     validate: [validator.isEmail, 'Please enter a valid email'],
   },
-  notification_email: {
-    type: String,
-    validate: [validator.isEmail, 'Please enter a valid email'],
-    default: null,
-  },
   password: {
     type: String,
     required: [true, 'Password is required'],
