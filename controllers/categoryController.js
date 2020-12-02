@@ -1,9 +1,9 @@
 const Category = require('../models/categoryModal');
 
-exports.createCategory = (req, res) => {
+exports.createCategory = async (req, res) => {
   try {
     const { name, image } = req.body;
-    const newCategory = Category.create({
+    const newCategory = await Category.create({
       name,
       image,
     });
@@ -22,7 +22,6 @@ exports.createCategory = (req, res) => {
 exports.getAllCategories = async (req, res) => {
   try {
     const allCategaories = await Category.find();
-
     res.status(200).json({
       status: 'success',
       length: allCategaories.length,
