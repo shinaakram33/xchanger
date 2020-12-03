@@ -47,5 +47,20 @@ const productSchema = new mongoose.Schema({
     required: [true, 'User data is required'],
   },
 });
+
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'category',
+    //   select: '-__v -passwordResetToken -passwordResetExpires',
+  });
+  next();
+});
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: '-__v -password -passwordResetToken, -passwordResetTokenExpire -roles',
+  });
+  next();
+});
 const product = mongoose.model('Product', productSchema);
 module.exports = product;
