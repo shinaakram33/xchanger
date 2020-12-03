@@ -51,7 +51,6 @@ const productSchema = new mongoose.Schema({
 productSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'category',
-    //   select: '-__v -passwordResetToken -passwordResetExpires',
   });
   next();
 });

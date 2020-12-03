@@ -45,7 +45,9 @@ exports.login = async (req, res) => {
       });
     }
     console.log(email, password);
-    const user = await User.findOne({ email: email }).select('password');
+    const user = await User.findOne({ email });
+    // const user = await User.findOne({ email: email }).select('password');
+    console.log('user', user);
     const correctPassword = await user.correctPassword(password, user.password);
     if (!user || !correctPassword) {
       res.status(401).json({
@@ -57,6 +59,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       status: 'success',
       token,
+      data: user,
     });
   } catch (err) {
     res.status(400).json({
