@@ -66,11 +66,16 @@ exports.removeProductFromWishList = async (req, res) => {
         {
           user: req.user.id,
         },
-        { $push: { products: req.body.products } }
+        { $pull: { products: req.params.productId } }
       );
+      res.status(200).json({
+        status: 'success',
+        message: 'Product is removed from wishlist successfully',
+      });
     } else {
       res.status(400).json({
         status: 'fail',
+        message: 'Product is not in the wishlist',
       });
     }
   } catch (err) {

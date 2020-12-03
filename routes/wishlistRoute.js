@@ -1,9 +1,15 @@
 const express = require('express');
-const { createWishList, getAllWishList } = require('../controllers/wishlistController');
+const {
+  createWishList,
+  getAllWishList,
+  removeProductFromWishList,
+} = require('../controllers/wishlistController');
 const { protected } = require('../controllers/authController');
 
 const router = express.Router();
 
 router.route('/').post(protected, createWishList).get(protected, getAllWishList);
+
+router.route('/:productId').post(protected, removeProductFromWishList);
 
 module.exports = router;
