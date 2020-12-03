@@ -9,6 +9,6 @@ const { protected, restrictTo } = require('../controllers/authController');
 const router = express.Router({ mergeParams: true });
 
 router.route('/').post(protected, createProduct).get(getAllProduct);
-router.route('/:productId').patch(protected, updateProducts).delete(deleteProducts);
+router.route('/:productId').patch(protected, updateProducts).delete(protected, deleteProducts);
 
 module.exports = router;
