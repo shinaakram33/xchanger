@@ -223,6 +223,12 @@ exports.resetPassword = async (req, res) => {
         message: 'invalid Pin or pin expired',
       });
     }
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Passwords are not match with each other',
+      });
+    }
     user.password = password;
     user.confirmPassword = undefined;
     user.passwordResetToken = undefined;
