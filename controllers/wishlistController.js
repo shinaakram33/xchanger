@@ -1,3 +1,4 @@
+const { get } = require('mongoose');
 const WishList = require('../models/wishlistModal');
 
 exports.createWishList = async (req, res) => {
@@ -59,7 +60,19 @@ exports.getAllWishList = async (req, res) => {
 
 exports.removeProductFromWishList = async (req, res) => {
   try {
-    const getWishList = await WishList.findOne({ user: req.user.id });
+    const getProduct = await WishList.findOne({ user: req.user.id });
+    if (getProduct) {
+      await WishList.updateOne(
+        {
+          user: req.user.id,
+        },
+        { $push: { products: req.body.products } }
+      );
+    } else {
+      res.status(400).json({
+        status: 'fail',
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
