@@ -1,12 +1,14 @@
 const express = require('express');
-const {createProduct, getAllProduct,updateproducts,deleteproducts} = require('../controllers/productController');
+const {
+  createProduct,
+  getAllProduct,
+  updateProducts,
+  deleteProducts,
+} = require('../controllers/productController');
 const { protected, restrictTo } = require('../controllers/authController');
 const router = express.Router({ mergeParams: true });
 
- router.route('/').post(createProduct).get(getAllProduct);
- router.route('/:id').patch(updateproducts);
- router.route('/:id').delete(deleteproducts);
-
-
+router.route('/').post(protected, createProduct).get(getAllProduct);
+router.route('/:productId').patch(protected, updateProducts).delete(deleteProducts);
 
 module.exports = router;
