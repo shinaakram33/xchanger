@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     // validate: [validator.isAlpha, 'Name only accept alphabets'],
     validate: {
       validator: function (el) {
-        console.log(el);
         return new RegExp(/^[a-zA-Z ]*$/).test(this.name);
       },
       message: 'Name only accept alphabets',

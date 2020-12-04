@@ -28,9 +28,90 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const pendingPost = await Product.findById(req.params.productId);
+    console.log('aaaaaaaaaaaaaaaaaaa', pendingPost);
+    if (!pendingPost) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No product found',
+      });
+    }
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.productId,
+      { status: req.body.status },
+      { new: true }
+    );
+    res.status(200).json({
+      status: 'success',
+      message: 'Product is updated successfully',
+      data: updatedProduct,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getAllPendingPosts = async (req, res) => {
+  try {
+    const pendingPosts = await Product.find();
+    const filterData = pendingPosts.filter((i) => i.status === req.body.status);
+    console.log('ifler', filterData);
+    if (!pendingPosts) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No product found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: filterData.length,
+      data: filterData,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getUserProducts = async (req, res) => {
+  try {
+    const userPosts = await Product.find({ user: { $in: req.params.userId } });
+    if (!userPosts) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No product found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: userPosts.length,
+      data: userPosts,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.getAllProduct = async (req, res) => {
   try {
-    const allProduct = await Product.find();
+    const allProduct = await Product.find({ category: { $in: req.params.categoryId } });
+    if (!allProduct) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No Product found of this category',
+      });
+    }
     res.status(200).json({
       status: 'success',
       length: allProduct.length,

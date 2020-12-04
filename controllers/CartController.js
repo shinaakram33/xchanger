@@ -1,11 +1,11 @@
-const WishList = require('../models/wishlistModal');
+const Cart = require('../models/cartModal');
 
-exports.createWishList = async (req, res) => {
+exports.createCart = async (req, res, next) => {
   try {
     let data = '';
-    const alreadyExist = await WishList.findOne({ user: req.user.id });
+    const alreadyExist = await Cart.findOne({ user: req.user.id });
     if (!alreadyExist) {
-      await WishList.create({
+      await Cart.create({
         user: req.user.id,
         products: req.body.products,
       });
@@ -14,13 +14,13 @@ exports.createWishList = async (req, res) => {
         if (i.toString() === req.body.products) {
           res.status(400).json({
             status: 'fail',
-            message: 'This product is already exist in the wishlist',
+            message: 'This product is already exist in the Cart',
           });
           data = 'aaaa';
         }
       });
       if (data === '') {
-        await WishList.updateOne(
+        await Cart.updateOne(
           {
             user: req.user.id,
           },
@@ -30,7 +30,7 @@ exports.createWishList = async (req, res) => {
     }
     res.status(201).json({
       status: 'success',
-      message: 'Added into wishlist successfully',
+      message: 'Added into Cart successfully',
     });
   } catch (err) {
     res.status(400).json({
@@ -40,14 +40,14 @@ exports.createWishList = async (req, res) => {
   }
 };
 
-exports.getAllWishList = async (req, res) => {
+exports.getAllCartProducts = async (req, res) => {
   try {
-    const getWishList = await WishList.findOne({ user: req.user.id })
+    const getCartList = await Cart.findOne({ user: req.user.id })
       .populate('user')
       .populate('products');
     res.status(200).json({
       status: 'success',
-      data: getWishList,
+      data: getCartList,
     });
   } catch (err) {
     res.status(400).json({
@@ -57,11 +57,11 @@ exports.getAllWishList = async (req, res) => {
   }
 };
 
-exports.removeProductFromWishList = async (req, res) => {
+exports.removeProductFromCart = async (req, res) => {
   try {
-    const getProduct = await WishList.findOne({ user: req.user.id });
+    const getProduct = await Cart.findOne({ user: req.user.id });
     if (getProduct) {
-      await WishList.updateOne(
+      await Cart.updateOne(
         {
           user: req.user.id,
         },
@@ -69,12 +69,12 @@ exports.removeProductFromWishList = async (req, res) => {
       );
       res.status(200).json({
         status: 'success',
-        message: 'Product is removed from wishlist successfully',
+        message: 'Product is removed from Cart successfully',
       });
     } else {
       res.status(400).json({
         status: 'fail',
-        message: 'Product is not in the wishlist',
+        message: 'Product is not in the Cart',
       });
     }
   } catch (err) {

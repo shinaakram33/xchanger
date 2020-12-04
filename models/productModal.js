@@ -36,6 +36,10 @@ const productSchema = new mongoose.Schema({
       message: 'Image of a product is required',
     },
   },
+  status: {
+    type: String,
+    default: 'WAITING',
+  },
   category: {
     type: mongoose.Schema.ObjectId,
     ref: 'Category',
