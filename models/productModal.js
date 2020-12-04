@@ -52,18 +52,18 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-productSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: 'category',
-  });
-  next();
-});
-productSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: 'user',
-    select: '-__v -password -passwordResetToken, -passwordResetTokenExpire -roles',
-  });
-  next();
-});
+// productSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: 'category',
+//   });
+//   next();
+// });
+// productSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: 'user',
+//     select: '-__v -password -passwordResetToken, -passwordResetTokenExpire -roles',
+//   });
+//   next();
+// });
 const product = mongoose.model('Product', productSchema);
 module.exports = product;

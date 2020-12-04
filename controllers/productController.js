@@ -59,9 +59,13 @@ exports.updateStatus = async (req, res) => {
 
 exports.getAllPendingPosts = async (req, res) => {
   try {
-    const pendingPosts = await Product.find();
-    const filterData = pendingPosts.filter((i) => i.status === req.body.status);
-    console.log('ifler', filterData);
+    console.log('categoryId', req.params.categoryId);
+    console.log('body', req.params.statusId);
+    const pendingPosts = await Product.find({
+      category: { $in: req.params.categoryId },
+      status: { $in: req.params.statusId },
+    });
+    // console.log('aaaa', pendingPosts);
     if (!pendingPosts) {
       res.status(400).json({
         status: 'fail',
@@ -70,8 +74,8 @@ exports.getAllPendingPosts = async (req, res) => {
     }
     res.status(200).json({
       status: 'success',
-      length: filterData.length,
-      data: filterData,
+      length: pendingPosts.length,
+      data: pendingPosts,
     });
   } catch (err) {
     res.status(400).json({
