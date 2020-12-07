@@ -21,6 +21,13 @@ const cartSchema = new mongoose.Schema({
       },
     },
   ],
+  selectedProducts: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Product',
+      default: undefined,
+    },
+  ],
 });
 
 const Cart = mongoose.model('Cart', cartSchema);

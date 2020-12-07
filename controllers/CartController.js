@@ -44,7 +44,8 @@ exports.getAllCartProducts = async (req, res) => {
   try {
     const getCartList = await Cart.findOne({ user: req.user.id })
       .populate('user')
-      .populate('products');
+      .populate('products')
+      .select('-selectedProducts');
     res.status(200).json({
       status: 'success',
       data: getCartList,
@@ -77,6 +78,54 @@ exports.removeProductFromCart = async (req, res) => {
         message: 'Product is not in the Cart',
       });
     }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.selectedProductFromCart = async (req, res, next) => {
+  try {
+    const cart = await Cart.findOne({ user: req.user.id });
+    if (cart._id.toString() !== req.params.cartId) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'You dont have an access to perform this action',
+      });
+    }
+    cart.selectedProducts = req.body.selectedProducts;
+    await cart.save({ validateBeforeSave: false });
+    res.status(200).json({
+      status: 'success',
+      message: 'Products selected successfully',
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getSelectedProductFromCart = async (req, res, next) => {
+  try {
+    const cart = await Cart.findOne({ user: req.user.id })
+      .populate('selectedProducts')
+      .select('-products');
+
+    if (cart._id.toString() !== req.params.cartId) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'You dont have an access to perform this action',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: cart,
+    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',

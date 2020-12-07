@@ -4,6 +4,8 @@ const {
   createCart,
   getAllCartProducts,
   removeProductFromCart,
+  selectedProductFromCart,
+  getSelectedProductFromCart,
 } = require('../controllers/CartController');
 
 const router = express.Router();
@@ -13,5 +15,10 @@ router
   .post(protected, createCart)
   .get(protected, getAllCartProducts)
   .put(protected, removeProductFromCart);
+
+router
+  .route('/:cartId')
+  .post(protected, selectedProductFromCart)
+  .get(protected, getSelectedProductFromCart);
 
 module.exports = router;
