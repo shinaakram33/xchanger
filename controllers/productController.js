@@ -1,4 +1,6 @@
 const Product = require('../models/productModal');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 exports.createProduct = async (req, res) => {
   try {
     if (!req.body) {
@@ -7,20 +9,69 @@ exports.createProduct = async (req, res) => {
         message: 'Please provide body of a product',
       });
     }
-    const newProduct = await Product.create({
-      name: req.body.name,
-      price: req.body.price,
-      image: req.body.image,
-      condition: req.body.condition,
-      color: req.body.color,
-      description: req.body.description,
-      category: req.params.categoryId,
-      user: req.user.id,
+    if (req.body.adType === 'featured') {
+      if (!req.body.adPrice) {
+        res.status(400).json({
+          status: 'fail',
+          message: 'Please provide checkout price for posting an ad',
+        });
+      }
+      const charge = await stripe.charges.create({
+        amount: req.body.adPrice * 100,
+        currency: 'usd',
+        source: req.body.source,
+      });
+      if (charge.paid) {
+        const newProduct = await Product.create({
+          name: req.body.name,
+          price: req.body.price,
+          image: req.body.image,
+          condition: req.body.condition,
+          color: req.body.color,
+          description: req.body.description,
+          adType: req.body.adType,
+          category: req.params.categoryId,
+          user: req.user.id,
+          checkoutId: charge.balance_transaction,
+        });
+        res.status(201).json({
+          status: 'success',
+          product: newProduct,
+        });
+      }
+    } else {
+      const newProduct = await Product.create({
+        name: req.body.name,
+        price: req.body.price,
+        image: req.body.image,
+        condition: req.body.condition,
+        color: req.body.color,
+        description: req.body.description,
+        adType: req.body.adType,
+        category: req.params.categoryId,
+        user: req.user.id,
+      });
+      res.status(201).json({
+        status: 'success',
+        product: newProduct,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
     });
-    res.status(201).json({
-      status: 'success',
-      product: newProduct,
-    });
+  }
+};
+
+exports.createFeaturedProduct = async (req, res) => {
+  try {
+    if (!req.body) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Please provide body of a product',
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -59,8 +110,6 @@ exports.updateStatus = async (req, res) => {
 
 exports.getAllPendingPosts = async (req, res) => {
   try {
-    console.log('categoryId', req.params.categoryId);
-    console.log('body', req.params.statusId);
     const pendingPosts = await Product.find({
       category: { $in: req.params.categoryId },
       status: { $in: req.params.statusId },
@@ -84,6 +133,8 @@ exports.getAllPendingPosts = async (req, res) => {
     });
   }
 };
+
+exports.getFeaturedPosts = async (req, res) => {};
 
 exports.getUserProducts = async (req, res) => {
   try {

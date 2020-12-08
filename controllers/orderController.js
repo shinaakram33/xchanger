@@ -12,7 +12,6 @@ exports.createOrder = async (req, res) => {
         message: 'There is no products selected for checkout!',
       });
     }
-    console.log('cart', cart._id);
     if (cart.user.toString() !== req.user.id) {
       res.status(400).json({
         status: 'fail',

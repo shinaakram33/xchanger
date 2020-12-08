@@ -36,9 +36,26 @@ const productSchema = new mongoose.Schema({
       message: 'Image of a product is required',
     },
   },
+  // make: {
+  //   type: String,
+  // },
   status: {
     type: String,
     default: 'WAITING',
+  },
+  adType: {
+    type: String,
+    required: [true, 'type of ad is required'],
+    enum: {
+      values: ['normal', 'featured', 'bidding'],
+      message: 'ad type is either: normal, featured or bidding',
+    },
+  },
+  adPrice: {
+    type: String,
+  },
+  checkoutId: {
+    type: String,
   },
   category: {
     type: mongoose.Schema.ObjectId,
