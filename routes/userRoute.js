@@ -1,13 +1,5 @@
 const express = require('express');
-const {
-  signup,
-  login,
-  forgetPassword,
-  pinCodeCompare,
-  resetPassword,
-  updateUser,
-  protected,
-} = require('../controllers/authController');
+const { signup, login, forgetPassword, pinCodeCompare, resetPassword, updateUser, protected } = require('../controllers/authController');
 const router = express.Router();
 
 router.route('/:userId').patch(protected, updateUser);
