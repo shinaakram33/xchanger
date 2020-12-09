@@ -3,6 +3,7 @@ const Brand = require('../models/brandModal');
 exports.createBrand = async (req, res) => {
   try {
     if (!req.body) {
+      s;
       res.status(400).json({
         status: 'fail',
         message: 'Please provide name and image of a brand',
