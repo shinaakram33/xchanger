@@ -83,7 +83,6 @@ exports.createFeaturedProduct = async (req, res) => {
 exports.updateStatus = async (req, res) => {
   try {
     const pendingPost = await Product.findById(req.params.productId);
-    console.log('aaaaaaaaaaaaaaaaaaa', pendingPost);
     if (!pendingPost) {
       res.status(400).json({
         status: 'fail',
@@ -188,13 +187,13 @@ exports.updateProducts = async (req, res) => {
 
     const product = await Product.findById(productId.toString());
     if (!product) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'product does not exist',
       });
     }
     if (product.user.toString() !== req.user.id) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'You do not have an access to update this product',
       });
@@ -233,6 +232,9 @@ exports.deleteProducts = async (req, res) => {
     const result = await product.findByIdAndDelete(id);
     res.send(result);
   } catch (error) {
-    console.log(message.error);
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
   }
 };
