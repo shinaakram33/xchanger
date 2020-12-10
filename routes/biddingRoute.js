@@ -1,9 +1,10 @@
 const express = require('express');
-const { createBidding, getAllbidding } = require('../controllers/biddingController');
+const { createBidding, getAllbidding, getuserbidding, updatebidding, deletebidding } = require('../controllers/biddingController');
 const { protected, restrictTo } = require('../controllers/authController');
 const router = express.Router();
 
-router.route('/user/:userid').post(protected, createBidding).get();
-router.route('/').get(protected, getAllbidding);
+router.route('/users/:userId').get(protected, getuserbidding);
+router.route('/').get(protected, getAllbidding).post(protected, createBidding);
+router.route('/:biddingid').patch(protected, updatebidding).delete(protected, deletebidding);
 
 module.exports = router;

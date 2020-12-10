@@ -1,3 +1,4 @@
+const { json } = require('express');
 const Product = require('../models/productModal');
 exports.createProduct = async (req, res) => {
   try {
@@ -91,11 +92,14 @@ exports.deleteProducts = async (req, res) => {
     if (product.user.toString() !== req.user.id) {
       res.status(400).json({
         status: 'fail',
-        message: 'You do not have an access to update this product',
+        message: 'product does not delete',
       });
     }
     const result = await product.findByIdAndDelete(id);
-    res.send(result);
+    res.send(200).json({
+      status: 'successful',
+      message: 'product delete successfully',
+    });
   } catch (error) {
     console.log(message.error);
   }

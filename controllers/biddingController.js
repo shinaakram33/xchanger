@@ -3,16 +3,15 @@ const { getAllBrands } = require('./brandController');
 exports.createBidding = async (req, res) => {
   try {
     if (!req.body) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
-        message: 'Please provide body of a Bid',
+        message: 'Please provide body of a Product',
       });
     }
 
     const newBidding = await Bidding.create({
       productprice: req.body.productprice,
-      user: req.params.userid,
-      bidBy: req.user.id,
+      user: req.user.id,
       image: req.body.image,
       condition: req.body.condition,
       productAuthentiaction: req.body.productAuthentiaction,
@@ -23,17 +22,17 @@ exports.createBidding = async (req, res) => {
       contact: req.body.contact,
       name: req.body.name,
       email: req.body.email,
-      // maxPrice: req.body.maxPrice,
-      // minPrice: req.body.minPrice,
+
       price: {
         min: req.body.price.min,
         max: req.body.price.max,
       },
-      time: {
-        to: req.body.time.to,
-        from: req.body.time.from,
+      date: {
+        to: req.body.date.to,
+        from: req.body.date.from,
       },
     });
+
     res.status(201).json({
       status: 'success',
       Bidding: newBidding,
@@ -46,8 +45,9 @@ exports.createBidding = async (req, res) => {
   }
 };
 exports.getAllbidding = async (req, res) => {
+  console.log('aaaaaaaaaaaaaaaaaaa');
   try {
-    const getAllbidding = await Bidding.find(req.user.bidByid);
+    const getAllbidding = await Bidding.find();
     res.status(200).json({
       status: 'success',
       length: getAllbidding.length,
@@ -58,5 +58,80 @@ exports.getAllbidding = async (req, res) => {
       status: 'fail',
       message: err,
     });
+  }
+};
+exports.getuserbidding = async (req, res) => {
+  try {
+    const getuserbidding = await Bidding.find({ user: { $in: req.params.userId } });
+    if (!getuserbidding) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Products does not exist',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: getuserbidding.length,
+      data: getuserbidding,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+exports.updatebidding = async (req, res) => {
+  try {
+    const biddingid = req.params.biddingid;
+    const updates = req.body;
+    const options = { new: true };
+    const bidding = await Bidding.findById(req.params.biddingid);
+
+    if (req.user.id !== bidding.user.toString()) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'product does not exist',
+      });
+    }
+
+    const updatedbidding = await Bidding.findByIdAndUpdate(biddingid, updates, options);
+    console.log('ssssssssss', updatedbidding);
+    res.status(200).json({
+      status: 'success',
+      message: 'product is updated successfully',
+      data: updatedbidding,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+
+exports.deletebidding = async (req, res) => {
+  try {
+    const biddingid = req.params.biddingid;
+    const bidding = await Bidding.findById(biddingid.toString());
+    if (!bidding) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Product does not exist',
+      });
+    }
+    if (bidding.user.toString() !== req.user.id) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Product does not delete',
+      });
+    }
+    const result = await Bidding.findByIdAndDelete(biddingid);
+    res.status(200).json({
+      status: 'successful',
+      message: 'Product delete successfully',
+    });
+  } catch (error) {
+    console.log(message.error);
   }
 };

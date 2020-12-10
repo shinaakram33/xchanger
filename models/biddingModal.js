@@ -7,11 +7,7 @@ const biddingSchema = new mongoose.Schema({
     ref: 'User',
     required: [true, 'user data is required'],
   },
-  bidBy: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: [true, 'bidBy  is required'],
-  },
+
   productprice: {
     type: String,
     required: [true, 'productprice is required'],
@@ -62,15 +58,7 @@ const biddingSchema = new mongoose.Schema({
       required: [true, 'maxPrice is required'],
     },
   },
-  // minPrice: {
-  //   type: String,
-  //   required: [true, 'minPrice is required'],
-  // },
-  // maxPrice: {
-  //   type: String,
-  //   required: [true, 'maxPrice is required'],
-  // },
-  time: {
+  date: {
     to: {
       type: Date,
       default: Date.now,
