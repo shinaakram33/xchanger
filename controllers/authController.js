@@ -45,7 +45,9 @@ exports.login = async (req, res) => {
       });
     }
     console.log(email, password);
-    const user = await User.findOne({ email: email }).select('password');
+    const user = await User.findOne({ email });
+    // const user = await User.findOne({ email: email }).select('password');
+    console.log('user', user);
     const correctPassword = await user.correctPassword(password, user.password);
     if (!user || !correctPassword) {
       res.status(401).json({
@@ -54,9 +56,11 @@ exports.login = async (req, res) => {
       });
     }
     const token = signToken(user._id);
+    console.log(token);
     res.status(200).json({
       status: 'success',
       token,
+      data: user,
     });
   } catch (err) {
     res.status(400).json({
@@ -221,6 +225,12 @@ exports.resetPassword = async (req, res) => {
       res.status(400).json({
         status: 'fail',
         message: 'invalid Pin or pin expired',
+      });
+    }
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'Passwords are not match with each other',
       });
     }
     user.password = password;

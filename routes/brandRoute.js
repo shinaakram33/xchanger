@@ -1,5 +1,10 @@
 const express = require('express');
-const { createBrand, getAllBrands, updateBrand, deletebrand } = require('../controllers/brandController');
+const {
+  createBrand,
+  getAllBrands,
+  updateBrand,
+  deletebrand,
+} = require('../controllers/brandController');
 const { protected, restrictTo } = require('../controllers/authController');
 const router = express.Router();
 

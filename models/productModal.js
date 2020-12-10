@@ -36,6 +36,27 @@ const productSchema = new mongoose.Schema({
       message: 'Image of a product is required',
     },
   },
+  // make: {
+  //   type: String,
+  // },
+  status: {
+    type: String,
+    default: 'WAITING',
+  },
+  adType: {
+    type: String,
+    required: [true, 'type of ad is required'],
+    enum: {
+      values: ['normal', 'featured', 'bidding'],
+      message: 'ad type is either: normal, featured or bidding',
+    },
+  },
+  adPrice: {
+    type: String,
+  },
+  checkoutId: {
+    type: String,
+  },
   category: {
     type: mongoose.Schema.ObjectId,
     ref: 'Category',
@@ -47,5 +68,19 @@ const productSchema = new mongoose.Schema({
     required: [true, 'User data is required'],
   },
 });
+
+// productSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: 'category',
+//   });
+//   next();
+// });
+// productSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: 'user',
+//     select: '-__v -password -passwordResetToken, -passwordResetTokenExpire -roles',
+//   });
+//   next();
+// });
 const product = mongoose.model('Product', productSchema);
 module.exports = product;
