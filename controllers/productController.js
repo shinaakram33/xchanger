@@ -110,6 +110,7 @@ exports.updateStatus = async (req, res) => {
 exports.getAllPendingPosts = async (req, res) => {
   try {
     let searchCriteria = {};
+    const pendingPosts = null;
     searchCriteria = {
       $or: [
         {
@@ -125,27 +126,52 @@ exports.getAllPendingPosts = async (req, res) => {
       ],
     };
     console.log('searchCriteria', req.query.search);
-    const pendingPosts = await Product.find({
-      category: { $in: req.params.categoryId },
-      status: { $in: req.params.statusId },
-      $or: [
-        {
-          name: {
-            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+    if (!req.query) {
+      pendingPosts = await Product.find({
+        category: { $in: req.params.categoryId },
+        status: { $in: req.params.statusId },
+        $or: [
+          {
+            name: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
           },
-        },
-        {
-          price: {
-            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          {
+            price: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
           },
-        },
-        {
-          color: {
-            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          {
+            color: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
+    } else {
+      pendingPosts = await Product.find({
+        category: { $in: req.params.categoryId },
+        status: { $in: req.params.statusId },
+        $or: [
+          {
+            name: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+          {
+            price: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+          {
+            color: {
+              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+        ],
+      });
+    }
+
     if (!pendingPosts) {
       res.status(400).json({
         status: 'fail',
