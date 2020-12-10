@@ -109,11 +109,43 @@ exports.updateStatus = async (req, res) => {
 
 exports.getAllPendingPosts = async (req, res) => {
   try {
+    let searchCriteria = {};
+    searchCriteria = {
+      $or: [
+        {
+          name: {
+            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          price: {
+            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+      ],
+    };
+    console.log('searchCriteria', req.query.search);
     const pendingPosts = await Product.find({
       category: { $in: req.params.categoryId },
       status: { $in: req.params.statusId },
+      $or: [
+        {
+          name: {
+            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          price: {
+            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          color: {
+            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+      ],
     });
-    // console.log('aaaa', pendingPosts);
     if (!pendingPosts) {
       res.status(400).json({
         status: 'fail',

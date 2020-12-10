@@ -42,6 +42,10 @@ const productSchema = new mongoose.Schema({
   status: {
     type: String,
     default: 'WAITING',
+    enum: {
+      values: ['WAITNG', 'POSTED', 'SOLD', 'DELIEVERED'],
+      message: 'Condition is either: WAITING, POSTED, SOLD, DELIEVERED',
+    },
   },
   adType: {
     type: String,
