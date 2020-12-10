@@ -109,24 +109,8 @@ exports.updateStatus = async (req, res) => {
 
 exports.getAllPendingPosts = async (req, res) => {
   try {
-    let searchCriteria = {};
-    const pendingPosts = null;
-    searchCriteria = {
-      $or: [
-        {
-          name: {
-            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-          },
-        },
-        {
-          price: {
-            $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-          },
-        },
-      ],
-    };
-    console.log('searchCriteria', req.query.search);
-    if (!req.query) {
+    let pendingPosts = null;
+    if (req.query.search) {
       pendingPosts = await Product.find({
         category: { $in: req.params.categoryId },
         status: { $in: req.params.statusId },
@@ -152,23 +136,6 @@ exports.getAllPendingPosts = async (req, res) => {
       pendingPosts = await Product.find({
         category: { $in: req.params.categoryId },
         status: { $in: req.params.statusId },
-        $or: [
-          {
-            name: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-          {
-            price: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-          {
-            color: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-        ],
       });
     }
 
