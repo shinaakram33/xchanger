@@ -120,12 +120,12 @@ exports.getSelectedProductFromCart = async (req, res, next) => {
     const cart = await Cart.findById(req.params.cartId)
       .populate('selectedProducts')
       .select('-products');
-    if (cart.user !== req.user.id) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'You dont have an access to perform this action',
-      });
-    }
+    // if (cart.user !== req.user.id) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: 'You dont have an access to perform this action',
+    //   });
+    // }
     if (!cart) {
       return res.status(400).json({
         status: 'fail',
