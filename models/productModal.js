@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -41,10 +43,10 @@ const productSchema = new mongoose.Schema({
   // },
   status: {
     type: String,
-    default: 'WAITING',
+    default: 'PROCESSING',
     enum: {
-      values: ['WAITNG', 'POSTED', 'SOLD', 'DELIEVERED'],
-      message: 'Condition is either: WAITING, POSTED, SOLD, DELIEVERED',
+      values: ['PROCESSING', 'SCRUTINIZING', 'ACCEPT', 'SOLD', 'NOT_SOLD'],
+      message: 'Condition is either: PROCESSING, SCRUTINIZING, ACCEPT, SOLD, NOT_SOLD',
     },
   },
   adType: {
@@ -60,6 +62,19 @@ const productSchema = new mongoose.Schema({
   },
   checkoutId: {
     type: String,
+  },
+  userName: {
+    type: String,
+    required: [true, 'Name of a user is required'],
+  },
+  userPhone: {
+    type: String,
+    required: [true, 'Phone Number of a user is required'],
+  },
+  userEmail: {
+    type: String,
+    required: [true, 'Email of a user is required'],
+    validate: [validator.isEmail, 'Please enter a valid email'],
   },
   category: {
     type: mongoose.Schema.ObjectId,

@@ -50,6 +50,9 @@ exports.createProduct = async (req, res) => {
         adType: req.body.adType,
         category: req.params.categoryId,
         user: req.user.id,
+        userName: req.body.userName,
+        userEmail: req.body.userEmail,
+        userPhone: req.body.userPhone,
       });
       res.status(201).json({
         status: 'success',
