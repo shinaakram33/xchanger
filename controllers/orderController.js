@@ -7,13 +7,13 @@ exports.createOrder = async (req, res) => {
   try {
     const cart = await Cart.findById(req.params.cartId);
     if (!cart.selectedProducts) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'There is no products selected for checkout!',
       });
     }
     if (cart.user.toString() !== req.user.id) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'You dont have an access to perform this action',
       });

@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
   try {
     const alreadyExistEmail = await User.findOne({ email: req.body.email });
     if (alreadyExistEmail) {
-      res.status(404).json({
+      return res.status(404).json({
         status: 'fail',
         message: 'This email is already Exist!',
       });
@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Please provide email and password',
       });
@@ -50,7 +50,7 @@ exports.login = async (req, res) => {
     console.log('user', user);
     const correctPassword = await user.correctPassword(password, user.password);
     if (!user || !correctPassword) {
-      res.status(401).json({
+      return res.status(401).json({
         status: 'fail',
         message: 'Invalid email or password',
       });
@@ -96,7 +96,7 @@ exports.protected = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
     }
     if (!token) {
-      res.status(401).json({
+      return res.status(401).json({
         status: 'fail',
         message: 'unauthorized access',
       });
@@ -104,14 +104,14 @@ exports.protected = async (req, res, next) => {
     //Verification of a token
     const wrongToken = jwt.decode(token);
     if (!wrongToken) {
-      res.status(401).json({
+      return res.status(401).json({
         status: 'fail',
         message: 'unauthorized access',
       });
     }
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_TOKEN);
     if (!decoded.id) {
-      res.status(401).json({
+      return res.status(401).json({
         status: 'fail',
         message: 'unauthorized access',
       });

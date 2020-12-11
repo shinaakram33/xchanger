@@ -87,14 +87,27 @@ exports.updateStatus = async (req, res) => {
   try {
     const pendingPost = await Product.findById(req.params.productId);
     if (!pendingPost) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'No product found',
       });
     }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.productId,
-      { status: req.body.status },
+      {
+        name: req.body.name,
+        price: req.body.price,
+        image: req.body.image,
+        condition: req.body.condition,
+        color: req.body.color,
+        description: req.body.description,
+        adType: req.body.adType,
+        category: req.params.categoryId,
+        userName: req.body.userName,
+        userEmail: req.body.userEmail,
+        userPhone: req.body.userPhone,
+        status: req.body.status,
+      },
       { new: true }
     );
     res.status(200).json({
