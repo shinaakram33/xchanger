@@ -18,6 +18,12 @@ exports.createOrder = async (req, res) => {
         message: 'You dont have an access to perform this action',
       });
     }
+    if (req.body.source) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Invalid credentials',
+      });
+    }
     const charge = await stripe.charges.create({
       amount: req.body.price * 100,
       currency: 'usd',
