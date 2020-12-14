@@ -7,11 +7,7 @@ const biddingSchema = new mongoose.Schema({
     ref: 'User',
     required: [true, 'user data is required'],
   },
-  bidBy: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: [true, 'bidBy  is required'],
-  },
+
   productprice: {
     type: String,
     required: [true, 'productprice is required'],
@@ -22,6 +18,15 @@ const biddingSchema = new mongoose.Schema({
     enum: {
       values: ['Old', 'New', 'Good'],
       message: 'condition is either: Old, New or Good',
+    },
+  },
+  status: {
+    type: String,
+    default: 'PROSCESSING',
+    required: [true, ' Status of product is required'],
+    enum: {
+      values: ['PROCESSING', 'SCRUTINIZING', 'ACCEPT', 'REJECT', 'SOLD', 'NOT SOLD'],
+      message: 'Status is either:PROCESSING, SCRUTINIZING, ACCEPT,REJECT,SOLD,Or  NOT SOLD',
     },
   },
   productAuthentiaction: {
@@ -62,15 +67,7 @@ const biddingSchema = new mongoose.Schema({
       required: [true, 'maxPrice is required'],
     },
   },
-  // minPrice: {
-  //   type: String,
-  //   required: [true, 'minPrice is required'],
-  // },
-  // maxPrice: {
-  //   type: String,
-  //   required: [true, 'maxPrice is required'],
-  // },
-  time: {
+  date: {
     to: {
       type: Date,
       default: Date.now,
