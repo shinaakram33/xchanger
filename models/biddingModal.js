@@ -96,6 +96,10 @@ const biddingSchema = new mongoose.Schema({
     type: String,
     required: [true, 'name is required'],
   },
+  category: {
+    type: String,
+    required: [true, 'Category Id is required'],
+  },
 });
 const Bidding = mongoose.model('Bidding', biddingSchema);
 module.exports = Bidding;

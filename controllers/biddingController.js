@@ -23,7 +23,7 @@ exports.createBidding = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       status: req.body.status,
-
+      category: req.body.category,
       price: {
         min: req.body.price.min,
         max: req.body.price.max,
@@ -62,8 +62,10 @@ exports.getAllbidding = async (req, res) => {
   }
 };
 exports.getAllPostedstatus = async (req, res) => {
+  console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   try {
     const Postedstatus = await Bidding.find({
+      // category: { $in: req.params.categoryId },
       status: { $in: req.params.statusId },
     });
 
