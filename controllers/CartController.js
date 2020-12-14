@@ -94,6 +94,7 @@ exports.removeProductFromCart = async (req, res) => {
 
 exports.selectedProductFromCart = async (req, res, next) => {
   try {
+    console.log(req.body);
     const cart = await Cart.findOne({ user: req.user.id });
     if (cart._id.toString() !== req.params.cartId) {
       res.status(400).json({

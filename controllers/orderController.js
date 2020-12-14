@@ -5,6 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.createOrder = async (req, res) => {
   try {
+    console.log('req.boy', req.body);
     const cart = await Cart.findById(req.params.cartId);
     if (!cart.selectedProducts) {
       return res.status(400).json({

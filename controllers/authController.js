@@ -222,13 +222,13 @@ exports.resetPassword = async (req, res) => {
       passwordResetTokenExpire: { $gt: Date.now() },
     });
     if (!user) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'invalid Pin or pin expired',
       });
     }
     if (password !== confirmPassword) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Passwords are not match with each other',
       });
@@ -237,6 +237,45 @@ exports.resetPassword = async (req, res) => {
     user.confirmPassword = undefined;
     user.passwordResetToken = undefined;
     user.passwordResetTokenExpire = undefined;
+    await user.save();
+    res.status(200).json({
+      status: 'success',
+      message: 'Password Changed Successfully!',
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    console.log('user', user);
+    if (!user) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User not found',
+      });
+    }
+    const correctPass = await user.correctPassword(req.body.previousPassword, user.password);
+    if (!correctPass) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Invalid exisiting password',
+      });
+    }
+    if (req.body.password !== req.body.confirmPassword) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Password and confrim password are not matched',
+      });
+    }
+    user.password = req.body.password;
+    user.confirmPassword = undefined;
+    user.previousPassword = undefined;
     await user.save();
     res.status(200).json({
       status: 'success',
