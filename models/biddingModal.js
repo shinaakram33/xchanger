@@ -20,6 +20,15 @@ const biddingSchema = new mongoose.Schema({
       message: 'condition is either: Old, New or Good',
     },
   },
+  status: {
+    type: String,
+    default: 'PROSCESSING',
+    required: [true, ' Status of product is required'],
+    enum: {
+      values: ['PROCESSING', 'SCRUTINIZING', 'ACCEPT', 'REJECT', 'SOLD', 'NOT SOLD'],
+      message: 'Status is either:PROCESSING, SCRUTINIZING, ACCEPT,REJECT,SOLD,Or  NOT SOLD',
+    },
+  },
   productAuthentiaction: {
     type: String,
     required: [true, 'productAuthentiaction  is required'],

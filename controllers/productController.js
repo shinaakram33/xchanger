@@ -90,11 +90,7 @@ exports.updateStatus = async (req, res) => {
         message: 'No product found',
       });
     }
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.productId,
-      { status: req.body.status },
-      { new: true }
-    );
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.productId, { status: req.body.status }, { new: true });
     res.status(200).json({
       status: 'success',
       message: 'Product is updated successfully',

@@ -22,6 +22,7 @@ exports.createBidding = async (req, res) => {
       contact: req.body.contact,
       name: req.body.name,
       email: req.body.email,
+      status: req.body.status,
 
       price: {
         min: req.body.price.min,
@@ -60,6 +61,30 @@ exports.getAllbidding = async (req, res) => {
     });
   }
 };
+exports.getAllPostedstatus = async (req, res) => {
+  try {
+    const Postedstatus = await Bidding.find({
+      status: { $in: req.params.statusId },
+    });
+
+    if (!Postedstatus) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No POSTED status found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: Postedstatus.length,
+      data: Postedstatus,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
 exports.getuserbidding = async (req, res) => {
   try {
     const getuserbidding = await Bidding.find({ user: { $in: req.params.userId } });
@@ -81,6 +106,7 @@ exports.getuserbidding = async (req, res) => {
     });
   }
 };
+
 exports.updatebidding = async (req, res) => {
   try {
     const biddingid = req.params.biddingid;
@@ -106,6 +132,53 @@ exports.updatebidding = async (req, res) => {
     res.status(400).json({
       status: 'fail',
       message: error,
+    });
+  }
+};
+exports.updateByAdmin = async (req, res) => {
+  try {
+    const updateByAdmin = await Bidding.findById(req.params.productId);
+    if (!updateByAdmin) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No product is found',
+      });
+    }
+    const updatedByAdmin = await Bidding.findByIdAndUpdate(
+      req.params.productId,
+      {
+        status: req.body.status,
+        productprice: req.body.productprice,
+        image: req.body.image,
+        condition: req.body.condition,
+        productAuthentiaction: req.body.productAuthentiaction,
+        adTitle: req.body.adTitle,
+        addescription: req.body.addescription,
+        setPrice: req.body.setPrice,
+        location: req.body.location,
+        contact: req.body.contact,
+        name: req.body.name,
+        email: req.body.email,
+        price: {
+          min: req.body.price.min,
+          max: req.body.price.max,
+        },
+        date: {
+          to: req.body.date.to,
+          from: req.body.date.from,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      status: 'success',
+      message: 'product is updated successfully',
+      data: updatedByAdmin,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
     });
   }
 };

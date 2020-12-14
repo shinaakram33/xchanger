@@ -22,5 +22,6 @@ router.use('/recentViews', recentViewRoute);
 router.use('/cart', cartRoute);
 router.use('/order', orderRoute);
 router.use('/bidding', biddingRoute);
+router.use('/placeBid', placebidRoute);
 
 module.exports = router;
