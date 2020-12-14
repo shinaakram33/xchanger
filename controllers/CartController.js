@@ -42,10 +42,7 @@ exports.createCart = async (req, res, next) => {
 
 exports.getAllCartProducts = async (req, res) => {
   try {
-    const getCartList = await Cart.findOne({ user: req.user.id })
-      .populate('user')
-      .populate('products')
-      .select('-selectedProducts');
+    const getCartList = await Cart.findOne({ user: req.user.id }).populate('user').populate('products').select('-selectedProducts');
     res.status(200).json({
       status: 'success',
       data: getCartList,
@@ -111,9 +108,7 @@ exports.selectedProductFromCart = async (req, res, next) => {
 
 exports.getSelectedProductFromCart = async (req, res, next) => {
   try {
-    const cart = await Cart.findOne({ user: req.user.id })
-      .populate('selectedProducts')
-      .select('-products');
+    const cart = await Cart.findOne({ user: req.user.id }).populate('selectedProducts').select('-products');
 
     if (cart._id.toString() !== req.params.cartId) {
       res.status(400).json({
