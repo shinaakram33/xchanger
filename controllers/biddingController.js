@@ -10,13 +10,13 @@ exports.createBidding = async (req, res) => {
     }
 
     const newBidding = await Bidding.create({
-      productprice: req.body.productprice,
+      productPrice: req.body.productPrice,
       user: req.user.id,
       image: req.body.image,
       condition: req.body.condition,
       productAuthentiaction: req.body.productAuthentiaction,
       adTitle: req.body.adTitle,
-      addescription: req.body.addescription,
+      adDescription: req.body.adDescription,
       setPrice: req.body.setPrice,
       location: req.body.location,
       contact: req.body.contact,
@@ -148,12 +148,12 @@ exports.updateByAdmin = async (req, res) => {
       req.params.productId,
       {
         status: req.body.status,
-        productprice: req.body.productprice,
+        productPrice: req.body.productPrice,
         image: req.body.image,
         condition: req.body.condition,
         productAuthentiaction: req.body.productAuthentiaction,
         adTitle: req.body.adTitle,
-        addescription: req.body.addescription,
+        adDescription: req.body.adDescription,
         setPrice: req.body.setPrice,
         location: req.body.location,
         contact: req.body.contact,

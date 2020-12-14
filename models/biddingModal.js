@@ -8,9 +8,9 @@ const biddingSchema = new mongoose.Schema({
     required: [true, 'user data is required'],
   },
 
-  productprice: {
+  productPrice: {
     type: String,
-    required: [true, 'productprice is required'],
+    required: [true, 'productPrice is required'],
   },
   condition: {
     type: String,
@@ -22,8 +22,8 @@ const biddingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: 'PROSCESSING',
     required: [true, ' Status of product is required'],
+    default: 'PROCESSING',
     enum: {
       values: ['PROCESSING', 'SCRUTINIZING', 'ACCEPT', 'REJECT', 'SOLD', 'NOT SOLD'],
       message: 'Status is either:PROCESSING, SCRUTINIZING, ACCEPT,REJECT,SOLD,Or  NOT SOLD',
@@ -53,9 +53,9 @@ const biddingSchema = new mongoose.Schema({
     type: String,
     required: [true, 'adTitle is required'],
   },
-  addescription: {
+  adDescription: {
     type: String,
-    required: [true, 'addescription is required'],
+    required: [true, 'adDescription is required'],
   },
   price: {
     min: {
