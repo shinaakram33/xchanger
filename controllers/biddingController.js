@@ -65,7 +65,7 @@ exports.getAllPostedstatus = async (req, res) => {
   console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   try {
     const Postedstatus = await Bidding.find({
-      // category: { $in: req.params.categoryId },
+      category: { $in: req.params.categoryId },
       status: { $in: req.params.statusId },
     });
 
