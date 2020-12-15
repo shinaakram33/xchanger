@@ -10,13 +10,11 @@ exports.createplaceBid = async (req, res) => {
       });
     }
     const placeBid = await placebid.create({
-      product: req.body.productId,
+      product: req.body.product,
       user: req.user.id,
-      date: req.body.date,
-      time: req.body.time,
       price: req.body.price,
     });
-    const biddingProduct = await Bidding.findById(req.body.productId);
+    const biddingProduct = await Bidding.findById(req.body.product);
     if (!biddingProduct) {
       return res.status(400).json({
         status: 'Fail',
