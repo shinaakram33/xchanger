@@ -8,6 +8,7 @@ const wishlistRoute = require('./wishlistRoute');
 const recentViewRoute = require('./recentViewRoute');
 const cartRoute = require('./cartRoute');
 const orderRoute = require('./orderRoute');
+const placeBidRoute = require('./placebidRoute');
 
 const router = express.Router();
 const biddingRoute = require('./biddingRoute');
@@ -22,6 +23,6 @@ router.use('/recentViews', recentViewRoute);
 router.use('/cart', cartRoute);
 router.use('/order', orderRoute);
 router.use('/bidding', biddingRoute);
-router.use('/placeBid', placebidRoute);
+router.use('/placeBid', placeBidRoute);
 
 module.exports = router;

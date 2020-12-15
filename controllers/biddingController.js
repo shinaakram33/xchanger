@@ -85,6 +85,29 @@ exports.getAllPostedstatus = async (req, res) => {
     });
   }
 };
+exports.getAllspecificbidProduct = async (req, res) => {
+  try {
+    const specificbidProduct = await Bidding.find({
+      product: { $in: req.params.productId },
+    });
+    if (!specificbidProduct) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No Specific Bid found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: specificbidProduct.length,
+      data: specificbidProduct,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
 exports.getuserbidding = async (req, res) => {
   try {
     const getuserbidding = await Bidding.find({ user: { $in: req.params.userId } });
