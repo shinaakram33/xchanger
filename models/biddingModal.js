@@ -96,7 +96,7 @@ const biddingSchema = new mongoose.Schema({
     type: String,
     required: [true, 'name is required'],
   },
-  bidByUser: [String],
+  bidByUser: [{ type: mongoose.Schema.ObjectId, ref: 'placeBid', default: undefined }],
 });
 const Bidding = mongoose.model('Bidding', biddingSchema);
 module.exports = Bidding;

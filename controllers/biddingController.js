@@ -85,12 +85,12 @@ exports.getAllPostedstatus = async (req, res) => {
     });
   }
 };
-exports.getAllspecificbidProduct = async (req, res) => {
+exports.getAllSpecificBidProduct = async (req, res) => {
   try {
-    const specificbidProduct = await Bidding.find({
-      product: { $in: req.params.productId },
-    });
-    if (!specificbidProduct) {
+    const SpecificBidProduct = await Bidding.findById(req.params.productId).populate('bidByUser');
+    // product: { $in: req.params.productId },
+
+    if (!SpecificBidProduct) {
       res.status(400).json({
         status: 'fail',
         message: 'No Specific Bid found',
@@ -98,8 +98,8 @@ exports.getAllspecificbidProduct = async (req, res) => {
     }
     res.status(200).json({
       status: 'success',
-      length: specificbidProduct.length,
-      data: specificbidProduct,
+      length: SpecificBidProduct.length,
+      data: SpecificBidProduct,
     });
   } catch (err) {
     res.status(400).json({

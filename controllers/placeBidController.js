@@ -23,7 +23,7 @@ exports.createplaceBid = async (req, res) => {
         message: 'Product not found',
       });
     }
-    biddingProduct.bidByUser = placeBid._id;
+    biddingProduct.bidByUser.push(placeBid._id);
     biddingProduct.save();
     res.status(201).json({
       status: 'success',
