@@ -10,6 +10,7 @@ const cartRoute = require('./cartRoute');
 const orderRoute = require('./orderRoute');
 const filterRoute = require('./filterRoute');
 const uploadFileRoute = require('./uploadFile');
+const placeBidRoute = require('./placebidRoute');
 
 const router = express.Router();
 const biddingRoute = require('./biddingRoute');
@@ -26,6 +27,6 @@ router.use('/order', orderRoute);
 router.use('/bidding', biddingRoute);
 router.use('/filter', filterRoute);
 router.use('/uploadFile', uploadFileRoute);
-// router.use('/placeBid', placebidRoute);
+router.use('/placeBid', placeBidRoute);
 
 module.exports = router;
