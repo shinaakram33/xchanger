@@ -46,7 +46,6 @@ exports.createBidding = async (req, res) => {
   }
 };
 exports.getAllbidding = async (req, res) => {
-  console.log('aaaaaaaaaaaaaaaaaaa');
   try {
     const getAllbidding = await Bidding.find();
     res.status(200).json({
@@ -62,7 +61,6 @@ exports.getAllbidding = async (req, res) => {
   }
 };
 exports.getAllPostedstatus = async (req, res) => {
-  console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   try {
     const Postedstatus = await Bidding.find({
       category: { $in: req.params.categoryId },
