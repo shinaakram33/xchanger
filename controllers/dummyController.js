@@ -33,6 +33,32 @@ exports.createDummyData = async (req, res) => {
   }
 };
 
+exports.updateDummyData = async (req, res) => {
+  try {
+    const data = await DummyModal.findById(req.params.proId);
+    console.log(data);
+    if (!data) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'category does not exist',
+      });
+    }
+    const updateData = await DummyModal.findByIdAndUpdate(req.params.proId, req.body, {
+      new: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      message: 'category is updated successfully',
+      data: updateData,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 // export const create = async (event) => {
 //   try {
 //     const { vehicleId } = event.pathParameters;
