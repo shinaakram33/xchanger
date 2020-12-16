@@ -1,5 +1,9 @@
 const express = require('express');
-const { createplaceBid, getTotalplacebid, getAllplacebid } = require('../controllers/placebidController');
+const {
+  createplaceBid,
+  getTotalplacebid,
+  getAllplacebid,
+} = require('../controllers/placeBidController');
 const { protected } = require('../controllers/authController');
 const router = express.Router();
 
