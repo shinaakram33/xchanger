@@ -10,56 +10,65 @@ exports.createProduct = async (req, res) => {
         message: 'Please provide body of a product',
       });
     }
-    if (req.body.adType === 'featured') {
-      if (!req.body.adPrice) {
-        res.status(400).json({
-          status: 'fail',
-          message: 'Please provide checkout price for posting an ad',
-        });
-      }
-      const charge = await stripe.charges.create({
-        amount: req.body.adPrice * 100,
-        currency: 'usd',
-        source: req.body.source,
-      });
-      if (charge.paid) {
-        const newProduct = await Product.create({
-          name: req.body.name,
-          price: req.body.price,
-          image: req.body.image,
-          condition: req.body.condition,
-          color: req.body.color,
-          description: req.body.description,
-          adType: req.body.adType,
-          category: req.params.categoryId,
-          user: req.user.id,
-          checkoutId: charge.balance_transaction,
-        });
-        res.status(201).json({
-          status: 'success',
-          product: newProduct,
-        });
-      }
-    } else {
-      const newProduct = await Product.create({
-        name: req.body.name,
-        price: req.body.price,
-        image: req.body.image,
-        condition: req.body.condition,
-        color: req.body.color,
-        description: req.body.description,
-        adType: req.body.adType,
-        category: req.params.categoryId,
-        user: req.user.id,
-        userName: req.body.userName,
-        userEmail: req.body.userEmail,
-        userPhone: req.body.userPhone,
-      });
-      res.status(201).json({
-        status: 'success',
-        product: newProduct,
-      });
-    }
+    // if (req.body.adType === 'featured') {
+    //   if (!req.body.adPrice) {
+    //     return res.status(400).json({
+    //       status: 'fail',
+    //       message: 'Please provide checkout price for posting an ad',
+    //     });
+    //   }
+    //   const charge = await stripe.charges.create({
+    //     amount: req.body.adPrice * 100,
+    //     currency: 'usd',
+    //     source: req.body.source,
+    //   });
+    //   if (charge.paid) {
+    //     const newProduct = await Product.create({
+    //       name: req.body.name,
+    //       price: req.body.price,
+    //       image: req.body.image,
+    //       condition: req.body.condition,
+    //       color: req.body.color,
+    //       description: req.body.description,
+    //       adType: req.body.adType,
+    //       category: req.params.categoryId,
+    //       user: req.user.id,
+    //       checkoutId: charge.balance_transaction,
+    //     });
+    //     res.status(201).json({
+    //       status: 'success',
+    //       product: newProduct,
+    //     });
+    //   }
+    // } else {
+    const newProduct = await Product.create({
+      price: req.body.price,
+      priceNegotiation: req.body.priceNegotiation,
+      color: req.body.color,
+      size: req.body.size,
+      state: req.body.state,
+      season: req.body.season,
+      condition: req.body.condition,
+      image: req.body.image,
+      brand: req.body.brand,
+      subject: req.body.subject,
+      title: req.body.title,
+      description: req.body.description,
+      category: req.params.categoryId,
+      subCategoryId: req.params.subCategoryId,
+      subCategoryOptionId: req.params.subCategoryOptionId,
+      user: req.user.id,
+      userName: req.body.userName,
+      userEmail: req.body.userEmail,
+      userPhone: req.body.userPhone,
+      adType: req.body.adType,
+    });
+    res.status(201).json({
+      status: 'success',
+      message: 'Product has been Created Successfully',
+      product: newProduct,
+    });
+    // }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -71,11 +80,29 @@ exports.createProduct = async (req, res) => {
 exports.createFeaturedProduct = async (req, res) => {
   try {
     if (!req.body) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Please provide body of a product',
       });
     }
+    if (req.body.adType === 'featured') {
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getCategoryProduct = async (req, res) => {
+  try {
+    const products = await Product.find({ category: req.params.categoryId, subCategoryId: req.params.subCategoryId, subCategoryOptionId: req.params.subCategoryOptionId });
+    res.status(200).json({
+      status: 'success',
+      length: products.length,
+      data: products,
+    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -201,7 +228,7 @@ exports.getUserProducts = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
   try {
-    const allProduct = await Product.find({ category: { $in: req.params.categoryId } });
+    const allProduct = await Product.find();
     if (!allProduct) {
       res.status(400).json({
         status: 'fail',

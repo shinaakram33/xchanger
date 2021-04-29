@@ -1,4 +1,5 @@
 const express = require('express');
+
 const dummyRoute = require('./dummyRoute');
 const userRoute = require('./userRoute');
 const categoryRoute = require('./categoriesRoute');
@@ -11,15 +12,19 @@ const orderRoute = require('./orderRoute');
 const filterRoute = require('./filterRoute');
 const uploadFileRoute = require('./uploadFile');
 const placeBidRoute = require('./placebidRoute');
+const biddingRoute = require('./biddingRoute');
+const productRoute = require('./productRoute');
+const subjectRoute = require('./subjectRoute');
 
 const router = express.Router();
-const biddingRoute = require('./biddingRoute');
 
 router.use('/dummy', dummyRoute);
+router.use('/products', productRoute);
 router.use('/users', userRoute);
 router.use('/categories', categoryRoute);
 router.use('/products', userProductRoute);
 router.use('/brands', brandRoute);
+router.use('/subjects', subjectRoute);
 router.use('/wishlist', wishlistRoute);
 router.use('/recentViews', recentViewRoute);
 router.use('/cart', cartRoute);

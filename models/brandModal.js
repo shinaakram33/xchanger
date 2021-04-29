@@ -5,10 +5,6 @@ const brandSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Brand name is required'],
   },
-  image: {
-    type: String,
-    required: [true, 'Brand image is required'],
-  },
 });
 
 const Brand = mongoose.model('Brand', brandSchema);

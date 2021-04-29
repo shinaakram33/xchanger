@@ -11,10 +11,10 @@ exports.createBrand = async (req, res) => {
     }
     const newBrand = await Brand.create({
       name: req.body.name,
-      image: req.body.image,
     });
     res.status(201).json({
       status: 'success',
+      message: 'Brand is created successfully',
       data: newBrand,
     });
   } catch (err) {
@@ -28,7 +28,6 @@ exports.createBrand = async (req, res) => {
 exports.getAllBrands = async (req, res) => {
   try {
     const allBrands = await Brand.find();
-    console.log('allBrands', allBrands);
     res.status(200).json({
       status: 'success',
       data: allBrands,

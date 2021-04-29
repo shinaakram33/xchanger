@@ -41,7 +41,6 @@ exports.updatecategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
     const updates = req.body;
-    // console.log(categoryId, updates);
     const options = { new: true };
     const category = await Category.findById(req.params.categoryId);
     console.log(category);
@@ -51,12 +50,6 @@ exports.updatecategory = async (req, res) => {
         message: 'category does not exist',
       });
     }
-    // if (category.user.toString() !== req.user.id) {
-    //   res.status(400).json({
-    //     status: 'fail',
-    //     message: 'You do not have an access to update this category',
-    //   });
-    // }
     const updatedcategory = await Category.findByIdAndUpdate(categoryId, updates, options);
     res.status(200).json({
       status: 'success',
@@ -87,7 +80,6 @@ exports.deletecategory = async (req, res) => {
     res.status(200).json({
       status: 'success',
       message: 'category is delete successfully',
-      // data: deletecategory,
     });
   } catch (error) {
     console.log(message.error);
