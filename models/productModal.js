@@ -5,11 +5,11 @@ const productSchema = new mongoose.Schema(
   {
     price: {
       orignalPrice: {
-        type: String,
+        type: Number,
         required: [true, 'Original Price of product is required'],
       },
       sellingPrice: {
-        type: String,
+        type: Number,
         required: [true, 'Selling Price of a product is required'],
       },
     },
