@@ -235,6 +235,7 @@ exports.getAllProduct = async (req, res) => {
       $or:[
          req.query
           ,
+
        
       ]
     }).sort({
@@ -425,7 +426,7 @@ exports.getAllProduct = async (req, res) => {
 //}
 
 };
-//update
+//update 
 exports.updateProducts = async (req, res) => {
   try {
     const productId = req.params.productId;

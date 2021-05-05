@@ -10,28 +10,22 @@ exports.createBidding = async (req, res) => {
     }
 
     const newBidding = await Bidding.create({
-      productPrice: req.body.productPrice,
       user: req.user.id,
+      product: req.body.product,         
       image: req.body.image,
       condition: req.body.condition,
-      productAuthentiaction: req.body.productAuthentiaction,
       adTitle: req.body.adTitle,
       adDescription: req.body.adDescription,
-      setPrice: req.body.setPrice,
       location: req.body.location,
-      contact: req.body.contact,
-      name: req.body.name,
-      email: req.body.email,
-      status: req.body.status,
-      category: req.body.category,
-      price: {
-        min: req.body.price.min,
-        max: req.body.price.max,
-      },
-      date: {
-        to: req.body.date.to,
-        from: req.body.date.from,
-      },
+      subject: req.body.subject,
+      price: req.body.price,
+      immediate_purchase_price: req.body.immediate_purchase_price,
+      date_for_auction: req.body.date_for_auction,
+      brand: req.body.brand,
+      color: req.body.color,
+      size: req.body.size,
+      season: req.body.season,
+      subject:req.body.subject
     });
 
     res.status(201).json({

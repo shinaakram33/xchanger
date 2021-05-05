@@ -9,24 +9,36 @@ exports.createplaceBid = async (req, res) => {
         message: 'provide body of product',
       });
     }
-    const placeBid = await placebid.create({
-      product: req.body.product,
-      user: req.user.id,
-      price: req.body.price,
-    });
-    const biddingProduct = await Bidding.findById(req.body.product);
+    
+    console.log("product id", req.body.product)
+    const biddingProduct = await Bidding.findOne({"product":req.body.product });
+    console.log(biddingProduct);
     if (!biddingProduct) {
       return res.status(400).json({
         status: 'Fail',
         message: 'Product not found',
       });
     }
-    biddingProduct.bidByUser.push(placeBid._id);
-    biddingProduct.save();
-    res.status(201).json({
-      status: 'success',
-      data: placeBid,
-    });
+    else if (biddingProduct.price < req.body.price)
+    {
+      res.status(400).json({
+        status:"fails",
+        message:"Entering biding price is greater than product existing price!"
+      })
+    }
+    else{
+      const placeBid = await placebid.create({
+        product: req.body.product,
+        user: req.user.id,
+        price: req.body.price,
+      });
+      biddingProduct.bidByUser.push(placeBid._id);
+      biddingProduct.save();
+      res.status(201).json({
+        status: 'success',
+        data: placeBid,
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',

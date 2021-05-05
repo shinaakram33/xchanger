@@ -6,13 +6,14 @@ const biddingSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'user data is required'],
+      required: [true, 'user data is required!'],
     },
 
-    productPrice: {
-      type: String,
-      required: [true, 'productPrice is required'],
-    },
+  product:{ 
+     type: mongoose.Schema.ObjectId,
+     ref:'Product',
+     required: [true, 'Product data is required!'],
+  } ,
     condition: {
       type: String,
       required: [true, 'condition of product is required'],
@@ -21,23 +22,7 @@ const biddingSchema = new mongoose.Schema(
         message: 'condition is either: Old, New or Good',
       },
     },
-    status: {
-      type: String,
-      required: [true, ' Status of product is required'],
-      default: 'PROCESSING',
-      enum: {
-        values: ['PROCESSING', 'SCRUTINIZING', 'ACCEPT', 'REJECT', 'SOLD', 'NOT SOLD'],
-        message: 'Status is either:PROCESSING, SCRUTINIZING, ACCEPT,REJECT,SOLD,Or  NOT SOLD',
-      },
-    },
-    productAuthentiaction: {
-      type: String,
-      required: [true, 'productAuthentiaction  is required'],
-      enum: {
-        values: ['Yes', 'No'],
-        message: 'productAuthentiaction is either: Yes, No',
-      },
-    },
+    
     image: {
       type: [String],
       required: [true, 'image of product is required'],
@@ -58,48 +43,47 @@ const biddingSchema = new mongoose.Schema(
       type: String,
       required: [true, 'adDescription is required'],
     },
-    price: {
-      min: {
-        type: String,
-        required: [true, 'minPrice is required'],
+      price:{
+        type: Number,
+        required: [true, 'Price is required!']
       },
-      max: {
-        type: String,
-        required: [true, 'maxPrice is required'],
+      immediate_purchase_price:{
+        type: Number,
+        required: [true, 'Immediate price is required!']
       },
+      date_for_auction:{
+        starting_date:{
+          type: Date,
+          default: Date.now,
+          required:[true, 'Starting Date is Required!']
+        },
+        ending_date:{
+          type: Date,
+          required:[true, 'Ending Date is Required!']
+        }
+      },
+    brand:{
+      type:String
     },
-    date: {
-      to: {
-        type: Date,
-        default: Date.now,
-        required: [true, 'start date is required'],
-      },
-      from: {
-        type: Date,
-        required: [true, 'ending date is required'],
-      },
+    color:{
+       type:String,
     },
+    size:{
+      type:String,
+    },
+    season: {
+      type: String,
+    },
+   
 
     location: {
       type: String,
       required: [true, 'location is required'],
     },
-    email: {
+  
+    subject: {
       type: String,
-      required: [true, 'email is required'],
-      validate: [validator.isEmail, 'Please enter a valid email'],
-    },
-    contact: {
-      type: String,
-      required: [true, 'contact is required'],
-    },
-    name: {
-      type: String,
-      required: [true, 'name is required'],
-    },
-    category: {
-      type: String,
-      required: [true, 'Category Id is required'],
+      required: [true, 'Subject  is required'],
     },
     bidByUser: [{ type: mongoose.Schema.ObjectId, ref: 'placeBid', default: undefined }],
   },
