@@ -95,9 +95,25 @@ exports.createFeaturedProduct = async (req, res) => {
   }
 };
 
-exports.getCategoryProduct = async (req, res) => {
+exports.getCategoryFilteredProduct = async (req, res) => {
   try {
     const products = await Product.find({ category: req.params.categoryId, subCategoryId: req.params.subCategoryId, subCategoryOptionId: req.params.subCategoryOptionId });
+    res.status(200).json({
+      status: 'success',
+      length: products.length,
+      data: products,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getCategoryProduct = async (req, res) => {
+  try {
+    const products = await Product.find({ category: req.params.categoryId });
     res.status(200).json({
       status: 'success',
       length: products.length,
@@ -227,44 +243,101 @@ exports.getUserProducts = async (req, res) => {
 };
 
 exports.getAllProduct = async (req, res) => {
-  if(req.query)
-  {
-     const  sortInt = req.query.price === 'decreasing price' ? 1 : -1;
-    delete req.query.price;
-    const filterProduct = await Product.find({
-      $or:[
-         req.query
-          ,
-       
-      ]
-    }).sort({
-      "price.sellingPrice": sortInt
-    })
+  let searchCriteria = {};
+  let sortingQuery = {};
+  if (req.query.search) {
+    searchCriteria = {
+      $or: [
+        {
+          title: {
+            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+      ],
+    };
+  }
+  if (req.query.condition) {
+    searchCriteria = {
+      'condition.state': req.query.condition.toLowerCase(),
+    };
+  }
+  if (req.query.season) {
+    searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.size) {
+    searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.category) {
+    searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.brand) {
+    searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.color) {
+    searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.state) {
+    searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+  }
+
+  if (req.query.sortingOrder) {
+    if (req.query.sortingOrder.toLowerCase() === 'asc') {
+      sortingQuery = {
+        'price.sellingPrice': 1,
+      };
+    } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+      sortingQuery = {
+        'price.sellingPrice': -1,
+      };
+    } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+      sortingQuery = {
+        createdAt: -1,
+      };
+    } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+    }
+  }
+
+  if (req.query.sortBy && req.query.sortingOrder) {
+    var sortBy = req.query.sortBy;
+    var sortingOrder = req.query.sortingOrder;
+    sortingQuery[sortBy] = sortingOrder;
+  }
+
+  if (req.query) {
+    // const sortInt = req.query.price === 'decreasing price' ? 1 : -1;
+    // delete req.query.price;
+    // const filterProduct = await Product.find({
+    //   $or: [req.query],
+    // }).sort({
+    //   'price.sellingPrice': sortInt,
+    // });
+    console.log(searchCriteria);
+    const allProduct = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
     res.status(200).json({
-            status: 'successs',
-            length: filterProduct.length,
-            data: filterProduct,
-          });
-
-  }
-
-  else {
+      status: 'successs',
+      length: allProduct.length,
+      data: allProduct,
+    });
+  } else {
     const allProduct = await Product.find();
-      if (!allProduct) {
-        res.status(400).json({
-          status: 'fail',
-          message: 'No Product found of this category',
-        });
-      }
-      res.status(200).json({
-        status: 'successs',
-        length: allProduct.length,
-        data: allProduct,
+    if (!allProduct) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'No Product found of this category',
       });
-
+    }
+    res.status(200).json({
+      status: 'successs',
+      length: allProduct.length,
+      data: allProduct,
+    });
   }
-  
-    
+
   //   if(req.query.filter === 'increasing price')
   //   {
   //     const increasingPrice = await Product.aggregate([{$sort: {
@@ -275,8 +348,6 @@ exports.getAllProduct = async (req, res) => {
   //       length: increasingPrice.length,
   //       data: increasingPrice,
   //     });
-
-
 
   //   }
 
@@ -322,7 +393,7 @@ exports.getAllProduct = async (req, res) => {
   //   });
 
   // }
-  
+
   // else if (req.query.size)
   // {
   //   const extraLargeSize = await Product.aggregate(
@@ -338,9 +409,8 @@ exports.getAllProduct = async (req, res) => {
   //   res.status(200).json({
   //     status: 'successs',
   //     length: extraLargeSize.length,
-  //     data: extraLargeSize 
+  //     data: extraLargeSize
   //   });
-
 
   // }
 
@@ -361,7 +431,6 @@ exports.getAllProduct = async (req, res) => {
   //     length: brandItems.length,
   //     data: brandItems,
   //   });
-
 
   // }
 
@@ -386,7 +455,7 @@ exports.getAllProduct = async (req, res) => {
   // }
   // else if (req.query.filter === 'latest')
   // {
-    
+
   //       const latestItems = await Product.find();
   //       res.status(200).json({
   //         status: 'successs',
@@ -394,36 +463,31 @@ exports.getAllProduct = async (req, res) => {
   //         data: latestItems.reverse(),
   //       });
 
-   
   // }
- 
+
   // else{
 
+  // try {
+  //   const allProduct = await Product.find();
+  //   if (!allProduct) {
+  //     res.status(400).json({
+  //       status: 'fail',
+  //       message: 'No Product found of this category',
+  //     });
+  //   }
+  //   res.status(200).json({
+  //     status: 'successs',
+  //     length: allProduct.length,
+  //     data: allProduct,
+  //   });
+  // } catch (err) {
+  //   res.status(400).json({
+  //     status: 'fail',
+  //     message: err,
+  //   });
+  // }
 
-
-    // try {
-    //   const allProduct = await Product.find();
-    //   if (!allProduct) {
-    //     res.status(400).json({
-    //       status: 'fail',
-    //       message: 'No Product found of this category',
-    //     });
-    //   }
-    //   res.status(200).json({
-    //     status: 'successs',
-    //     length: allProduct.length,
-    //     data: allProduct,
-    //   });
-    // } catch (err) {
-    //   res.status(400).json({
-    //     status: 'fail',
-    //     message: err,
-    //   });
-    // }
-
-
-//}
-
+  //}
 };
 //update
 exports.updateProducts = async (req, res) => {
