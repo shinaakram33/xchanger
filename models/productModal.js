@@ -29,6 +29,10 @@ const productSchema = new mongoose.Schema(
         message: 'Size of product must be XXL, XL or M',
       },
     },
+    categoryName: {
+      type: String,
+      required: [true, 'Category Options Name is required'],
+    },
     state: {
       type: String,
       required: [true, 'State of a product is required'],
@@ -144,6 +148,10 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'SubCategoryOptions',
       required: [true, 'Sub Category Option is required'],
+    },
+    categoryName: {
+      type: String,
+      required: [true, 'Category Options Name is required'],
     },
     user: {
       type: mongoose.Schema.ObjectId,
