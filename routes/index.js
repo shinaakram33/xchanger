@@ -15,6 +15,7 @@ const placeBidRoute = require('./placebidRoute');
 const biddingRoute = require('./biddingRoute');
 const productRoute = require('./productRoute');
 const subjectRoute = require('./subjectRoute');
+const featureAdRoute = require('./featureAdRoute');
 
 const router = express.Router();
 
@@ -33,5 +34,6 @@ router.use('/bidding', biddingRoute);
 router.use('/filter', filterRoute);
 router.use('/uploadFile', uploadFileRoute);
 router.use('/placeBid', placeBidRoute);
+router.use('/featureAd', featureAdRoute)
 
 module.exports = router;

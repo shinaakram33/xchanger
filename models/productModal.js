@@ -158,6 +158,11 @@ const productSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'User data is required'],
     },
+    featureAd:{
+      type: mongoose.Schema.ObjectId,
+      ref:'FeatureAd',
+      default: undefined,
+    }
   },
   { timestamps: true }
 );

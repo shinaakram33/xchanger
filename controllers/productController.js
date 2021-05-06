@@ -1,6 +1,8 @@
 const { json } = require('express');
 const Product = require('../models/productModal');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const featureAd = require('../models/featureAdModel');
+const cron = require('node-cron')
 
 exports.createProduct = async (req, res) => {
   try {
@@ -62,6 +64,7 @@ exports.createProduct = async (req, res) => {
       userEmail: req.body.userEmail,
       userPhone: req.body.userPhone,
       adType: req.body.adType,
+    
     });
     res.status(201).json({
       status: 'success',
@@ -159,6 +162,7 @@ exports.updateStatus = async (req, res) => {
       message: 'Product is updated successfully',
       data: updatedProduct,
     });
+
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -516,6 +520,22 @@ exports.updateProducts = async (req, res) => {
       message: 'Product is updated successfully',
       data: updatedProduct,
     });
+    //console.log(updatedProduct)
+    if(updatedProduct.featureAd != null && updatedProduct.featureAd != 'undefined' && req.body.featureAd) {
+      
+      const specificFeatureAd = await featureAd.findById(updatedProduct.featureAd);
+      const numberOfDays = specificFeatureAd.noOfDays;
+      const timing = `00 00 00 ${numberOfDays} * *`;
+      console.log(timing)
+        var task = cron.schedule( timing , () => {
+          console.log("do now something that i want!")
+      });
+      console.log("Cron-Job Task", task);
+      console.log(numberOfDays)
+    }
+    else{
+      console.log("my name is khan!")
+    }
   } catch (error) {
     res.status(400).json({
       status: 'fail',
