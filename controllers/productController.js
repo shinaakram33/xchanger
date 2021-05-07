@@ -2,7 +2,7 @@ const { json } = require('express');
 const Product = require('../models/productModal');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const featureAd = require('../models/featureAdModel');
-const cron = require('node-cron')
+const cron = require('node-cron');
 
 exports.createProduct = async (req, res) => {
   try {
@@ -57,14 +57,13 @@ exports.createProduct = async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       category: req.params.categoryId,
+      categoryName: req.body.categoryName,
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
       userName: req.body.userName,
       userEmail: req.body.userEmail,
       userPhone: req.body.userPhone,
-      adType: req.body.adType,
-    
     });
     res.status(201).json({
       status: 'success',
@@ -72,6 +71,275 @@ exports.createProduct = async (req, res) => {
       product: newProduct,
     });
     // }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getCategoryFilteredProduct = async (req, res) => {
+  try {
+    let searchCriteria = {
+      status: 'not_sold',
+    };
+    let sortingQuery = {};
+    if (req.query.search) {
+      searchCriteria = {
+        $or: [
+          {
+            title: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+        ],
+      };
+    }
+    if (req.params.category) {
+      searchCriteria = {
+        categoryId: req.params.categoryId,
+      };
+    }
+    if (req.params.subCategoryId) {
+      searchCriteria = {
+        subCategoryId: req.params.subCategoryId,
+      };
+    }
+    if (req.params.subCategoryOptionId) {
+      searchCriteria = {
+        subCategoryOptionId: req.params.subCategoryOptionId,
+      };
+    }
+    if (req.query.condition) {
+      searchCriteria = {
+        'condition.state': req.query.condition.toLowerCase(),
+      };
+    }
+    if (req.query.season) {
+      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.size) {
+      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.category) {
+      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.brand) {
+      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.color) {
+      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.state) {
+      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.buyingFormat) {
+      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.sortingOrder) {
+      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+        sortingQuery = {
+          'price.sellingPrice': 1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+        sortingQuery = {
+          'price.sellingPrice': -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+        sortingQuery = {
+          createdAt: -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      }
+    }
+
+    if (req.query.sortBy && req.query.sortingOrder) {
+      var sortBy = req.query.sortBy;
+      var sortingOrder = req.query.sortingOrder;
+      sortingQuery[sortBy] = sortingOrder;
+    }
+    if (Object.keys(req.query).length !== 0) {
+      const products = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
+      return res.status(200).json({
+        status: 'success',
+        length: products.length,
+        data: products,
+      });
+    } else {
+      const products = await Product.find({
+        category: req.params.categoryId,
+        subCategoryId: req.params.subCategoryId,
+        subCategoryOptionId: req.params.subCategoryOptionId,
+        status: 'not_sold',
+      })
+        .populate('category')
+        .populate('subCategoryId')
+        .populate('subCategoryOptionId');
+      return res.status(200).json({
+        status: 'success',
+        length: products.length,
+        data: products,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+exports.getCategoryProduct = async (req, res) => {
+  try {
+    let searchCriteria = {
+      status: 'not_sold',
+    };
+    let sortingQuery = {};
+    let products = null;
+    if (req.query.search) {
+      searchCriteria = {
+        $or: [
+          {
+            title: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+        ],
+      };
+    }
+    if (req.params.category) {
+      searchCriteria = {
+        categoryId: req.params.categoryId,
+      };
+    }
+    if (req.query.condition) {
+      searchCriteria = {
+        'condition.state': req.query.condition.toLowerCase(),
+      };
+    }
+    if (req.query.season) {
+      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.size) {
+      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.category) {
+      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.brand) {
+      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.color) {
+      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.state) {
+      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.buyingFormat) {
+      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.sortingOrder) {
+      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+        sortingQuery = {
+          'price.sellingPrice': 1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+        sortingQuery = {
+          'price.sellingPrice': -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+        sortingQuery = {
+          createdAt: -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      }
+    }
+
+    if (req.query.sortBy && req.query.sortingOrder) {
+      var sortBy = req.query.sortBy;
+      var sortingOrder = req.query.sortingOrder;
+      sortingQuery[sortBy] = sortingOrder;
+    }
+    if (Object.keys(req.query).length !== 0) {
+      products = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
+    } else {
+      products = await Product.find({ category: req.params.categoryId, status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    }
+
+    res.status(200).json({
+      status: 'success',
+      length: products.length,
+      data: products,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.createBiddingProduct = async (req, res) => {
+  try {
+    const newProduct = await Product.create({
+      price: req.body.price,
+      color: req.body.color,
+      size: req.body.size,
+      state: req.body.state,
+      season: req.body.season,
+      condition: req.body.condition,
+      image: req.body.image,
+      brand: req.body.brand,
+      subject: req.body.subject,
+      title: req.body.title,
+      description: req.body.description,
+      date_for_auction: req.body.date_for_auction,
+      category: req.params.categoryId,
+      categoryName: req.body.categoryName,
+      subCategoryId: req.params.subCategoryId,
+      subCategoryOptionId: req.params.subCategoryOptionId,
+      user: req.user.id,
+      userName: req.body.userName,
+      userEmail: req.body.userEmail,
+      userPhone: req.body.userPhone,
+      adType: 'bidding',
+      status: 'pending',
+    });
+    res.status(201).json({
+      status: 'success',
+      message: 'Product has been Created Successfully',
+      product: newProduct,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getBiddingPendingProduct = async (req, res) => {
+  try {
+    const pendingProduct = await Product.find({ status: 'pending' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    res.status(200).json({
+      status: 'success',
+      length: pendingProduct.length,
+      data: pendingProduct,
+    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -90,130 +358,6 @@ exports.createFeaturedProduct = async (req, res) => {
     }
     if (req.body.adType === 'featured') {
     }
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
-
-exports.getCategoryFilteredProduct = async (req, res) => {
-  try {
-    const products = await Product.find({ category: req.params.categoryId, subCategoryId: req.params.subCategoryId, subCategoryOptionId: req.params.subCategoryOptionId });
-    res.status(200).json({
-      status: 'success',
-      length: products.length,
-      data: products,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
-
-exports.getCategoryProduct = async (req, res) => {
-  try {
-    const products = await Product.find({ category: req.params.categoryId });
-    res.status(200).json({
-      status: 'success',
-      length: products.length,
-      data: products,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
-
-exports.updateStatus = async (req, res) => {
-  try {
-    const pendingPost = await Product.findById(req.params.productId);
-    if (!pendingPost) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'No product found',
-      });
-    }
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.productId,
-      {
-        name: req.body.name,
-        price: req.body.price,
-        image: req.body.image,
-        condition: req.body.condition,
-        color: req.body.color,
-        description: req.body.description,
-        adType: req.body.adType,
-        category: req.params.categoryId,
-        userName: req.body.userName,
-        userEmail: req.body.userEmail,
-        userPhone: req.body.userPhone,
-        status: req.body.status,
-      },
-      { new: true }
-    );
-    res.status(200).json({
-      status: 'success',
-      message: 'Product is updated successfully',
-      data: updatedProduct,
-    });
-
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
-
-exports.getAllPendingPosts = async (req, res) => {
-  try {
-    let pendingPosts = null;
-    if (req.query.search) {
-      pendingPosts = await Product.find({
-        category: { $in: req.params.categoryId },
-        status: { $in: req.params.statusId },
-        $or: [
-          {
-            name: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-          {
-            price: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-          {
-            color: {
-              $regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
-            },
-          },
-        ],
-      });
-    } else {
-      pendingPosts = await Product.find({
-        category: { $in: req.params.categoryId },
-        status: { $in: req.params.statusId },
-      });
-    }
-
-    if (!pendingPosts) {
-      res.status(400).json({
-        status: 'fail',
-        message: 'No product found',
-      });
-    }
-    res.status(200).json({
-      status: 'success',
-      length: pendingPosts.length,
-      data: pendingPosts,
-    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -247,7 +391,9 @@ exports.getUserProducts = async (req, res) => {
 };
 
 exports.getAllProduct = async (req, res) => {
-  let searchCriteria = {};
+  let searchCriteria = {
+    status: 'not_sold',
+  };
   let sortingQuery = {};
   if (req.query.search) {
     searchCriteria = {
@@ -289,6 +435,10 @@ exports.getAllProduct = async (req, res) => {
     searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
   }
 
+  if (req.query.buyingFormat) {
+    searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+  }
+
   if (req.query.sortingOrder) {
     if (req.query.sortingOrder.toLowerCase() === 'asc') {
       sortingQuery = {
@@ -312,188 +462,51 @@ exports.getAllProduct = async (req, res) => {
     sortingQuery[sortBy] = sortingOrder;
   }
 
-  if (req.query) {
-    // const sortInt = req.query.price === 'decreasing price' ? 1 : -1;
-    // delete req.query.price;
-    // const filterProduct = await Product.find({
-    //   $or: [req.query],
-    // }).sort({
-    //   'price.sellingPrice': sortInt,
-    // });
-    console.log(searchCriteria);
+  if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
-    res.status(200).json({
-      status: 'successs',
+    return res.status(200).json({
+      status: 'success',
       length: allProduct.length,
       data: allProduct,
     });
   } else {
-    const allProduct = await Product.find();
+    const allProduct = await Product.find({ status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
     if (!allProduct) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'No Product found of this category',
       });
     }
-    res.status(200).json({
-      status: 'successs',
+    return res.status(200).json({
+      status: 'success',
       length: allProduct.length,
       data: allProduct,
     });
   }
-
-  //   if(req.query.filter === 'increasing price')
-  //   {
-  //     const increasingPrice = await Product.aggregate([{$sort: {
-  //       "price.sellingPrice": -1
-  //     }}])
-  //     res.status(200).json({
-  //       status: 'successs',
-  //       length: increasingPrice.length,
-  //       data: increasingPrice,
-  //     });
-
-  //   }
-
-  // else if (req.query.filter === 'decreasing price')
-  // {
-  //   const decreasingPrice = await Product.aggregate([{$sort: {
-  //     "price.sellingPrice": 1
-  //   }}])
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: decreasingPrice.length,
-  //     data: decreasingPrice,
-  //   });
-
-  // }
-
-  // else if (req.query.filter === 'bigDiscount')
-  // {
-  //   const bigDiscount = await Product.aggregate(
-  //     [{$project: {
-  //       status:"$status",
-  //       adType:"$adType",
-  //       orignalPrice:"$price.orignalPrice",
-  //       sellingPrice:"$price.sellingPrice",
-  //       priceNegotiation:"$priceNegotiation",
-  //       color:"$color",
-  //       size:"$size",
-  //       state:"$state",
-  //       season:"$season",
-  //       image:"$image",
-  //       condition:"$condition",
-  //       price:"$price",
-  //       bigDiscount:{
-  //              $subtract : ["$price.orignalPrice", "$price.sellingPrice"]}
-  //    }}, {$sort: {
-  //      bigDiscount: -1
-  //    }}]
-  //   )
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: bigDiscount.length,
-  //     data: bigDiscount,
-  //   });
-
-  // }
-
-  // else if (req.query.size)
-  // {
-  //   const extraLargeSize = await Product.aggregate(
-  //     [
-  //       {
-  //         '$match': {
-  //           'size': `${req.query.size}`
-  //         }
-  //       }
-  //     ]
-  //   )
-
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: extraLargeSize.length,
-  //     data: extraLargeSize
-  //   });
-
-  // }
-
-  // else if (req.query.brand)
-  // {
-  //   const brandItems = await Product.aggregate(
-  //     [
-  //       {
-  //         '$match': {
-  //           'brand': `${req.query.brand}`
-  //         }
-  //       }
-  //     ]
-
-  //   )
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: brandItems.length,
-  //     data: brandItems,
-  //   });
-
-  // }
-
-  // else if (req.query.condition)
-  // {
-  //   const itemsOnConditionBased = await Product.aggregate(
-  //     [
-  //       {
-  //         '$match': {
-  //           'condition.state':  `${req.query.condition}`
-  //         }
-  //       }
-  //     ]
-  //   )
-
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: itemsOnConditionBased.length,
-  //     data: itemsOnConditionBased,
-  //   });
-
-  // }
-  // else if (req.query.filter === 'latest')
-  // {
-
-  //       const latestItems = await Product.find();
-  //       res.status(200).json({
-  //         status: 'successs',
-  //         length: latestItems.length,
-  //         data: latestItems.reverse(),
-  //       });
-
-  // }
-
-  // else{
-
-  // try {
-  //   const allProduct = await Product.find();
-  //   if (!allProduct) {
-  //     res.status(400).json({
-  //       status: 'fail',
-  //       message: 'No Product found of this category',
-  //     });
-  //   }
-  //   res.status(200).json({
-  //     status: 'successs',
-  //     length: allProduct.length,
-  //     data: allProduct,
-  //   });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-
-  //}
 };
-//update 
+
+exports.getSpecificProductDetail = async (req, res) => {
+  try {
+    const specificProduct = await Product.findById(req.params.productId);
+    if (!specificProduct) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'No Product Found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      data: specificProduct,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+//update
 exports.updateProducts = async (req, res) => {
   try {
     const productId = req.params.productId;
@@ -521,21 +534,19 @@ exports.updateProducts = async (req, res) => {
       data: updatedProduct,
     });
     //console.log(updatedProduct)
-    if(updatedProduct.featureAd != null && updatedProduct.featureAd != 'undefined' && req.body.featureAd) {
-      
-      const specificFeatureAd = await featureAd.findById(updatedProduct.featureAd);
-      const numberOfDays = specificFeatureAd.noOfDays;
-      const timing = `00 00 00 ${numberOfDays} * *`;
-      console.log(timing)
-        var task = cron.schedule( timing , () => {
-          console.log("do now something that i want!")
-      });
-      console.log("Cron-Job Task", task);
-      console.log(numberOfDays)
-    }
-    else{
-      console.log("my name is khan!")
-    }
+    // if (updatedProduct.featureAd != null && updatedProduct.featureAd != 'undefined' && req.body.featureAd) {
+    //   const specificFeatureAd = await featureAd.findById(updatedProduct.featureAd);
+    //   const numberOfDays = specificFeatureAd.noOfDays;
+    //   const timing = `00 00 00 ${numberOfDays} * *`;
+    //   console.log(timing);
+    //   var task = cron.schedule(timing, () => {
+    //     console.log('do now something that i want!');
+    //   });
+    //   console.log('Cron-Job Task', task);
+    //   console.log(numberOfDays);
+    // } else {
+    //   console.log('my name is khan!');
+    // }
   } catch (error) {
     res.status(400).json({
       status: 'fail',

@@ -10,12 +10,16 @@ const productSchema = new mongoose.Schema(
       },
       sellingPrice: {
         type: Number,
-        required: [true, 'Selling Price of a product is required'],
+        default: undefined,
+      },
+      immediate_purchase_price: {
+        type: Number,
+        default: undefined,
       },
     },
     priceNegotiation: {
       type: Boolean,
-      required: [true, 'Price Negotiation is required'],
+      default: undefined,
     },
     color: {
       type: String,
@@ -102,7 +106,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: 'not_sold',
       enum: {
-        values: ['sold', 'not_sold'],
+        values: ['sold', 'not_sold', 'pending'],
         message: 'Condition is either: sold, not_sold',
       },
     },
@@ -113,6 +117,16 @@ const productSchema = new mongoose.Schema(
       enum: {
         values: ['normal', 'featured', 'bidding'],
         message: 'ad type is either: normal, featured or bidding',
+      },
+    },
+    date_for_auction: {
+      starting_date: {
+        type: Date,
+        default: undefined,
+      },
+      ending_date: {
+        type: Date,
+        default: undefined,
       },
     },
     adPrice: {
@@ -158,11 +172,11 @@ const productSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'User data is required'],
     },
-    featureAd:{
+    featureAd: {
       type: mongoose.Schema.ObjectId,
-      ref:'FeatureAd',
+      ref: 'FeatureAd',
       default: undefined,
-    }
+    },
   },
   { timestamps: true }
 );

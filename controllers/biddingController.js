@@ -1,5 +1,6 @@
 const Bidding = require('../models/biddingModal');
 const { getAllBrands } = require('./brandController');
+
 exports.createBidding = async (req, res) => {
   try {
     if (!req.body) {
@@ -11,21 +12,7 @@ exports.createBidding = async (req, res) => {
 
     const newBidding = await Bidding.create({
       user: req.user.id,
-      product: req.body.product,         
-      image: req.body.image,
-      condition: req.body.condition,
-      adTitle: req.body.adTitle,
-      adDescription: req.body.adDescription,
-      location: req.body.location,
-      subject: req.body.subject,
-      price: req.body.price,
-      immediate_purchase_price: req.body.immediate_purchase_price,
-      date_for_auction: req.body.date_for_auction,
-      brand: req.body.brand,
-      color: req.body.color,
-      size: req.body.size,
-      season: req.body.season,
-      subject:req.body.subject
+      product: req.body.product,
     });
 
     res.status(201).json({
