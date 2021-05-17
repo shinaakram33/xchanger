@@ -350,7 +350,98 @@ exports.getBiddingPendingProduct = async (req, res) => {
 
 exports.getBiddingProducts = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ adType: 'bidding', status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    let pendingProduct = null;
+    let searchCriteria = {
+      adType: 'bidding',
+      status: 'not_sold',
+    };
+    let sortingQuery = {};
+    if (req.query.search) {
+      searchCriteria = {
+        $or: [
+          {
+            title: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+          {
+            brand: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+          {
+            subject: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+          {
+            season: {
+              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            },
+          },
+        ],
+      };
+    }
+    if (req.query.condition) {
+      searchCriteria = {
+        'condition.state': req.query.condition.toLowerCase(),
+      };
+    }
+    if (req.query.season) {
+      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.size) {
+      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.category) {
+      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.brand) {
+      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.color) {
+      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.state) {
+      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.buyingFormat) {
+      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+    }
+
+    if (req.query.sortingOrder) {
+      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+        sortingQuery = {
+          'price.sellingPrice': 1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+        sortingQuery = {
+          'price.sellingPrice': -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+        sortingQuery = {
+          createdAt: -1,
+        };
+      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      }
+    }
+
+    if (req.query.sortBy && req.query.sortingOrder) {
+      var sortBy = req.query.sortBy;
+      var sortingOrder = req.query.sortingOrder;
+      sortingQuery[sortBy] = sortingOrder;
+    }
+    if (Object.keys(req.query).length !== 0) {
+      pendingProduct = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    } else {
+      pendingProduct = await Product.find({ adType: 'bidding', status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    }
     res.status(200).json({
       status: 'success',
       length: pendingProduct.length,

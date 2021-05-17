@@ -35,6 +35,13 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Make status into SOLD'],
   },
+  productId: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Product',
+      required: [true, 'Product Id is required'],
+    },
+  ],
 });
 
 const Order = mongoose.model('Order', orderSchema);

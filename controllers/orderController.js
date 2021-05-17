@@ -32,22 +32,24 @@ exports.createOrder = async (req, res) => {
     });
     if (charge.paid) {
       cart.products.map(async (i, index) => {
-        const updatedProduct = await Product.findByIdAndUpdate(
-          i,
-          { status: 'SOLD' },
-          { new: true }
-        );
+        const updatedProduct = await Product.findByIdAndUpdate(i, { status: 'sold' }, { new: true });
       });
-      const createOrderTable = await Order.create({
-        name: req.body.name,
-        email: req.body.email,
-        phoneNumber: req.body.phoneNumber,
-        location: req.body.location,
-        user: req.user.id,
-        cartId: cart._id,
-        checkoutId: charge.balance_transaction,
-        status: 'SOLD',
-      });
+      console.log(cart.selectedProducts);
+      const createOrderTable = await Order.create(
+        {
+          name: req.body.name,
+          email: req.body.email,
+          phoneNumber: req.body.phoneNumber,
+          location: req.body.location,
+          user: req.user.id,
+          cartId: cart._id,
+          checkoutId: charge.balance_transaction,
+          status: 'sold',
+          productId: cart.selectedProducts,
+        }
+        // { $push: { productId: cart.selectedProducts } }
+      );
+      console.log('createdOrderTable');
       await Cart.updateOne(
         {
           user: req.user.id,
@@ -117,6 +119,22 @@ exports.createOrder = async (req, res) => {
     //           message: 'Product is purchased successfully',
     //         });
     //       });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const allOrders = await Order.find({ user: req.user.id }).populate('user').populate('cartId').populate('productId');
+    res.status(200).json({
+      status: 'success',
+      length: allOrders.length,
+      data: allOrders,
+    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',

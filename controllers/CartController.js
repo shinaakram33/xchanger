@@ -42,10 +42,7 @@ exports.createCart = async (req, res, next) => {
 
 exports.getAllCartProducts = async (req, res) => {
   try {
-    const getCartList = await Cart.findOne({ user: req.user.id })
-      .populate('user')
-      .populate('products')
-      .select('-selectedProducts');
+    const getCartList = await Cart.findOne({ user: req.user.id }).populate('user').populate('products').select('-selectedProducts');
     if (!getCartList) {
       return res.status(400).json({
         status: 'fail',
@@ -102,6 +99,8 @@ exports.selectedProductFromCart = async (req, res, next) => {
         message: 'You dont have an access to perform this action',
       });
     }
+    cart.selectedProducts = undefined;
+    await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = req.body.selectedProducts;
     await cart.save({ validateBeforeSave: false });
     res.status(200).json({
@@ -118,9 +117,7 @@ exports.selectedProductFromCart = async (req, res, next) => {
 
 exports.getSelectedProductFromCart = async (req, res, next) => {
   try {
-    const cart = await Cart.findById(req.params.cartId)
-      .populate('selectedProducts')
-      .select('-products');
+    const cart = await Cart.findById(req.params.cartId).populate('selectedProducts').select('-products');
     // if (cart.user !== req.user.id) {
     //   return res.status(400).json({
     //     status: 'fail',
