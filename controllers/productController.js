@@ -350,7 +350,7 @@ exports.getBiddingPendingProduct = async (req, res) => {
 
 exports.getBiddingProducts = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ adType: 'bidding' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    const pendingProduct = await Product.find({ adType: 'bidding', status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
     res.status(200).json({
       status: 'success',
       length: pendingProduct.length,
