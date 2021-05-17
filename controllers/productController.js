@@ -348,6 +348,45 @@ exports.getBiddingPendingProduct = async (req, res) => {
   }
 };
 
+exports.getBiddingProducts = async (req, res) => {
+  try {
+    const pendingProduct = await Product.find({ adType: 'bidding' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    res.status(200).json({
+      status: 'success',
+      length: pendingProduct.length,
+      data: pendingProduct,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.changeBiddingStatus = async (req, res) => {
+  try {
+    const products = await Product.findByIdAndUpdate(
+      req.params.productId,
+      {
+        status: 'not_sold',
+        time: req.body.time,
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      status: 'success',
+      message: 'Status has been updated successfully',
+      data: products,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.createFeaturedProduct = async (req, res) => {
   try {
     if (!req.body) {
@@ -400,6 +439,21 @@ exports.getAllProduct = async (req, res) => {
       $or: [
         {
           title: {
+            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          brand: {
+            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          subject: {
+            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+          },
+        },
+        {
+          season: {
             regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
           },
         },

@@ -129,6 +129,16 @@ const productSchema = new mongoose.Schema(
         default: undefined,
       },
     },
+    time: {
+      startingTime: {
+        type: Date,
+        default: undefined,
+      },
+      endingTime: {
+        type: Date,
+        default: undefined,
+      },
+    },
     adPrice: {
       type: String,
     },
