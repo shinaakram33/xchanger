@@ -43,7 +43,7 @@ exports.createplaceBid = async (req, res) => {
 
 exports.getAllplacebid = async (req, res) => {
   try {
-    const getAllplacebid = await placebid.find().populate('user').populate('product');
+    const getAllplacebid = await placebid.find({ user: req.user.id }).populate('user').populate('product');
     res.status(200).json({
       status: 'success',
       length: getAllplacebid.length,
@@ -60,8 +60,7 @@ exports.getAllplacebid = async (req, res) => {
 exports.getTotalplacebid = async (req, res) => {
   try {
     const getTotalplacebid = await placebid
-      .findOne({
-        user: req.user.id,
+      .find({
         product: req.params.productId,
       })
       .populate('user')
