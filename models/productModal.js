@@ -88,16 +88,38 @@ const productSchema = new mongoose.Schema(
       required: [true, 'description of product is required'],
     },
     image: {
-      type: [String],
-      required: [true, 'image of product is required'],
-      validate: {
-        validator: function (val) {
-          if (this.image.length === 0) {
-            return false;
-          }
-        },
-        message: 'Image of a product is required',
+      frontPhoto: {
+        type: String,
+        required: [true, 'Front Photo is required'],
       },
+      clawPhoto: {
+        type: String,
+        required: [true, 'Caw Photo is required'],
+      },
+      backPhoto: {
+        type: String,
+        required: [true, 'Back Photo is required'],
+      },
+      wearPhoto: {
+        type: String,
+      },
+      sizePhoto: {
+        type: String,
+        required: [true, 'Size Photo is required'],
+      },
+      authenicationCardPhoto: {
+        type: String,
+      },
+      // type: [String],
+      // required: [true, 'image of product is required'],
+      // validate: {
+      //   validator: function (val) {
+      //     if (this.image.length === 0) {
+      //       return false;
+      //     }
+      //   },
+      //   message: 'Image of a product is required',
+      // },
     },
     // make: {
     //   type: String,
