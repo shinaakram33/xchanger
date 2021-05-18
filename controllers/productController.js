@@ -61,9 +61,6 @@ exports.createProduct = async (req, res) => {
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
-      userName: req.body.userName,
-      userEmail: req.body.userEmail,
-      userPhone: req.body.userPhone,
     });
     res.status(201).json({
       status: 'success',
@@ -313,9 +310,6 @@ exports.createBiddingProduct = async (req, res) => {
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
-      userName: req.body.userName,
-      userEmail: req.body.userEmail,
-      userPhone: req.body.userPhone,
       adType: 'bidding',
       status: 'pending',
     });
