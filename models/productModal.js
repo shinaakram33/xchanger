@@ -110,6 +110,9 @@ const productSchema = new mongoose.Schema(
       authenicationCardPhoto: {
         type: String,
       },
+      otherPhoto: {
+        type: String,
+      },
       // type: [String],
       // required: [true, 'image of product is required'],
       // validate: {
@@ -167,19 +170,19 @@ const productSchema = new mongoose.Schema(
     checkoutId: {
       type: String,
     },
-    userName: {
-      type: String,
-      required: [true, 'Name of a user is required'],
-    },
-    userPhone: {
-      type: String,
-      required: [true, 'Phone Number of a user is required'],
-    },
-    userEmail: {
-      type: String,
-      required: [true, 'Email of a user is required'],
-      validate: [validator.isEmail, 'Please enter a valid email'],
-    },
+    // userName: {
+    //   type: String,
+    //   required: [true, 'Name of a user is required'],
+    // },
+    // userPhone: {
+    //   type: String,
+    //   required: [true, 'Phone Number of a user is required'],
+    // },
+    // userEmail: {
+    //   type: String,
+    //   required: [true, 'Email of a user is required'],
+    //   validate: [validator.isEmail, 'Please enter a valid email'],
+    // },
     category: {
       type: mongoose.Schema.ObjectId,
       ref: 'Category',
