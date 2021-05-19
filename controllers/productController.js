@@ -48,7 +48,7 @@ exports.createProduct = async (req, res) => {
       priceNegotiation: req.body.priceNegotiation,
       color: req.body.color,
       size: req.body.size,
-      state: req.body.state,
+      country: req.body.country,
       season: req.body.season,
       condition: req.body.condition,
       image: req.body.image,
