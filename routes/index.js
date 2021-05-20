@@ -36,6 +36,6 @@ router.use('/filter', filterRoute);
 router.use('/uploadFile', uploadFileRoute);
 router.use('/placeBid', placeBidRoute);
 router.use('/featureAd', featureAdRoute);
-router.use('subCategoryOptions', subCategoryOptionsRoute);
+router.use('/subCategoryOptions', subCategoryOptionsRoute);
 
 module.exports = router;
