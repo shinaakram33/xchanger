@@ -22,6 +22,22 @@ exports.createSubCategoryOptions = async (req, res) => {
   }
 };
 
+exports.getAllSubCategoryOptions = async (req, res) => {
+  try {
+    const data = await SubCategoryOptions.find().populate('categoryId').populate('subCategoryId');
+    res.status(200).json({
+      status: 'success',
+      length: data.length,
+      data: data,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.getSubCategoryOptions = async (req, res) => {
   try {
     const subCategoryOption = await SubCategoryOptions.find({ categoryId: req.params.categoryId, subCategoryId: req.params.subCategoryId })
