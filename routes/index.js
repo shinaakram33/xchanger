@@ -17,6 +17,7 @@ const productRoute = require('./productRoute');
 const subjectRoute = require('./subjectRoute');
 const featureAdRoute = require('./featureAdRoute');
 const subCategoryOptionsRoute = require('./subCategoryOptionRoute');
+const notificationRoute = require('./notificationRoute');
 
 const router = express.Router();
 
@@ -37,5 +38,6 @@ router.use('/uploadFile', uploadFileRoute);
 router.use('/placeBid', placeBidRoute);
 router.use('/featureAd', featureAdRoute);
 router.use('/subCategoryOptions', subCategoryOptionsRoute);
+router.use('/notification', notificationRoute);
 
 module.exports = router;

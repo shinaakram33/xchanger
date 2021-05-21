@@ -9,7 +9,8 @@ exports.createplaceBid = async (req, res) => {
         message: 'provide body of product',
       });
     }
-    const biddingProduct = await Product.findById(req.params.productId);
+    console.log(req.body)
+    const biddingProduct = await Product.findById(req.body.product);
     console.log(biddingProduct);
     if (!biddingProduct) {
       return res.status(400).json({
@@ -23,7 +24,7 @@ exports.createplaceBid = async (req, res) => {
       });
     } else {
       const placeBid = await placebid.create({
-        product: req.params.productId,
+        product: req.body.product,
         user: req.user.id,
         price: req.body.price,
       });

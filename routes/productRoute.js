@@ -11,6 +11,7 @@ const {
   getSpecificProductDetail,
   changeBiddingStatus,
   getBiddingProducts,
+  scheduleAndAddToCart
 } = require('../controllers/productController');
 const { protected, restrictTo } = require('../controllers/authController');
 
@@ -26,6 +27,7 @@ router
   .patch(protected, updateProducts)
   .delete(protected, deleteProducts)
   .get(getSpecificProductDetail)
-  .put(protected, restrictTo('admin'), changeBiddingStatus);
+  .put(protected, restrictTo('admin'), changeBiddingStatus)
+  .post(protected, scheduleAndAddToCart)
 
 module.exports = router;

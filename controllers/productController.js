@@ -2,7 +2,12 @@ const { json } = require('express');
 const Product = require('../models/productModal');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const featureAd = require('../models/featureAdModel');
+const PlaceBid = require('../models/placebidModal')
+const Cart = require('../models/cartModal')
 const cron = require('node-cron');
+const moment = require('moment');
+const schedule = require('node-schedule');
+const fetch = require('node-fetch');
 
 exports.createProduct = async (req, res) => {
   try {
@@ -61,6 +66,7 @@ exports.createProduct = async (req, res) => {
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
+      time: req.body.time
     });
     res.status(201).json({
       status: 'success',
@@ -304,7 +310,7 @@ exports.createBiddingProduct = async (req, res) => {
       subject: req.body.subject,
       title: req.body.title,
       description: req.body.description,
-      date_for_auction: req.body.date_for_auction,
+      date_for_auction: req.body.date_for_auction, 
       category: req.params.categoryId,
       categoryName: req.body.categoryName,
       subCategoryId: req.params.subCategoryId,
@@ -714,6 +720,116 @@ exports.deleteProducts = async (req, res) => {
     res.send(200).json({
       status: 'successful',
       message: 'product delete successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+
+
+exports.scheduleAndAddToCart = async (req, res) => {
+  try {
+    console.log('Hello')
+    let { productId } = req.params;
+    let product = await Product.findById(productId);
+    let updatedProduct = await Product.findOneAndUpdate(req.params.productId, { status: 'Not Sold' });
+    console.log(updatedProduct)
+
+    let bidProducts = await PlaceBid.find({product: productId})
+    console.log(bidProducts)
+    let userId = req.user.id;
+    let dateFromDb = new Date(product.time.endingTime);
+    
+    let h = dateFromDb.getHours()-5;
+    let m = dateFromDb.getMinutes();
+    let d = dateFromDb.getDate();
+    
+    console.log(h,m,d)
+
+    let date = { date:d,hour:h, minute:m }
+    console.log(date)
+    var job = schedule.scheduleJob(date, ()=>{
+      console.log('time')
+      let max = 0;
+      let IdOfMaxBidUser;
+      if(bidProducts){
+        
+        for(let x of bidProducts){
+          
+          if(x.price>max){
+            max = x.price;
+            IdOfMaxBidUser = x.user
+          }
+        }
+        if(max<product.price.originalPrice){
+          res.status(400).json({
+            status: 'Fail',
+            message: "Max Bided price is less then mininmum price",
+          });
+        }
+        console.log('Times Up')
+        async function addToCart() {
+          let alreadyExist = await Cart.findOne({ user: IdOfMaxBidUser }); 
+          if(alreadyExist){
+            await Cart.updateOne(
+              {
+                user: userId,
+              },
+              { $push: { products: product.id } }
+            );
+          }else{
+            await Cart.create({
+              user: IdOfMaxBidUser,
+              products: [product.id],
+            });
+          }
+
+
+        }
+        addToCart();
+        let dataOfBidUser = {
+          user: IdOfMaxBidUser,
+          text: `Product ${product.title} has been added to your cart`
+        };
+        
+        fetch('http://localhost:8000/api/v1/notification', {
+          method: 'POST',
+          body: JSON.stringify(dataOfBidUser),
+          headers: { 'Content-Type': 'application/json' }
+        }).then(res => res.json())
+          .then(json => console.log(json));
+
+
+        let dataOfProductOwner = {
+          user: product.user,
+          text: `Your product ${product.title} has been sold`
+        };
+      
+        fetch('http://localhost:8000/api/v1/notification', {
+          method: 'POST',
+          body: JSON.stringify(dataOfProductOwner),
+          headers: { 'Content-Type': 'application/json' }
+        }).then(res => res.json())
+          .then(json => console.log(json));
+      }else{
+        res.status(400).json({
+          status: 'Fail',
+          message: "No bids found on this product",
+        });
+      }
+
+    });
+
+    //console.log('Job', job)
+    
+    
+
+    res.status(200).json({
+      status: 'successful',
+      message: 'Added to cart',
     });
   } catch (error) {
     res.status(400).json({

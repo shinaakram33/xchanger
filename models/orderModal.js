@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema({
   cartId: {
     type: mongoose.Schema.ObjectId,
     ref: 'Cart',
-    required: [true, 'Cart id is required'],
+    //required: [true, 'Cart id is required'],
   },
   checkoutId: {
     type: String,
