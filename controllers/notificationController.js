@@ -41,12 +41,13 @@ exports.getAllUserNotifications = async (req, res) => {
                 message: 'No Notifications Found For This User',
             });
         }
+        let countOfFalseNotification = await Notification.countDocuments({status:false, user:userId});
+        
         res.status(200).json({
             status: 'success',
+            count: countOfFalseNotification,
             data: notifications,
         });
-        
-        
         
     } catch (err) {
         res.status(400).json({
