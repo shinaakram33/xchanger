@@ -839,3 +839,60 @@ exports.scheduleAndAddToCart = async (req, res) => {
     });
   }
 };
+
+
+exports.updateWishlistStatus = async (req, res) => {
+  try {
+    let {productId, status} = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'product does not exist',
+      });
+    }
+    
+    let updatedProduct = await Product.findOneAndUpdate(productId, { wishlistStatus: status });
+    console.log(updatedProduct);
+
+    res.send(200).json({
+      status: 'successful',
+      message: 'Wishlist Updated successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+
+exports.updateRating = async (req, res) => {
+  try {
+    let {productId, rating} = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'product does not exist',
+      });
+    }
+    
+    let prevRating = parseInt(product.rating);
+    
+    let newRating = (prevRating + rating)/2;
+
+    let updatedProduct = await Product.findOneAndUpdate(productId, { rating: newRating });
+    console.log(updatedProduct);
+
+    res.send(200).json({
+      status: 'successful',
+      message: 'Rating Updated Successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};

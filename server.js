@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const http = require('http');
+const User = require('./models/userModal')
+const Chat = require('./models/chatModal')
+
 
 dotenv.config({ path: './config.env' });
 const app = require('./app');

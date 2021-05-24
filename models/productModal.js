@@ -202,6 +202,14 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Category Options Name is required'],
     },
+    wishlistStatus: {
+      type: Boolean,
+      defalt: false
+    },
+    rating: {
+      type: Number,
+      defalt: 0
+    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
