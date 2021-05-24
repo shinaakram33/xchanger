@@ -2,12 +2,13 @@ const Notification = require('../models/notificationModal');
 
 exports.createNotification = async (req, res) => {
     
-    const {user, text, status} = req.body;
+    const {user, text,product, status} = req.body;
   
     try {
 
         let notification = new Notification({
             user,
+            product,
             text,
             status
         });
@@ -34,7 +35,7 @@ exports.getAllUserNotifications = async (req, res) => {
   
     try {
 
-        const notifications = await Notification.find({user: userId});
+        const notifications = await Notification.find({user: userId}).populate('user').populate('product');
         if (!notifications) {
             return res.status(400).json({
                 status: 'fail',

@@ -792,6 +792,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
         addToCart();
         let dataOfBidUser = {
           user: IdOfMaxBidUser,
+          product: product.id,
           text: `Product ${product.title} has been added to your cart`
         };
         

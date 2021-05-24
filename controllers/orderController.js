@@ -44,6 +44,7 @@ exports.createOrder = async (req, res) => {
         console.log('2')
         let data = {
           user: updatedProduct.user,
+          product: updatedProduct.id,
           text: `Your product ${updatedProduct.title} has been sold`
         };
         console.log('check2',data);
@@ -171,6 +172,7 @@ exports.createImmediateOrder = async (req, res) => {
 
       let data = {
         user: updatedProduct.user,
+        product:updatedProduct.id,
         text: `Your product ${updatedProduct.title} has been sold`
       };
     
