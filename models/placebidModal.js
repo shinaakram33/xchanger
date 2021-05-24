@@ -21,7 +21,7 @@ const placeBidSchema = new mongoose.Schema(
     // },
     product: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Bidding',
+      ref: 'Product',
       required: [true, 'product data is required'],
     },
   },

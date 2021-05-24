@@ -58,6 +58,22 @@ exports.getAllplacebid = async (req, res) => {
   }
 };
 
+exports.getAllplacebidOfSpecficProduct = async (req, res) => {
+  try {
+    const getAllplacebid = await placebid.find({ product: req.params.productId }).populate('user').populate('product');
+    res.status(200).json({
+      status: 'success',
+      length: getAllplacebid.length,
+      data: getAllplacebid,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.getTotalplacebid = async (req, res) => {
   try {
     const getTotalplacebid = await placebid
