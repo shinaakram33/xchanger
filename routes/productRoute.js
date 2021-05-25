@@ -13,7 +13,8 @@ const {
   getBiddingProducts,
   scheduleAndAddToCart,
   updateWishlistStatus,
-  getRandomProducts
+  getRandomProducts,
+  getProductByTitle
 } = require('../controllers/productController');
 const { protected, restrictTo } = require('../controllers/authController');
 
@@ -24,6 +25,7 @@ router.route('/bidding').post(protected, createBiddingProduct).get(getBiddingPro
 router.route('/filtered').get(getCategoryFilteredProduct);
 router.route('/all').get(getAllProduct);
 router.route('/recomended').get(getRandomProducts);
+router.route('/:title').get(getProductByTitle);
 router.route('/pending').get(protected, restrictTo('admin'), getBiddingPendingProduct);
 router.route('/wishlistStatus').put(updateWishlistStatus)
 router

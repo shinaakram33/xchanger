@@ -928,7 +928,33 @@ exports.getRandomProducts = async (req, res) => {
     }
     
     console.log(product);
+    let products = {products: product}
+    return res.json({
+      status: 'successful',
+      message: 'Random Products Found',
+      data: products
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
 
+exports.getProductByTitle = async (req, res) => {
+  try {
+    
+    let product = await Product.find({ title:req.params.title})
+    if (!product) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'product does not exist',
+      });
+    }
+    
+    console.log(product);
+    
     return res.json({
       status: 'successful',
       message: 'Random Products Found',
