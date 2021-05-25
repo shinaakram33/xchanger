@@ -9,6 +9,10 @@ dotenv.config({ path: './config.env' });
 const app = require('./app');
 const cron = require('node-cron')
 const DB = process.env.DATABASE;
+const port = process.env.PORT || 4000;
+const server = http.createServer(app);
+server.listen(port);
+let io = require('socket.io')(server);
 mongoose
   // .connect(process.env.DATABASE_LOCAL, {
   .connect(DB, {
@@ -26,7 +30,52 @@ mongoose
 //     console.log('it will run evey 30 days');
 // });
 // console.log("Cron-Job Task", task);
-const port = process.env.PORT || 8000;
-app.listen(port, () => {
-  console.log(`App running on a port ${port}`);
+
+
+
+
+// app.listen(port, () => {
+//   console.log(`App running on a port ${port}`);
+// });
+
+console.log("Running on http://"+port);
+
+io.on("connection", (socket) => {
+  console.log("Connected: ");
+  socket.on("disconnect", () => {
+    console.log("Disconnected: " + socket.userId);
+  });
+  var connectedClients = {};
+  socket.on("joinRoom", ({ chatroomId,id }) => {
+    socket.join(chatroomId);
+    connectedClients[id] = socket.id;
+    console.log(`A user joined chatroom: ${chatroomId} with id : ${id}`);
+  });
+
+  socket.on("leaveRoom", ({ chatroomId, id }) => {
+    socket.leave(chatroomId);
+    delete connectedClients[id];
+    console.log("A user left chatroom: " + chatroomId);
+  });
+
+  socket.on("chatroomMessage", async ( data ) => {
+    console.log("hello #####", data);
+    const chatMessage = data[0];
+    if (chatMessage.text.trim().length > 0) {
+      console.log(data);
+      const user = await User.findOne({ _id: chatMessage.user._id });
+      const newMessage = new Chat({
+        _id: chatMessage._id,
+        chat_room_id: chatMessage.user.chatroomId,
+        user: chatMessage.user,
+        text:chatMessage.text
+      });
+      const obj = await newMessage.save();
+      console.log(obj);
+      io.to(obj.chat_room_id).emit("newMessage", {
+        obj
+      });
+    }
+  });
+
 });

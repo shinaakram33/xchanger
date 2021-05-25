@@ -1,7 +1,7 @@
 var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
-const Chat = new Schema({
+const ChatSchema = new Schema({
   _id: {
     type: String,
     required: true
@@ -26,5 +26,6 @@ const Chat = new Schema({
   }
 },{ timestamps: true }
 );
+const Chat = mongoose.model('chat', ChatSchema);
 
-module.exports = mongoose.model("Chat", Chat);
+module.exports = Chat;
