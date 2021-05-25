@@ -8,6 +8,7 @@ const {
   updateUser,
   protected,
   changePassword,
+  updatePrivacteStatus
 } = require('../controllers/authController');
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.route('/forgetPassword').post(forgetPassword);
 router.route('/pinCompare').post(pinCodeCompare);
 router.route('/resetPassword/:pin').post(resetPassword);
 router.route('/changePassword/:userId').post(protected, changePassword);
+router.route('/private').put(updatePrivacteStatus)
 
 module.exports = router;

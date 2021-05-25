@@ -11,7 +11,9 @@ const {
   getSpecificProductDetail,
   changeBiddingStatus,
   getBiddingProducts,
-  scheduleAndAddToCart
+  scheduleAndAddToCart,
+  updateWishlistStatus,
+  getRandomProducts
 } = require('../controllers/productController');
 const { protected, restrictTo } = require('../controllers/authController');
 
@@ -21,7 +23,9 @@ router.route('/').post(protected, createProduct).get(getCategoryProduct);
 router.route('/bidding').post(protected, createBiddingProduct).get(getBiddingProducts);
 router.route('/filtered').get(getCategoryFilteredProduct);
 router.route('/all').get(getAllProduct);
+router.route('/recomended').get(getRandomProducts);
 router.route('/pending').get(protected, restrictTo('admin'), getBiddingPendingProduct);
+router.route('/wishlistStatus').put(updateWishlistStatus)
 router
   .route('/:productId')
   .patch(protected, updateProducts)

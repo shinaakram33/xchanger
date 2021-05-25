@@ -73,8 +73,7 @@ exports.login = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
-      new: true,
-      runValidators: true,
+      new: true
     });
     res.status(200).json({
       status: 'success',
@@ -288,3 +287,32 @@ exports.changePassword = async (req, res) => {
     });
   }
 };
+
+exports.updatePrivacteStatus = async (req, res) => {
+  try {
+    let {userId, status} = req.body;
+    console.log(userId, status);
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'user does not exist',
+      });
+    }
+    
+    let updatedUser = await User.findOneAndUpdate(userId, { privateStatus: status });
+    console.log(updatedUser);
+
+    res.send(200).json({
+      status: 'successful',
+      message: 'User Updated successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+

@@ -672,6 +672,21 @@ exports.updateProducts = async (req, res) => {
       });
     }
 
+    if(updates.rating){
+
+      if(!product.rating){
+        let dummyrating = 0;
+      }else{
+        let dummyrating = product.rating;
+      }
+      
+      let prevRating = dummyrating;
+    
+      let newRating = (prevRating + updates.rating)/2;
+
+      updates.rating = newRating;
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(productId, updates, options);
     res.status(200).json({
       status: 'success',
@@ -845,6 +860,7 @@ exports.updateWishlistStatus = async (req, res) => {
   try {
     let {productId, status} = req.body;
     const product = await Product.findById(productId);
+    console.log(product)
     if (!product) {
       res.status(400).json({
         status: 'fail',
@@ -888,6 +904,35 @@ exports.updateRating = async (req, res) => {
     res.send(200).json({
       status: 'successful',
       message: 'Rating Updated Successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+
+
+exports.getRandomProducts = async (req, res) => {
+  try {
+    
+    let product = await Product.aggregate(
+      [ { $sample: { size: 10 } } ]
+    );
+    if (!product) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'product does not exist',
+      });
+    }
+    
+    console.log(product);
+
+    return res.json({
+      status: 'successful',
+      message: 'Random Products Found',
+      data: product
     });
   } catch (error) {
     res.status(400).json({

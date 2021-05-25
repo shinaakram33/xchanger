@@ -46,6 +46,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  privateStatus: {
+    type: Boolean,
+    defalt: false
+  },
+  
   image: {
     type: String,
     default: null,

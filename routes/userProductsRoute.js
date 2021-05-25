@@ -6,7 +6,7 @@ const { protected } = require('../controllers/authController');
 const router = express.Router();
 
 router.route('/users/:userId').get(protected, getUserProducts);
-router.route('/wishlistStatus').put(protected, updateWishlistStatus);
+router.route('/wishlistStatus').put(updateWishlistStatus);
 router.route('/rating').put(protected, updateRating);
 
 module.exports = router;
