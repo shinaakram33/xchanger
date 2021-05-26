@@ -136,7 +136,13 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+      var array = req.query.color.split(',');
+      searchCriteria.color =array;
+    }
+
+    if (req.query.subject) {
+      var array = req.query.subject.split(',');
+      searchCriteria.subject =array;
     }
 
     if (req.query.state) {
@@ -244,7 +250,13 @@ exports.getCategoryProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+      var array = req.query.color.split(',');
+      searchCriteria.color =array;
+    }
+
+    if (req.query.subject) {
+      var array = req.query.subject.split(',');
+      searchCriteria.subject =array;
     }
 
     if (req.query.state) {
@@ -404,7 +416,13 @@ exports.getBiddingProducts = async (req, res) => {
     }
 
     if (req.query.color) {
-      searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+      var array = req.query.color.split(',');
+      searchCriteria.color =array;
+    }
+
+    if (req.query.subject) {
+      var array = req.query.subject.split(',');
+      searchCriteria.subject =array;
     }
 
     if (req.query.state) {
@@ -573,7 +591,13 @@ exports.getAllProduct = async (req, res) => {
   }
 
   if (req.query.color) {
-    searchCriteria.color = new RegExp('.*' + req.query.color.toLowerCase() + '.*', 'i');
+    var array = req.query.color.split(',');
+    searchCriteria.color =array;
+  }
+
+  if (req.query.subject) {
+    var array = req.query.subject.split(',');
+    searchCriteria.subject =array;
   }
 
   if (req.query.state) {
