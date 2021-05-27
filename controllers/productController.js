@@ -689,12 +689,12 @@ exports.updateProducts = async (req, res) => {
         message: 'product does not exist',
       });
     }
-    if (product.user.toString() !== req.user.id) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'You do not have an access to update this product',
-      });
-    }
+    // if (product.user.toString() !== req.user.id) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: 'You do not have an access to update this product',
+    //   });
+    // }
 
     if(updates.rating){
 

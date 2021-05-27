@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  sellerRating: {
+    type: Number,
+    defalt: 0
+  },
   passwordResetToken: String,
   passwordResetTokenExpire: Date,
   previousPassword: { type: String, default: undefined },

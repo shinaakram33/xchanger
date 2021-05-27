@@ -72,6 +72,31 @@ exports.login = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
+    let updates = req.body;
+
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User does not exist',
+      });
+    }
+
+    if(updates.sellerRating){
+
+      if(!user.sellerRating){
+        let dummyrating = 0;
+      }else{
+        let dummyrating = user.sellerRating;
+      }
+      
+      let prevRating = dummyrating;
+    
+      let newRating = (prevRating + updates.sellerRating)/2;
+
+      updates.sellerRating = newRating;
+    }
+
     const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true
     });
