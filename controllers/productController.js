@@ -657,6 +657,7 @@ exports.getAllProduct = async (req, res) => {
 exports.getSpecificProductDetail = async (req, res) => {
   try {
     const specificProduct = await Product.findById(req.params.productId);
+    
     if (!specificProduct) {
       return res.status(400).json({
         status: 'fail',

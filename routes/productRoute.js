@@ -28,11 +28,11 @@ router.route('/recomended').get(getRandomProducts);
 router.route('/:title').get(getProductByTitle);
 router.route('/pending').get(protected, restrictTo('admin'), getBiddingPendingProduct);
 router.route('/wishlistStatus').put(updateWishlistStatus)
+router.route('/product/:productId').get(getSpecificProductDetail)
 router
   .route('/:productId')
   .patch(protected, updateProducts)
   .delete(protected, deleteProducts)
-  .get(getSpecificProductDetail)
   .put(protected, restrictTo('admin'), changeBiddingStatus)
   .post(protected, scheduleAndAddToCart)
 
