@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
     let textNotificaton = {
       user:chatMessage.user.ownerId,
       text: `You have a new message`,
-      chat_room_id: chatMessage.user.chatroomId
+      chat_room_id: JSON.stringify(chatMessage.user.chatroomId)
     };
     
     fetch('https://x-changer.herokuapp.com/api/v1/notification', {
