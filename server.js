@@ -69,8 +69,7 @@ io.on("connection", (socket) => {
       text: `You have a new message`,
       chat_room_id: chatMessage.user.chatroomId
     };
-    console.log('check2',data);
-    console.log('check2',updatedProduct);
+    
     fetch('https://x-changer.herokuapp.com/api/v1/notification', {
       method: 'POST',
       body: JSON.stringify(textNotificaton),
