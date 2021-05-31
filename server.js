@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const http = require('http');
 const User = require('./models/userModal')
 const Chat = require('./models/chatModal')
+const Notification = require('./models/notificationModal')
+const fetch = require('node-fetch');
 
 
 dotenv.config({ path: './config.env' });
@@ -61,6 +63,21 @@ io.on("connection", (socket) => {
   socket.on("chatroomMessage", async ( data ) => {
     console.log("hello #####", data);
     const chatMessage = data[0];
+    console.log(chatMessage.pId, chatMessage.uId)
+    let textNotificaton = {
+      user:chatMessage.ownerId,
+      text: `You have a new message`,
+      chat_room_id: chatMessage.user.chatroomId
+    };
+    console.log('check2',data);
+    console.log('check2',updatedProduct);
+    fetch('https://x-changer.herokuapp.com/api/v1/notification', {
+      method: 'POST',
+      body: JSON.stringify(textNotificaton),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json())
+      .then(json => console.log(json));
+    
     if (chatMessage.text.trim().length > 0) {
       console.log(data);
       const user = await User.findOne({ _id: chatMessage.user._id });

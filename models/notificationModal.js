@@ -16,6 +16,9 @@ const notificationSchema = new mongoose.Schema({
   status:{
       type:Boolean,
       default: false
+  },
+  chat_room_id:{
+      type: String
   }
 });
 
