@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
     console.log("hello #####", data);
     const chatMessage = data[0];
     console.log(chatMessage)
-    console.log(chatMessage.user.chat_room_id,'')
+    console.log(chatMessage.user.chatroomId,'RoomId')
     let textNotificaton = {
       user:chatMessage.user.ownerId,
       text: `You have a new message`,
