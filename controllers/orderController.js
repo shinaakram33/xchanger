@@ -49,7 +49,7 @@ exports.createOrder = async (req, res) => {
         };
         console.log('check2',data);
         console.log('check2',updatedProduct);
-        fetch('http://localhost:8000/api/v1/notification', {
+        fetch('https://x-changer.herokuapp.com/api/v1/notification', {
           method: 'POST',
           body: JSON.stringify(data),
           headers: { 'Content-Type': 'application/json' }
@@ -176,7 +176,7 @@ exports.createImmediateOrder = async (req, res) => {
         text: `Your product ${updatedProduct.title} has been sold`
       };
     
-      fetch('http://localhost:8000/api/v1/notification', {
+      fetch('https://x-changer.herokuapp.com/api/v1/notification', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }

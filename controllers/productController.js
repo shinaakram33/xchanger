@@ -836,7 +836,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Product ${product.title} has been added to your cart`
         };
         
-        fetch('http://localhost:8000/api/v1/notification', {
+        fetch('https://x-changer.herokuapp.com/api/v1/notification', {
           method: 'POST',
           body: JSON.stringify(dataOfBidUser),
           headers: { 'Content-Type': 'application/json' }
@@ -849,7 +849,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Your product ${product.title} has been sold`
         };
       
-        fetch('http://localhost:8000/api/v1/notification', {
+        fetch('https://x-changer.herokuapp.com/api/v1/notification', {
           method: 'POST',
           body: JSON.stringify(dataOfProductOwner),
           headers: { 'Content-Type': 'application/json' }
