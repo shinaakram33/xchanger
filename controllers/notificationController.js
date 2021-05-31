@@ -2,7 +2,7 @@ const Notification = require('../models/notificationModal');
 
 exports.createNotification = async (req, res) => {
     
-    const {user, text,product, status} = req.body;
+    const {user, text,product, status, chat_room_id} = req.body;
   
     try {
 
@@ -10,7 +10,8 @@ exports.createNotification = async (req, res) => {
             user,
             product,
             text,
-            status
+            status,
+            chat_room_id
         });
 
         await notification.save();
