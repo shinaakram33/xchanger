@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
       console.log(data);
       const user = await User.findOne({ _id: chatMessage.user._id });
       const newMessage = new Chat({
-        _id: chatMessage._id,
+        // _id: chatMessage._id,
         chat_room_id: chatMessage.user.chatroomId,
         user: chatMessage.user,
         text:chatMessage.text
