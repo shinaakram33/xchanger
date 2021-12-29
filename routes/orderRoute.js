@@ -9,7 +9,7 @@ const { protected } = require("../controllers/authController");
 const router = express.Router();
 
 router.route("/cart/:cartId").post(protected, createOrder);
-router.route("/:orderId").get(protected, orderAccepted);
+router.route("/:orderId").patch(protected, orderAccepted);
 router
   .route("/")
   .get(protected, getAllOrders)
