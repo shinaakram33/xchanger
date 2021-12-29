@@ -21,81 +21,94 @@ exports.createOrder = async (req, res) => {
         message: "You dont have an access to perform this action",
       });
     }
-    if (!req.body.source) {
+    if (!req.body.card) {
       return res.status(400).json({
         status: "fail",
         message: "Invalid credentials",
       });
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.price * 100,
-      currency: "usd",
-      payment_method_types: ["card"],
-      payment_method: req.body.source,
-      confirm: true,
-      capture_method: "manual",
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: "card",
+      card: req.body.card,
     });
+    console.log("paymentMethod ", paymentMethod);
 
-    // const charge = await stripe.charges.create({
-    //   amount: req.body.price * 100,
-    //   currency: "usd",
-    //   source: req.body.source,
-    // });
-
-    if (paymentIntent.created) {
-      console.log("payment created");
-      cart.products.map(async (i, index) => {
-        console.log("map");
-        let updatedProduct = await Product.findByIdAndUpdate(
-          i,
-          { status: "pending" },
-          { new: true }
-        );
-        console.log("product updated");
-        const createOrderTable = await Order.create({
-          name: req.body.name,
-          email: req.body.email,
-          phoneNumber: req.body.phoneNumber,
-          location: req.body.location,
-          user: req.user.id,
-          cartId: cart._id,
-          checkoutId: paymentIntent.id,
-          status: "pending",
-          productId: cart.selectedProducts,
-        });
-        console.log("createdOrderTable");
-        await Cart.updateOne(
-          {
-            user: req.user.id,
-          },
-          { $pull: { products: { $in: cart.products } } }
-        );
-        cart.selectedProducts = undefined;
-        await cart.save({ validateBeforeSave: false });
-
-        let data = {
-          user: updatedProduct.user,
-          product: updatedProduct.id,
-          text: `Your product ${updatedProduct.title} has been bought`,
-        };
-        console.log("check2", data);
-        console.log("check2", updatedProduct);
-        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" },
-        })
-          .then((res) => res.json())
-          .then((json) => console.log(json));
-
-        console.log("status ", paymentIntent.status);
-        res.status(200).json({
-          status: "success",
-          message: "Product is ordered successfully",
-          data: createOrderTable,
-        });
+    if (paymentMethod.created) {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: req.body.price * 100,
+        currency: "usd",
+        payment_method_types: ["card"],
+        payment_method: paymentMethod.id,
+        confirm: true,
+        capture_method: "manual",
       });
+
+      // const charge = await stripe.charges.create({
+      //   amount: req.body.price * 100,
+      //   currency: "usd",
+      //   source: req.body.source,
+      // });
+
+      if (paymentIntent.created) {
+        console.log("payment created");
+        cart.products.map(async (i, index) => {
+          console.log("map");
+          let updatedProduct = await Product.findByIdAndUpdate(
+            i,
+            { status: "pending" },
+            { new: true }
+          );
+          console.log("product updated");
+          const createOrderTable = await Order.create({
+            name: req.body.name,
+            email: req.body.email,
+            phoneNumber: req.body.phoneNumber,
+            location: req.body.location,
+            user: req.user.id,
+            cartId: cart._id,
+            checkoutId: paymentIntent.id,
+            status: "pending",
+            productId: cart.selectedProducts,
+          });
+          console.log("createdOrderTable");
+          await Cart.updateOne(
+            {
+              user: req.user.id,
+            },
+            { $pull: { products: { $in: cart.products } } }
+          );
+          cart.selectedProducts = undefined;
+          await cart.save({ validateBeforeSave: false });
+
+          let data = {
+            user: updatedProduct.user,
+            product: updatedProduct.id,
+            text: `Your product ${updatedProduct.title} has been bought`,
+          };
+          console.log("check2", data);
+          console.log("check2", updatedProduct);
+          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json" },
+          })
+            .then((res) => res.json())
+            .then((json) => console.log(json));
+
+          console.log("status ", paymentIntent.status);
+          res.status(200).json({
+            status: "success",
+            message: "Product is ordered successfully",
+            data: createOrderTable,
+          });
+        });
+      } else {
+        res.status(400).json({
+          status: "fail",
+          message: "Stripe error",
+        });
+      }
     } else {
       res.status(400).json({
         status: "fail",
