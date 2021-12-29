@@ -74,14 +74,14 @@ exports.createOrder = async (req, res) => {
           productId: cart.selectedProducts,
         });
         console.log("createdOrderTable");
-        // await Cart.updateOne(
-        //   {
-        //     user: req.user.id,
-        //   },
-        //   { $pull: { products: { $in: cart.products } } }
-        // );
-        // cart.selectedProducts = undefined;
-        // await cart.save({ validateBeforeSave: false });
+        await Cart.updateOne(
+          {
+            user: req.user.id,
+          },
+          { $pull: { products: { $in: cart.products } } }
+        );
+        cart.selectedProducts = undefined;
+        await cart.save({ validateBeforeSave: false });
 
         let data = {
           user: updatedProduct.user,
