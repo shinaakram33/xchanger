@@ -74,14 +74,14 @@ exports.createOrder = async (req, res) => {
           productId: cart.selectedProducts,
         });
         console.log("createdOrderTable");
-        await Cart.updateOne(
-          {
-            user: req.user.id,
-          },
-          { $pull: { products: { $in: cart.products } } }
-        );
-        cart.selectedProducts = undefined;
-        await cart.save({ validateBeforeSave: false });
+        // await Cart.updateOne(
+        //   {
+        //     user: req.user.id,
+        //   },
+        //   { $pull: { products: { $in: cart.products } } }
+        // );
+        // cart.selectedProducts = undefined;
+        // await cart.save({ validateBeforeSave: false });
 
         let data = {
           user: updatedProduct.user,
@@ -95,8 +95,20 @@ exports.createOrder = async (req, res) => {
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
         })
-          .then((res) => res.json())
-          .then((json) => console.log(json));
+          .then(async (res) => {
+            try {
+              console.log("res ", res);
+              const data = await res.json();
+              console.log("response data?", data);
+            } catch (err) {
+              console.log("error");
+              console.log(err);
+            }
+          })
+          .then((json) => console.log("json ", json))
+          .catch((error) => {
+            console.log(error);
+          });
 
         console.log("status ", paymentIntent.status);
         res.status(200).json({
