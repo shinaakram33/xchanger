@@ -42,6 +42,10 @@ const orderSchema = new mongoose.Schema({
       required: [true, 'Product Id is required'],
     },
   ],
+  accepted: {
+    type: Boolean,
+    default: false
+  },
 });
 
 const Order = mongoose.model('Order', orderSchema);
