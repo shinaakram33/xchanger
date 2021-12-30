@@ -16,7 +16,7 @@ exports.createNotification = async (req, res) => {
 
     return res.status(200).json({
       status: "success",
-      message: "Notification is created succesfully",
+      message: "Notification is created successfully",
       data: notification,
     });
   } catch (err) {
@@ -44,7 +44,7 @@ exports.getAllUserNotifications = async (req, res) => {
       status: false,
       user: userId,
     });
-
+    console.log("notifications ", notifications);
     res.status(200).json({
       status: "success",
       count: countOfFalseNotification,

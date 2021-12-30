@@ -57,13 +57,14 @@ exports.createOrder = async (req, res) => {
 
     if (paymentIntent.created) {
       console.log("payment created");
-      cart.products.map(async (i, index) => {
+      cart.selectedProducts.map(async (i, index) => {
         console.log("map");
         let updatedProduct = await Product.findByIdAndUpdate(
           i,
           { status: "pending" },
           { new: true }
         );
+        console.log("price ", i.price.orignalPrice);
         console.log("product updated");
         const createOrderTable = await Order.create({
           name: req.body.name,
@@ -74,15 +75,15 @@ exports.createOrder = async (req, res) => {
           cartId: cart._id,
           checkoutId: paymentIntent.id,
           status: "pending",
-          price: req.body.price,
-          productId: cart.selectedProducts,
+          price: i.price.orignalPrice,
+          productId: i,
         });
         console.log("createdOrderTable");
         await Cart.updateOne(
           {
             user: req.user.id,
           },
-          { $pull: { products: { $in: cart.products } } }
+          { $pull: { products: { $in: cart.selectedProducts } } }
         );
         cart.selectedProducts = undefined;
         await cart.save({ validateBeforeSave: false });
@@ -408,6 +409,7 @@ exports.orderAccepted = async (req, res) => {
             });
           }
         });
+        await order.save();
       } else {
         return res.status(400).json({
           status: "fail",
