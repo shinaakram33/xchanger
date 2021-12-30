@@ -73,15 +73,15 @@ exports.createOrder = async (req, res) => {
           status: "pending",
           productId: cart.selectedProducts,
         });
-        console.log("createdOrderTable");
-        await Cart.updateOne(
-          {
-            user: req.user.id,
-          },
-          { $pull: { products: { $in: cart.products } } }
-        );
-        cart.selectedProducts = undefined;
-        await cart.save({ validateBeforeSave: false });
+        // console.log("createdOrderTable");
+        // await Cart.updateOne(
+        //   {
+        //     user: req.user.id,
+        //   },
+        //   { $pull: { products: { $in: cart.products } } }
+        // );
+        // cart.selectedProducts = undefined;
+        // await cart.save({ validateBeforeSave: false });
 
         let data = {
           user: updatedProduct.user,
@@ -90,7 +90,7 @@ exports.createOrder = async (req, res) => {
         };
         console.log("check2", data);
         console.log("check2", updatedProduct);
-        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
           method: "POST",
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
@@ -211,14 +211,24 @@ exports.createImmediateOrder = async (req, res) => {
         text: `Your product ${updatedProduct.title} has been sold`,
       };
 
-      fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+      fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
       })
-        .then((res) => res.json())
-        .then((json) => console.log(json));
-
+        .then(async (res) => {
+          try {
+            const data = await res.json();
+            console.log("response data?", data);
+          } catch (err) {
+            console.log("error");
+            console.log(err);
+          }
+        })
+        .then((json) => console.log("json ", json))
+        .catch((error) => {
+          console.log(error);
+        });
       console.log("Check 2", updatedProduct);
 
       let createOrderTable = new Order({
@@ -290,22 +300,34 @@ exports.orderAccepted = async (req, res) => {
           };
           console.log("check2", data);
           console.log("check2", updatedProduct);
-          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+          fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
             method: "POST",
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json" },
           })
-            .then((res) => res.json())
-            .then((json) => console.log(json));
+            .then(async (res) => {
+              try {
+                console.log("res ", res);
+                const data = await res.json();
+                console.log("response data?", data);
+              } catch (err) {
+                console.log("error");
+                console.log(err);
+              }
+            })
+            .then((json) => console.log("json ", json))
+            .catch((error) => {
+              console.log(error);
+            });
         });
         await order.save();
-        res.status(200).json({
+        return res.status(200).json({
           status: "success",
           message: "Product is purchased successfully",
           data: order,
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           status: "fail",
           message: "Stripe error",
         });
@@ -319,41 +341,59 @@ exports.orderAccepted = async (req, res) => {
         order.accepted = false;
         order.status = "Rejected";
         order.productId.map(async (i, index) => {
-          console.log("1");
-          let updatedProduct = await Product.findByIdAndUpdate(
-            i,
-            { status: "not_sold" },
-            { new: true }
-          );
-          console.log("2");
-          let data = {
-            user: updatedProduct.user,
-            product: updatedProduct.id,
-            text: `Your product ${updatedProduct.title} has been rejected`,
-          };
-          console.log("check2", data);
-          console.log("check2", updatedProduct);
-          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" },
-          })
-            .then((res) => res.json())
-            .then((json) => console.log(json));
+          try {
+            console.log("1");
+            let updatedProduct = await Product.findByIdAndUpdate(
+              i,
+              { status: "not_sold" },
+              { new: true }
+            );
+            console.log("2");
+            let data = {
+              user: updatedProduct.user,
+              product: updatedProduct.id,
+              text: `Your product ${updatedProduct.title} has been rejected`,
+            };
+            console.log("check2", data);
+            console.log("check2", updatedProduct);
+            fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(async (res) => {
+                try {
+                  const data = await res.json();
+                  console.log("response data?", data);
+                } catch (err) {
+                  console.log("error");
+                  console.log(err);
+                }
+              })
+              .then((json) => console.log("json ", json))
+              .catch((error) => {
+                console.log(error);
+              });
+          } catch (err) {
+            return res.status(400).json({
+              status: "fail",
+              message: err.message,
+            });
+          }
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           status: "fail",
           message: "Stripe error",
         });
       }
     }
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
       data: order,
     });
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "fail",
       message: err.message,
     });

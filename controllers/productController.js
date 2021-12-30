@@ -1,20 +1,20 @@
-const { json } = require('express');
-const Product = require('../models/productModal');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const featureAd = require('../models/featureAdModel');
-const PlaceBid = require('../models/placebidModal')
-const Cart = require('../models/cartModal')
-const cron = require('node-cron');
-const moment = require('moment');
-const schedule = require('node-schedule');
-const fetch = require('node-fetch');
+const { json } = require("express");
+const Product = require("../models/productModal");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const featureAd = require("../models/featureAdModel");
+const PlaceBid = require("../models/placebidModal");
+const Cart = require("../models/cartModal");
+const cron = require("node-cron");
+const moment = require("moment");
+const schedule = require("node-schedule");
+const fetch = require("node-fetch");
 
 exports.createProduct = async (req, res) => {
   try {
     if (!req.body) {
       res.status(400).json({
-        status: 'fail',
-        message: 'Please provide body of a product',
+        status: "fail",
+        message: "Please provide body of a product",
       });
     }
     // if (req.body.adType === 'featured') {
@@ -66,17 +66,17 @@ exports.createProduct = async (req, res) => {
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
-      time: req.body.time
+      time: req.body.time,
     });
     res.status(201).json({
-      status: 'success',
-      message: 'Product has been Created Successfully',
+      status: "success",
+      message: "Product has been Created Successfully",
       product: newProduct,
     });
     // }
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -85,7 +85,7 @@ exports.createProduct = async (req, res) => {
 exports.getCategoryFilteredProduct = async (req, res) => {
   try {
     let searchCriteria = {
-      status: 'not_sold',
+      status: "not_sold",
     };
     let sortingQuery = {};
     if (req.query.search) {
@@ -93,7 +93,10 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         $or: [
           {
             title: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
         ],
@@ -116,57 +119,75 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     }
     if (req.query.condition) {
       searchCriteria = {
-        'condition.state': req.query.condition.toLowerCase(),
+        "condition.state": req.query.condition.toLowerCase(),
       };
     }
     if (req.query.season) {
-      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+      searchCriteria.season = new RegExp(
+        ".*" + req.query.season.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.size) {
-      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+      searchCriteria.size = new RegExp(
+        ".*" + req.query.size.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.category) {
-      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+      searchCriteria.categoryName = new RegExp(
+        ".*" + req.query.category.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.brand) {
-      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+      searchCriteria.brand = new RegExp(
+        ".*" + req.query.brand.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.color) {
-      var array = req.query.color.split(',');
-      searchCriteria.color =array;
+      var array = req.query.color.split(",");
+      searchCriteria.color = array;
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(',');
-      searchCriteria.subject =array;
+      var array = req.query.subject.split(",");
+      searchCriteria.subject = array;
     }
 
     if (req.query.state) {
-      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+      searchCriteria.state = new RegExp(
+        ".*" + req.query.state.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.buyingFormat) {
-      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+      searchCriteria.adType = new RegExp(
+        ".*" + req.query.buyingFormat.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.sortingOrder) {
-      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+      if (req.query.sortingOrder.toLowerCase() === "asc") {
         sortingQuery = {
-          'price.sellingPrice': 1,
+          "price.sellingPrice": 1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+      } else if (req.query.sortingOrder.toLowerCase() === "desc") {
         sortingQuery = {
-          'price.sellingPrice': -1,
+          "price.sellingPrice": -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+      } else if (req.query.sortingOrder.toLowerCase() === "latest") {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
       }
     }
 
@@ -176,9 +197,13 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
-      const products = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
+      const products = await Product.find(searchCriteria)
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .sort(sortingQuery);
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         length: products.length,
         data: products,
       });
@@ -187,20 +212,20 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         category: req.params.categoryId,
         subCategoryId: req.params.subCategoryId,
         subCategoryOptionId: req.params.subCategoryOptionId,
-        status: 'not_sold',
+        status: "not_sold",
       })
-        .populate('category')
-        .populate('subCategoryId')
-        .populate('subCategoryOptionId');
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId");
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         length: products.length,
         data: products,
       });
     }
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -208,7 +233,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
 exports.getCategoryProduct = async (req, res) => {
   try {
     let searchCriteria = {
-      status: 'not_sold',
+      status: "not_sold",
     };
     let sortingQuery = {};
     let products = null;
@@ -217,7 +242,10 @@ exports.getCategoryProduct = async (req, res) => {
         $or: [
           {
             title: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
         ],
@@ -230,57 +258,75 @@ exports.getCategoryProduct = async (req, res) => {
     }
     if (req.query.condition) {
       searchCriteria = {
-        'condition.state': req.query.condition.toLowerCase(),
+        "condition.state": req.query.condition.toLowerCase(),
       };
     }
     if (req.query.season) {
-      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+      searchCriteria.season = new RegExp(
+        ".*" + req.query.season.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.size) {
-      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+      searchCriteria.size = new RegExp(
+        ".*" + req.query.size.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.category) {
-      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+      searchCriteria.categoryName = new RegExp(
+        ".*" + req.query.category.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.brand) {
-      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+      searchCriteria.brand = new RegExp(
+        ".*" + req.query.brand.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.color) {
-      var array = req.query.color.split(',');
-      searchCriteria.color =array;
+      var array = req.query.color.split(",");
+      searchCriteria.color = array;
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(',');
-      searchCriteria.subject =array;
+      var array = req.query.subject.split(",");
+      searchCriteria.subject = array;
     }
 
     if (req.query.state) {
-      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+      searchCriteria.state = new RegExp(
+        ".*" + req.query.state.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.buyingFormat) {
-      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+      searchCriteria.adType = new RegExp(
+        ".*" + req.query.buyingFormat.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.sortingOrder) {
-      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+      if (req.query.sortingOrder.toLowerCase() === "asc") {
         sortingQuery = {
-          'price.sellingPrice': 1,
+          "price.sellingPrice": 1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+      } else if (req.query.sortingOrder.toLowerCase() === "desc") {
         sortingQuery = {
-          'price.sellingPrice': -1,
+          "price.sellingPrice": -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+      } else if (req.query.sortingOrder.toLowerCase() === "latest") {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
       }
     }
 
@@ -290,19 +336,29 @@ exports.getCategoryProduct = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
-      products = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
+      products = await Product.find(searchCriteria)
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .sort(sortingQuery);
     } else {
-      products = await Product.find({ category: req.params.categoryId, status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+      products = await Product.find({
+        category: req.params.categoryId,
+        status: "not_sold",
+      })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId");
     }
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       length: products.length,
       data: products,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -322,23 +378,23 @@ exports.createBiddingProduct = async (req, res) => {
       subject: req.body.subject,
       title: req.body.title,
       description: req.body.description,
-      date_for_auction: req.body.date_for_auction, 
+      date_for_auction: req.body.date_for_auction,
       category: req.params.categoryId,
       categoryName: req.body.categoryName,
       subCategoryId: req.params.subCategoryId,
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
-      adType: 'bidding',
-      status: 'pending',
+      adType: "bidding",
+      status: "pending",
     });
     res.status(201).json({
-      status: 'success',
-      message: 'Product has been Created Successfully',
+      status: "success",
+      message: "Product has been Created Successfully",
       product: newProduct,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -346,15 +402,18 @@ exports.createBiddingProduct = async (req, res) => {
 
 exports.getBiddingPendingProduct = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ status: 'pending' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    const pendingProduct = await Product.find({ status: "pending" })
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId");
     res.status(200).json({
-      status: 'success',
+      status: "success",
       length: pendingProduct.length,
       data: pendingProduct,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -364,8 +423,8 @@ exports.getBiddingProducts = async (req, res) => {
   try {
     let pendingProduct = null;
     let searchCriteria = {
-      adType: 'bidding',
-      status: 'not_sold',
+      adType: "bidding",
+      status: "not_sold",
     };
     let sortingQuery = {};
     if (req.query.search) {
@@ -373,22 +432,34 @@ exports.getBiddingProducts = async (req, res) => {
         $or: [
           {
             title: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
           {
             brand: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
           {
             subject: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
           {
             season: {
-              regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+              regex: new RegExp(
+                ".*" + req.query.search.toLowerCase() + ".*",
+                "i"
+              ),
             },
           },
         ],
@@ -396,57 +467,75 @@ exports.getBiddingProducts = async (req, res) => {
     }
     if (req.query.condition) {
       searchCriteria = {
-        'condition.state': req.query.condition.toLowerCase(),
+        "condition.state": req.query.condition.toLowerCase(),
       };
     }
     if (req.query.season) {
-      searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+      searchCriteria.season = new RegExp(
+        ".*" + req.query.season.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.size) {
-      searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+      searchCriteria.size = new RegExp(
+        ".*" + req.query.size.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.category) {
-      searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+      searchCriteria.categoryName = new RegExp(
+        ".*" + req.query.category.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.brand) {
-      searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+      searchCriteria.brand = new RegExp(
+        ".*" + req.query.brand.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.color) {
-      var array = req.query.color.split(',');
-      searchCriteria.color =array;
+      var array = req.query.color.split(",");
+      searchCriteria.color = array;
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(',');
-      searchCriteria.subject =array;
+      var array = req.query.subject.split(",");
+      searchCriteria.subject = array;
     }
 
     if (req.query.state) {
-      searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+      searchCriteria.state = new RegExp(
+        ".*" + req.query.state.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.buyingFormat) {
-      searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+      searchCriteria.adType = new RegExp(
+        ".*" + req.query.buyingFormat.toLowerCase() + ".*",
+        "i"
+      );
     }
 
     if (req.query.sortingOrder) {
-      if (req.query.sortingOrder.toLowerCase() === 'asc') {
+      if (req.query.sortingOrder.toLowerCase() === "asc") {
         sortingQuery = {
-          'price.sellingPrice': 1,
+          "price.sellingPrice": 1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+      } else if (req.query.sortingOrder.toLowerCase() === "desc") {
         sortingQuery = {
-          'price.sellingPrice': -1,
+          "price.sellingPrice": -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+      } else if (req.query.sortingOrder.toLowerCase() === "latest") {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
       }
     }
 
@@ -456,18 +545,27 @@ exports.getBiddingProducts = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
-      pendingProduct = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+      pendingProduct = await Product.find(searchCriteria)
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId");
     } else {
-      pendingProduct = await Product.find({ adType: 'bidding', status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+      pendingProduct = await Product.find({
+        adType: "bidding",
+        status: "not_sold",
+      })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId");
     }
     res.status(200).json({
-      status: 'success',
+      status: "success",
       length: pendingProduct.length,
       data: pendingProduct,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -478,19 +576,19 @@ exports.changeBiddingStatus = async (req, res) => {
     const products = await Product.findByIdAndUpdate(
       req.params.productId,
       {
-        status: 'not_sold',
+        status: "not_sold",
         time: req.body.time,
       },
       { new: true }
     );
     res.status(200).json({
-      status: 'success',
-      message: 'Status has been updated successfully',
+      status: "success",
+      message: "Status has been updated successfully",
       data: products,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -500,15 +598,15 @@ exports.createFeaturedProduct = async (req, res) => {
   try {
     if (!req.body) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'Please provide body of a product',
+        status: "fail",
+        message: "Please provide body of a product",
       });
     }
-    if (req.body.adType === 'featured') {
+    if (req.body.adType === "featured") {
     }
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -521,18 +619,18 @@ exports.getUserProducts = async (req, res) => {
     const userPosts = await Product.find({ user: { $in: req.params.userId } });
     if (!userPosts) {
       res.status(400).json({
-        status: 'fail',
-        message: 'No product found',
+        status: "fail",
+        message: "No product found",
       });
     }
     res.status(200).json({
-      status: 'success',
+      status: "success",
       length: userPosts.length,
       data: userPosts,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -540,7 +638,7 @@ exports.getUserProducts = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
   let searchCriteria = {
-    status: 'not_sold',
+    status: "not_sold",
   };
   let sortingQuery = {};
   if (req.query.search) {
@@ -548,22 +646,34 @@ exports.getAllProduct = async (req, res) => {
       $or: [
         {
           title: {
-            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            regex: new RegExp(
+              ".*" + req.query.search.toLowerCase() + ".*",
+              "i"
+            ),
           },
         },
         {
           brand: {
-            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            regex: new RegExp(
+              ".*" + req.query.search.toLowerCase() + ".*",
+              "i"
+            ),
           },
         },
         {
           subject: {
-            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            regex: new RegExp(
+              ".*" + req.query.search.toLowerCase() + ".*",
+              "i"
+            ),
           },
         },
         {
           season: {
-            regex: new RegExp('.*' + req.query.search.toLowerCase() + '.*', 'i'),
+            regex: new RegExp(
+              ".*" + req.query.search.toLowerCase() + ".*",
+              "i"
+            ),
           },
         },
       ],
@@ -571,57 +681,75 @@ exports.getAllProduct = async (req, res) => {
   }
   if (req.query.condition) {
     searchCriteria = {
-      'condition.state': req.query.condition.toLowerCase(),
+      "condition.state": req.query.condition.toLowerCase(),
     };
   }
   if (req.query.season) {
-    searchCriteria.season = new RegExp('.*' + req.query.season.toLowerCase() + '.*', 'i');
+    searchCriteria.season = new RegExp(
+      ".*" + req.query.season.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.size) {
-    searchCriteria.size = new RegExp('.*' + req.query.size.toLowerCase() + '.*', 'i');
+    searchCriteria.size = new RegExp(
+      ".*" + req.query.size.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.category) {
-    searchCriteria.categoryName = new RegExp('.*' + req.query.category.toLowerCase() + '.*', 'i');
+    searchCriteria.categoryName = new RegExp(
+      ".*" + req.query.category.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.brand) {
-    searchCriteria.brand = new RegExp('.*' + req.query.brand.toLowerCase() + '.*', 'i');
+    searchCriteria.brand = new RegExp(
+      ".*" + req.query.brand.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.color) {
-    var array = req.query.color.split(',');
-    searchCriteria.color =array;
+    var array = req.query.color.split(",");
+    searchCriteria.color = array;
   }
 
   if (req.query.subject) {
-    var array = req.query.subject.split(',');
-    searchCriteria.subject =array;
+    var array = req.query.subject.split(",");
+    searchCriteria.subject = array;
   }
 
   if (req.query.state) {
-    searchCriteria.state = new RegExp('.*' + req.query.state.toLowerCase() + '.*', 'i');
+    searchCriteria.state = new RegExp(
+      ".*" + req.query.state.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.buyingFormat) {
-    searchCriteria.adType = new RegExp('.*' + req.query.buyingFormat.toLowerCase() + '.*', 'i');
+    searchCriteria.adType = new RegExp(
+      ".*" + req.query.buyingFormat.toLowerCase() + ".*",
+      "i"
+    );
   }
 
   if (req.query.sortingOrder) {
-    if (req.query.sortingOrder.toLowerCase() === 'asc') {
+    if (req.query.sortingOrder.toLowerCase() === "asc") {
       sortingQuery = {
-        'price.sellingPrice': 1,
+        "price.sellingPrice": 1,
       };
-    } else if (req.query.sortingOrder.toLowerCase() === 'desc') {
+    } else if (req.query.sortingOrder.toLowerCase() === "desc") {
       sortingQuery = {
-        'price.sellingPrice': -1,
+        "price.sellingPrice": -1,
       };
-    } else if (req.query.sortingOrder.toLowerCase() === 'latest') {
+    } else if (req.query.sortingOrder.toLowerCase() === "latest") {
       sortingQuery = {
         createdAt: -1,
       };
-    } else if (req.query.sortingOrder.toLowerCase() === 'sale') {
+    } else if (req.query.sortingOrder.toLowerCase() === "sale") {
     }
   }
 
@@ -632,22 +760,29 @@ exports.getAllProduct = async (req, res) => {
   }
 
   if (Object.keys(req.query).length !== 0) {
-    const allProduct = await Product.find(searchCriteria).populate('category').populate('subCategoryId').populate('subCategoryOptionId').sort(sortingQuery);
+    const allProduct = await Product.find(searchCriteria)
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .sort(sortingQuery);
     return res.status(200).json({
-      status: 'success',
+      status: "success",
       length: allProduct.length,
       data: allProduct,
     });
   } else {
-    const allProduct = await Product.find({ status: 'not_sold' }).populate('category').populate('subCategoryId').populate('subCategoryOptionId');
+    const allProduct = await Product.find({ status: "not_sold" })
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId");
     if (!allProduct) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'No Product found of this category',
+        status: "fail",
+        message: "No Product found of this category",
       });
     }
     return res.status(200).json({
-      status: 'success',
+      status: "success",
       length: allProduct.length,
       data: allProduct,
     });
@@ -657,20 +792,20 @@ exports.getAllProduct = async (req, res) => {
 exports.getSpecificProductDetail = async (req, res) => {
   try {
     const specificProduct = await Product.findById(req.params.productId);
-    
+
     if (!specificProduct) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'No Product Found',
+        status: "fail",
+        message: "No Product Found",
       });
     }
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: specificProduct,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err,
     });
   }
@@ -686,8 +821,8 @@ exports.updateProducts = async (req, res) => {
     const product = await Product.findById(productId.toString());
     if (!product) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
     // if (product.user.toString() !== req.user.id) {
@@ -697,25 +832,28 @@ exports.updateProducts = async (req, res) => {
     //   });
     // }
 
-    if(updates.rating){
-
-      if(!product.rating){
+    if (updates.rating) {
+      if (!product.rating) {
         let dummyrating = 0;
-      }else{
+      } else {
         let dummyrating = product.rating;
       }
-      
+
       let prevRating = dummyrating;
-    
-      let newRating = (prevRating + updates.rating)/2;
+
+      let newRating = (prevRating + updates.rating) / 2;
 
       updates.rating = newRating;
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(productId, updates, options);
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updates,
+      options
+    );
     res.status(200).json({
-      status: 'success',
-      message: 'Product is updated successfully',
+      status: "success",
+      message: "Product is updated successfully",
       data: updatedProduct,
     });
     //console.log(updatedProduct)
@@ -734,7 +872,7 @@ exports.updateProducts = async (req, res) => {
     // }
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
@@ -746,163 +884,159 @@ exports.deleteProducts = async (req, res) => {
     const product = await Product.findById(productId.toString());
     if (!product) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
     if (product.user.toString() !== req.user.id) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not delete',
+        status: "fail",
+        message: "product does not delete",
       });
     }
     const result = await product.findByIdAndDelete(id);
     res.send(200).json({
-      status: 'successful',
-      message: 'product delete successfully',
+      status: "successful",
+      message: "product delete successfully",
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
 };
 
-
 exports.scheduleAndAddToCart = async (req, res) => {
   try {
-    console.log('Hello')
+    console.log("Hello");
     let { productId } = req.params;
     let product = await Product.findById(productId);
-    let updatedProduct = await Product.findOneAndUpdate(req.params.productId, { status: 'Not Sold' });
-    console.log(updatedProduct)
+    let updatedProduct = await Product.findOneAndUpdate(req.params.productId, {
+      status: "Not Sold",
+    });
+    console.log(updatedProduct);
 
-    let bidProducts = await PlaceBid.find({product: productId})
-    console.log(bidProducts)
+    let bidProducts = await PlaceBid.find({ product: productId });
+    console.log(bidProducts);
     let userId = req.user.id;
     let dateFromDb = new Date(product.time.endingTime);
-    
-    let h = dateFromDb.getHours()-5;
+
+    let h = dateFromDb.getHours() - 5;
     let m = dateFromDb.getMinutes();
     let d = dateFromDb.getDate();
-    
-    console.log(h,m,d)
 
-    let date = { date:d,hour:h, minute:m }
-    console.log(date)
-    var job = schedule.scheduleJob(date, ()=>{
-      console.log('time')
+    console.log(h, m, d);
+
+    let date = { date: d, hour: h, minute: m };
+    console.log(date);
+    var job = schedule.scheduleJob(date, () => {
+      console.log("time");
       let max = 0;
       let IdOfMaxBidUser;
-      if(bidProducts){
-        
-        for(let x of bidProducts){
-          
-          if(x.price>max){
+      if (bidProducts) {
+        for (let x of bidProducts) {
+          if (x.price > max) {
             max = x.price;
-            IdOfMaxBidUser = x.user
+            IdOfMaxBidUser = x.user;
           }
         }
-        if(max<product.price.originalPrice){
+        if (max < product.price.originalPrice) {
           res.status(400).json({
-            status: 'Fail',
+            status: "Fail",
             message: "Max Bided price is less then mininmum price",
           });
         }
-        console.log('Times Up')
+        console.log("Times Up");
         async function addToCart() {
-          let alreadyExist = await Cart.findOne({ user: IdOfMaxBidUser }); 
-          if(alreadyExist){
+          let alreadyExist = await Cart.findOne({ user: IdOfMaxBidUser });
+          if (alreadyExist) {
             await Cart.updateOne(
               {
                 user: userId,
               },
               { $push: { products: product.id } }
             );
-          }else{
+          } else {
             await Cart.create({
               user: IdOfMaxBidUser,
               products: [product.id],
             });
           }
-
-
         }
         addToCart();
         let dataOfBidUser = {
           user: IdOfMaxBidUser,
           product: product.id,
-          text: `Product ${product.title} has been added to your cart`
+          text: `Product ${product.title} has been added to your cart`,
         };
-        
-        fetch('https://x-changer.herokuapp.com/api/v1/notification', {
-          method: 'POST',
-          body: JSON.stringify(dataOfBidUser),
-          headers: { 'Content-Type': 'application/json' }
-        }).then(res => res.json())
-          .then(json => console.log(json));
 
+        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          method: "POST",
+          body: JSON.stringify(dataOfBidUser),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then((json) => console.log(json));
 
         let dataOfProductOwner = {
           user: product.user,
-          text: `Your product ${product.title} has been sold`
+          text: `Your product ${product.title} has been sold`,
         };
-      
-        fetch('https://x-changer.herokuapp.com/api/v1/notification', {
-          method: 'POST',
+
+        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          method: "POST",
           body: JSON.stringify(dataOfProductOwner),
-          headers: { 'Content-Type': 'application/json' }
-        }).then(res => res.json())
-          .then(json => console.log(json));
-      }else{
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then((json) => console.log(json));
+      } else {
         res.status(400).json({
-          status: 'Fail',
+          status: "Fail",
           message: "No bids found on this product",
         });
       }
-
     });
 
     //console.log('Job', job)
-    
-    
 
     res.status(200).json({
-      status: 'successful',
-      message: 'Added to cart',
+      status: "successful",
+      message: "Added to cart",
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
 };
 
-
 exports.updateWishlistStatus = async (req, res) => {
   try {
-    let {productId, status} = req.body;
+    let { productId, status } = req.body;
     const product = await Product.findById(productId);
-    console.log(product)
+    console.log(product);
     if (!product) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
-    
-    let updatedProduct = await Product.findOneAndUpdate(productId, { wishlistStatus: status });
+
+    let updatedProduct = await Product.findOneAndUpdate(productId, {
+      wishlistStatus: status,
+    });
     console.log(updatedProduct);
 
     res.send(200).json({
-      status: 'successful',
-      message: 'Wishlist Updated successfully',
+      status: "successful",
+      message: "Wishlist Updated successfully",
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
@@ -910,58 +1044,56 @@ exports.updateWishlistStatus = async (req, res) => {
 
 exports.updateRating = async (req, res) => {
   try {
-    let {productId, rating} = req.body;
+    let { productId, rating } = req.body;
     const product = await Product.findById(productId);
     if (!product) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
-    
-    let prevRating = parseInt(product.rating);
-    
-    let newRating = (prevRating + rating)/2;
 
-    let updatedProduct = await Product.findOneAndUpdate(productId, { rating: newRating });
+    let prevRating = parseInt(product.rating);
+
+    let newRating = (prevRating + rating) / 2;
+
+    let updatedProduct = await Product.findOneAndUpdate(productId, {
+      rating: newRating,
+    });
     console.log(updatedProduct);
 
     res.send(200).json({
-      status: 'successful',
-      message: 'Rating Updated Successfully',
+      status: "successful",
+      message: "Rating Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
 };
 
-
 exports.getRandomProducts = async (req, res) => {
   try {
-    
-    let product = await Product.aggregate(
-      [ { $sample: { size: 10 } } ]
-    );
+    let product = await Product.aggregate([{ $sample: { size: 10 } }]);
     if (!product) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
-    
+
     console.log(product);
-    let products = {products: product}
+    let products = { products: product };
     return res.json({
-      status: 'successful',
-      message: 'Random Products Found',
-      data: products
+      status: "successful",
+      message: "Random Products Found",
+      data: products,
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
@@ -969,25 +1101,24 @@ exports.getRandomProducts = async (req, res) => {
 
 exports.getProductByTitle = async (req, res) => {
   try {
-    
-    let product = await Product.find({ title:req.params.title})
+    let product = await Product.find({ title: req.params.title });
     if (!product) {
       res.status(400).json({
-        status: 'fail',
-        message: 'product does not exist',
+        status: "fail",
+        message: "product does not exist",
       });
     }
-    
+
     console.log(product);
-    
+
     return res.json({
-      status: 'successful',
-      message: 'Random Products Found',
-      data: product
+      status: "successful",
+      message: "Random Products Found",
+      data: product,
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: error,
     });
   }
