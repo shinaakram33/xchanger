@@ -8,6 +8,7 @@ const User = require("../models/userModal");
 exports.createOrder = async (req, res) => {
   try {
     console.log("req.boy", req.body);
+    console.log("params ", req.params.cartId);
     const cart = await Cart.findById(req.params.cartId);
     if (cart.selectedProducts.length === 0) {
       return res.status(400).json({
@@ -21,7 +22,7 @@ exports.createOrder = async (req, res) => {
         message: "You dont have an access to perform this action",
       });
     }
-    if (!req.body.card) {
+    if (!req.body.source) {
       return res.status(400).json({
         status: "fail",
         message: "Invalid credentials",
@@ -30,7 +31,9 @@ exports.createOrder = async (req, res) => {
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
-      card: req.body.card,
+      card: {
+        token: req.body.source,
+      },
     });
     console.log("paymentMethod ", paymentMethod);
 
@@ -71,17 +74,18 @@ exports.createOrder = async (req, res) => {
           cartId: cart._id,
           checkoutId: paymentIntent.id,
           status: "pending",
+          price: req.body.price,
           productId: cart.selectedProducts,
         });
-        // console.log("createdOrderTable");
-        // await Cart.updateOne(
-        //   {
-        //     user: req.user.id,
-        //   },
-        //   { $pull: { products: { $in: cart.products } } }
-        // );
-        // cart.selectedProducts = undefined;
-        // await cart.save({ validateBeforeSave: false });
+        console.log("createdOrderTable");
+        await Cart.updateOne(
+          {
+            user: req.user.id,
+          },
+          { $pull: { products: { $in: cart.products } } }
+        );
+        cart.selectedProducts = undefined;
+        await cart.save({ validateBeforeSave: false });
 
         let data = {
           user: updatedProduct.user,
@@ -192,18 +196,54 @@ exports.createImmediateOrder = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    const charge = await stripe.charges.create({
+
+    // const charge = await stripe.charges.create({
+    //   amount: req.body.price * 100,
+    //   currency: "usd",
+    //   source: req.body.source,
+    // });
+
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: "card",
+      card: {
+        token: req.body.source,
+      },
+    });
+    console.log("paymentMethod ", paymentMethod);
+
+    if (!paymentMethod.created)
+      res.status(403).send("Payment method not created");
+
+    const paymentIntent = await stripe.paymentIntents.create({
       amount: req.body.price * 100,
       currency: "usd",
-      source: req.body.source,
+      payment_method_types: ["card"],
+      payment_method: paymentMethod.id,
+      confirm: true,
+      capture_method: "manual",
     });
-    if (charge.paid) {
+
+    if (paymentIntent.created) {
       const updatedProduct = await Product.findOneAndUpdate(
         req.body.productId,
-        { status: "sold" }
+        { status: "pending" }
       );
 
       //let product = await Product.findById(req.body.productId);
+
+      let createOrderTable = new Order({
+        name: req.body.name,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber,
+        location: req.body.location,
+        user: req.user.id,
+        checkoutId: paymentIntent.id,
+        status: "pending",
+        price: req.body.price,
+        productId: req.body.productId,
+      });
+      await createOrderTable.save();
+      console.log("createdOrderTable");
 
       let data = {
         user: updatedProduct.user,
@@ -231,34 +271,21 @@ exports.createImmediateOrder = async (req, res) => {
         });
       console.log("Check 2", updatedProduct);
 
-      let createOrderTable = new Order({
-        name: req.body.name,
-        email: req.body.email,
-        phoneNumber: req.body.phoneNumber,
-        location: req.body.location,
-        user: req.user.id,
-        checkoutId: charge.balance_transaction,
-        status: "sold",
-        productId: req.body.productId,
-      });
-      await createOrderTable.save();
-      console.log("createdOrderTable");
-
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         message: "Product is purchased successfully",
         data: createOrderTable,
       });
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         status: "fail",
         message: "Stripe error",
       });
     }
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -415,6 +442,27 @@ exports.getAllOrders = async (req, res) => {
     res.status(400).json({
       status: "fail",
       message: err,
+    });
+  }
+};
+
+exports.getPendingOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      user: req.user.id,
+      status: "pending",
+    }).populate("productId");
+    if (!orders) return res.status(201).send("No pending orders.");
+
+    return res.status(200).json({
+      status: "success",
+      length: orders.length,
+      data: orders,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: "fail",
+      message: err.message,
     });
   }
 };
