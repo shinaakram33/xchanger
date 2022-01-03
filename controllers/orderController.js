@@ -29,6 +29,15 @@ exports.createOrder = async (req, res) => {
       });
     }
 
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
+
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -104,8 +113,8 @@ exports.createOrder = async (req, res) => {
           .then(async (res) => {
             try {
               console.log("res ", res);
-              const data = await res.json();
-              console.log("response data?", data);
+              const dataa = await res.json();
+              console.log("response data?", dataa);
             } catch (err) {
               console.log("error");
               console.log(err);
@@ -242,8 +251,8 @@ exports.createImmediateOrder = async (req, res) => {
       })
         .then(async (res) => {
           try {
-            const data = await res.json();
-            console.log("response data?", data);
+            const dataa = await res.json();
+            console.log("response data?", dataa);
           } catch (err) {
             console.log("error");
             console.log(err);
@@ -319,8 +328,8 @@ exports.orderAccepted = async (req, res) => {
             .then(async (res) => {
               try {
                 console.log("res ", res);
-                const data = await res.json();
-                console.log("response data?", data);
+                const dataa = await res.json();
+                console.log("response data?", dataa);
               } catch (err) {
                 console.log("error");
                 console.log(err);
@@ -374,8 +383,8 @@ exports.orderAccepted = async (req, res) => {
             })
               .then(async (res) => {
                 try {
-                  const data = await res.json();
-                  console.log("response data?", data);
+                  const dataa = await res.json();
+                  console.log("response data?", dataa);
                 } catch (err) {
                   console.log("error");
                   console.log(err);

@@ -3,14 +3,10 @@ const Notification = require("../models/notificationModal");
 exports.createNotification = async (req, res) => {
   const { user, text, product, status, chat_room_id } = req.body;
 
+  if (!text) return res.status(403).send("Text is required");
+
   try {
-    let notification = new Notification({
-      user,
-      product,
-      text,
-      status,
-      chat_room_id,
-    });
+    let notification = new Notification(req.body);
 
     await notification.save();
 
@@ -40,6 +36,7 @@ exports.getAllUserNotifications = async (req, res) => {
         message: "No Notifications Found For This User",
       });
     }
+    console.log("notifications", notifications);
     let countOfFalseNotification = await Notification.countDocuments({
       status: false,
       user: userId,
@@ -63,7 +60,7 @@ exports.updateNotificationStatus = async (req, res) => {
 
   try {
     let notification = await Notification.findById(notificationId);
-    if (!notifications) {
+    if (!notification) {
       return res.status(400).json({
         status: "fail",
         message: "No Notifications Found",
