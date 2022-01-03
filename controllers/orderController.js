@@ -199,33 +199,15 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
-    // const charge = await stripe.charges.create({
-    //   amount: req.body.price * 100,
-    //   currency: "usd",
-    //   source: req.body.source,
-    // });
-
-    const paymentMethod = await stripe.paymentMethods.create({
-      type: "card",
-      card: {
-        token: req.body.source,
-      },
-    });
-    console.log("paymentMethod ", paymentMethod);
-
-    if (!paymentMethod.created)
-      res.status(403).send("Payment method not created");
-
-    const paymentIntent = await stripe.paymentIntents.create({
+    const charge = await stripe.charges.create({
       amount: req.body.price * 100,
       currency: "usd",
-      payment_method_types: ["card"],
-      payment_method: paymentMethod.id,
-      confirm: true,
-      capture_method: "manual",
+      source: req.body.source,
     });
 
-    if (paymentIntent.created) {
+    if (!charge) res.status(403).send("Payment method not created");
+
+    if (charge.paid) {
       const updatedProduct = await Product.findOneAndUpdate(
         req.body.productId,
         { status: "pending" }
