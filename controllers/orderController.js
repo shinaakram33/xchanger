@@ -64,7 +64,8 @@ exports.createOrder = async (req, res) => {
           { status: "pending" },
           { new: true }
         );
-        console.log("price ", i.price.orignalPrice);
+        console.log("product ", updatedProduct);
+        console.log("price ", updatedProduct.price.orignalPrice);
         console.log("product updated");
         const createOrderTable = await Order.create({
           name: req.body.name,
@@ -75,8 +76,8 @@ exports.createOrder = async (req, res) => {
           cartId: cart._id,
           checkoutId: paymentIntent.id,
           status: "pending",
-          price: i.price.orignalPrice,
-          productId: i,
+          price: updatedProduct.price.orignalPrice,
+          productId: updatedProduct.id,
         });
         console.log("createdOrderTable");
         await Cart.updateOne(
