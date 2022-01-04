@@ -66,6 +66,19 @@ exports.createOrder = async (req, res) => {
 
     if (paymentIntent.created) {
       console.log("payment created");
+      const createOrderTable = await Order.create({
+        name: req.body.name,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber,
+        location: req.body.location,
+        user: req.user.id,
+        cartId: cart._id,
+        checkoutId: paymentIntent.id,
+        status: "pending",
+        price: req.body.price,
+      });
+      console.log("createdOrderTable");
+
       cart.selectedProducts.map(async (i, index) => {
         console.log("map");
         let updatedProduct = await Product.findByIdAndUpdate(
@@ -73,22 +86,10 @@ exports.createOrder = async (req, res) => {
           { status: "pending" },
           { new: true }
         );
-        console.log("product ", updatedProduct);
-        console.log("price ", updatedProduct.price.orignalPrice);
         console.log("product updated");
-        const createOrderTable = await Order.create({
-          name: req.body.name,
-          email: req.body.email,
-          phoneNumber: req.body.phoneNumber,
-          location: req.body.location,
-          user: req.user.id,
-          cartId: cart._id,
-          checkoutId: paymentIntent.id,
-          status: "pending",
-          price: updatedProduct.price.orignalPrice,
-          productId: updatedProduct.id,
-        });
-        console.log("createdOrderTable");
+
+        createOrderTable.productId.push(updatedProduct.id);
+
         await Cart.updateOne(
           {
             user: req.user.id,
@@ -126,11 +127,12 @@ exports.createOrder = async (req, res) => {
           });
 
         console.log("status ", paymentIntent.status);
-        res.status(200).json({
-          status: "success",
-          message: "Product is ordered successfully",
-          data: createOrderTable,
-        });
+      });
+      await createOrderTable.save();
+      return res.status(200).json({
+        status: "success",
+        message: "Product is ordered successfully",
+        data: createOrderTable,
       });
     } else {
       res.status(400).json({
