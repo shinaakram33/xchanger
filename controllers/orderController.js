@@ -89,6 +89,7 @@ exports.createOrder = async (req, res) => {
         console.log("product updated");
 
         createOrderTable.productId.push(updatedProduct.id);
+        console.log("product array ", createOrderTable.productId);
 
         await Cart.updateOne(
           {
@@ -97,7 +98,6 @@ exports.createOrder = async (req, res) => {
           { $pull: { products: { $in: cart.selectedProducts } } }
         );
         cart.selectedProducts = undefined;
-        await cart.save({ validateBeforeSave: false });
 
         let data = {
           user: updatedProduct.user,
@@ -125,9 +125,9 @@ exports.createOrder = async (req, res) => {
           .catch((error) => {
             console.log(error);
           });
-
         console.log("status ", paymentIntent.status);
       });
+      await cart.save({ validateBeforeSave: false });
       await createOrderTable.save();
       return res.status(200).json({
         status: "success",
