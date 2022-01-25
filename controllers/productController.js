@@ -167,6 +167,10 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       );
     }
 
+    if(req.query.flag) {
+      searchCriteria.flag = req.query.flag;
+    }
+
     if (req.query.buyingFormat) {
       searchCriteria.adType = new RegExp(
         ".*" + req.query.buyingFormat.toLowerCase() + ".*",
@@ -305,6 +309,10 @@ exports.getCategoryProduct = async (req, res) => {
         "i"
       );
     }
+    
+    if(req.query.flag) {
+      searchCriteria.flag = req.query.flag;
+    }
 
     if (req.query.buyingFormat) {
       searchCriteria.adType = new RegExp(
@@ -402,7 +410,7 @@ exports.createBiddingProduct = async (req, res) => {
 
 exports.getBiddingPendingProduct = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ status: "pending" })
+    const pendingProduct = await Product.find({ status: "pending", flag: "Approved" })
       .populate("category")
       .populate("subCategoryId")
       .populate("subCategoryOptionId");
@@ -514,6 +522,10 @@ exports.getBiddingProducts = async (req, res) => {
         "i"
       );
     }
+    
+    if(req.query.flag) {
+      searchCriteria.flag = req.query.flag;
+    }
 
     if (req.query.buyingFormat) {
       searchCriteria.adType = new RegExp(
@@ -615,8 +627,13 @@ exports.createFeaturedProduct = async (req, res) => {
 exports.getFeaturedPosts = async (req, res) => {};
 
 exports.getUserProducts = async (req, res) => {
-  try {
-    const userPosts = await Product.find({ user: { $in: req.params.userId } });
+  try { 
+    let userPosts;   
+    if(req.query.flag) {
+      let flag = req.query.flag;
+      userPosts = await Product.find({ user: { $in: req.params.userId }, flag });
+    }
+    userPosts = await Product.find({ user: { $in: req.params.userId } });
     if (!userPosts) {
       res.status(400).json({
         status: "fail",
@@ -638,7 +655,7 @@ exports.getUserProducts = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
   let searchCriteria = {
-    status: "not_sold",
+    status: "not_sold"
   };
   let sortingQuery = {};
   if (req.query.search) {
@@ -727,6 +744,10 @@ exports.getAllProduct = async (req, res) => {
       ".*" + req.query.state.toLowerCase() + ".*",
       "i"
     );
+  }
+
+  if(req.query.flag) {
+    searchCriteria.flag = req.query.flag;
   }
 
   if (req.query.buyingFormat) {
@@ -1076,7 +1097,7 @@ exports.updateRating = async (req, res) => {
 
 exports.getRandomProducts = async (req, res) => {
   try {
-    let product = await Product.aggregate([{ $sample: { size: 10 } }]);
+    let product = await Product.aggregate([{ $sample: { size: 10 }}, { $match: { flag: "Approved" }}]);
     if (!product) {
       res.status(400).json({
         status: "fail",
@@ -1101,7 +1122,12 @@ exports.getRandomProducts = async (req, res) => {
 
 exports.getProductByTitle = async (req, res) => {
   try {
-    let product = await Product.find({ title: req.params.title });
+    let product;
+    if (req.query.flag) {
+      let flag = req.query.flag;
+      product = await Product.find({ title: req.params.title, flag });
+    }
+    product = await Product.find({ title: req.params.title });
     if (!product) {
       res.status(400).json({
         status: "fail",

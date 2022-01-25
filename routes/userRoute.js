@@ -9,10 +9,14 @@ const {
   protected,
   changePassword,
   updatePrivacteStatus,
+  getAllUsers,
+  getUserById,
+  deleteUser
 } = require("../controllers/authController");
 const router = express.Router();
 
-router.route("/:userId").patch(protected, updateUser);
+router.route("/").get(getAllUsers)
+router.route("/:userId").patch(protected, updateUser).get(getUserById).delete(deleteUser);
 router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/forgetPassword").post(forgetPassword);

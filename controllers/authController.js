@@ -340,3 +340,74 @@ exports.updatePrivacteStatus = async (req, res) => {
   }
 };
 
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.status(200).json({
+      status: 'successful',
+      length: users.length,
+      data: users,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+}
+
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User id is required',
+      });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(200).json({
+        status: 'successful',
+        message: 'User does not exist',
+      });
+    }
+    return res.status(200).json({
+      status: 'successful',
+      user: user,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+}
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User id is required',
+      });
+    }
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(200).json({
+        status: 'successful',
+        message: 'User does not exist',
+      });
+    }
+    return res.status(200).json({
+      status: 'successful',
+      user: user,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+}

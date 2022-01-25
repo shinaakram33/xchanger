@@ -220,6 +220,11 @@ const productSchema = new mongoose.Schema(
       ref: 'FeatureAd',
       default: undefined,
     },
+    flag: {
+      type: String,
+      enum: ['Pending', 'Approved'],
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );
