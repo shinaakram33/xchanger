@@ -404,6 +404,7 @@ exports.deleteUser = async (req, res) => {
       status: 'successful',
       user: user,
     });
+    
   } catch (err) {
     return res.status(400).json({
       status: 'fail',
