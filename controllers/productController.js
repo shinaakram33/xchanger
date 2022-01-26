@@ -922,26 +922,26 @@ exports.updateProducts = async (req, res) => {
 exports.deleteProducts = async (req, res) => {
   try {
     const id = req.params.productId;
-    const product = await Product.findById(productId.toString());
+    if (!id) {
+      res.status(400).json({
+        status: "fail",
+        message: "Product Id is required",
+      });
+    }
+    const product = await Product.findById(id);
     if (!product) {
       res.status(400).json({
         status: "fail",
         message: "product does not exist",
       });
     }
-    if (product.user.toString() !== req.user.id) {
-      res.status(400).json({
-        status: "fail",
-        message: "product does not delete",
-      });
-    }
-    const result = await product.findByIdAndDelete(id);
-    res.send(200).json({
+    const result = await Product.findByIdAndDelete(id);
+    return res.status(200).json({
       status: "successful",
       message: "product delete successfully",
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "fail",
       message: error,
     });
