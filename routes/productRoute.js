@@ -33,7 +33,7 @@ router.route('/product/:productId').get(getSpecificProductDetail)
 router
   .route('/:productId')
   .patch(protected, updateProducts)
-  .delete(protected, deleteProducts)
+  .delete(deleteProducts)
   .put(protected, restrictTo('admin'), changeBiddingStatus)
   .post(protected, scheduleAndAddToCart)
 
