@@ -462,3 +462,97 @@ exports.getPendingOrders = async (req, res) => {
     });
   }
 };
+
+exports.getOrderById = async (req, res) => {
+  try {
+      const id = req.params.orderId;
+      if(!id) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Order id is required',
+            });
+      }
+      const order = await Order.findById(id)
+      .populate("user")
+      .populate("cartId")
+      .populate("productId");
+      if (!order) {
+          return res.status(200).json({
+              status: 'successful',
+              message: 'Order does not exist',
+            });
+      }
+      res.status(201).json({
+          status: 'success',
+          TermCondition: order
+      });
+} catch (err) {
+  res.status(400).json({
+    status: 'fail',
+    message: err,
+  });
+}
+}
+
+exports.updateOrder = async (req, res) => {
+  try {
+      const id = req.params.orderId;
+      const updates = req.body;
+      if(!id) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Order id is required',
+            });
+      }
+      const order = await Order.findById(id);
+      if (!order) {
+          return res.status(200).json({
+              status: 'successful',
+              message: 'Order does not exist',
+            });
+      }
+      const updated_order = await Order.findByIdAndUpdate(id, updates, { new: true })
+      .populate("user")
+      .populate("cartId")
+      .populate("productId");
+      res.status(201).json({
+          status: 'success',
+          data: updated_order
+      });
+} catch (err) {
+  res.status(400).json({
+    status: 'fail',
+    message: err,
+  });
+}
+}
+
+exports.deleteOrder = async (req, res) => {
+  try {
+      const id = req.params.orderId;
+      if(!id) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Order id is required',
+            });
+      }
+      const order = await Order.findById(id);
+      if (!order) {
+          return res.status(200).json({
+              status: 'successful',
+              message: 'Order does not exist',
+            });
+      }
+      const deleted_order = await Order.findByIdAndDelete(id);
+      res.status(201).json({
+          status: 'success',
+          message: 'Order deleted successfully',
+          data: deleted_order
+      });
+} catch (err) {
+  res.status(400).json({
+    status: 'fail',
+    message: err,
+  });
+}
+}
