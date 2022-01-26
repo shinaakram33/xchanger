@@ -68,7 +68,7 @@ exports.createProduct = async (req, res) => {
     //   }
     // } else {
 
-    // console.log('here', req.body, req.params);
+    console.log('here', req.body, req.params);
     // const obj_ = {
     //   price: req.body.price,
     //   priceNegotiation: req.body.priceNegotiation,
@@ -92,7 +92,10 @@ exports.createProduct = async (req, res) => {
     // }
     // console.log('after object');
     // console.log(obj_);
+    console.log(req.user.id);
     
+    const pkgSize = obj[req.body.pakageSize];
+    console.log(pkgSize);
     const newProduct = await Product.create({
       price: req.body.price,
       priceNegotiation: req.body.priceNegotiation,
@@ -112,7 +115,7 @@ exports.createProduct = async (req, res) => {
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
       time: req.body.time,
-      pakageSize: obj[req.body.pakageSize],
+      pakageSize: pkgSize,
     });
     console.log(newProduct);
     res.status(201).json({
@@ -123,7 +126,7 @@ exports.createProduct = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
