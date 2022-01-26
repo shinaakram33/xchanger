@@ -11,6 +11,25 @@ const fetch = require("node-fetch");
 
 exports.createProduct = async (req, res) => {
   try {
+    let pakageSize = {};
+    const obj = {
+      small: {
+        type: 'S',
+        price: 7,
+        maxWeight: 2
+      },
+      medium: {
+        type: 'M',
+        price: 9.7,
+        maxWeight: 10
+      },
+      large: {
+        type: 'L',
+        price: 20.5,
+        maxWeight: 30
+      }
+    };
+
     if (!req.body) {
       res.status(400).json({
         status: "fail",
@@ -48,6 +67,7 @@ exports.createProduct = async (req, res) => {
     //     });
     //   }
     // } else {
+
     const newProduct = await Product.create({
       price: req.body.price,
       priceNegotiation: req.body.priceNegotiation,
@@ -67,13 +87,13 @@ exports.createProduct = async (req, res) => {
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
       time: req.body.time,
+      pakageSize: obj[req.body.pakageSize],
     });
     res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
       product: newProduct,
     });
-    // }
   } catch (err) {
     res.status(400).json({
       status: "fail",

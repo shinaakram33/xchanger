@@ -225,6 +225,10 @@ const productSchema = new mongoose.Schema(
       enum: ['Pending', 'Approved'],
       default: 'Pending',
     },
+    pakageSize: {
+      type: Object,
+      require: [true, 'Pakage size is required']
+    }
   },
   { timestamps: true }
 );
