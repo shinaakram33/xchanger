@@ -7,6 +7,7 @@ const {
   resetPassword,
   updateUser,
   protected,
+  restrictTo,
   changePassword,
   updatePrivacteStatus,
   getAllUsers,
@@ -16,7 +17,9 @@ const {
 const router = express.Router();
 
 router.route("/").get(getAllUsers)
-router.route("/:userId").patch(protected, updateUser).get(getUserById).delete(deleteUser);
+router.route("/:userId")
+.patch(protected, updateUser).get(getUserById)
+.delete(protected, restrictTo('admin'), deleteUser);
 router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/forgetPassword").post(forgetPassword);
