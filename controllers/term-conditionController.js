@@ -98,7 +98,6 @@ exports.updateTermAndCondition = async (req, res) => {
 exports.deleteTermAndCondition = async (req, res) => {
     try {
         const id = req.params.id;
-        const updates = req.body;
         if(!id) {
             return res.status(400).json({
                 status: 'fail',
