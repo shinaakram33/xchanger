@@ -68,6 +68,31 @@ exports.createProduct = async (req, res) => {
     //   }
     // } else {
 
+    // console.log('here', req.body, req.params);
+    // const obj_ = {
+    //   price: req.body.price,
+    //   priceNegotiation: req.body.priceNegotiation,
+    //   color: req.body.color,
+    //   size: req.body.size,
+    //   country: req.body.country,
+    //   season: req.body.season,
+    //   condition: req.body.condition,
+    //   image: req.body.image,
+    //   brand: req.body.brand,
+    //   subject: req.body.subject,
+    //   title: req.body.title,
+    //   description: req.body.description,
+    //   category: req.params.categoryId,
+    //   categoryName: req.body.categoryName,
+    //   subCategoryId: req.params.subCategoryId,
+    //   subCategoryOptionId: req.params.subCategoryOptionId,
+    //   user: req.user.id,
+    //   time: req.body.time,
+    //   pakageSize: obj[req.body.pakageSize],
+    // }
+    // console.log('after object');
+    // console.log(obj_);
+    
     const newProduct = await Product.create({
       price: req.body.price,
       priceNegotiation: req.body.priceNegotiation,
@@ -89,6 +114,7 @@ exports.createProduct = async (req, res) => {
       time: req.body.time,
       pakageSize: obj[req.body.pakageSize],
     });
+    console.log(newProduct);
     res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",

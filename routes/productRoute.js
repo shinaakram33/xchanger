@@ -20,7 +20,7 @@ const { protected, restrictTo } = require('../controllers/authController');
 
 const router = express.Router({ mergeParams: true });
 
-router.route('/:categoryId/:subCategoryId/:subCategoryOptionId').post(protected, createProduct);
+router.route('/').post(createProduct);
 router.route('/').get(getCategoryProduct);
 router.route('/bidding').post(protected, createBiddingProduct).get(getBiddingProducts);
 router.route('/filtered').get(getCategoryFilteredProduct);
