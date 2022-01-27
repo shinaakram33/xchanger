@@ -425,15 +425,30 @@ exports.orderAccepted = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const allOrders = await Order.find({ user: req.user.id })
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (user.roles === 'admin') {
+      const allOrders = await Order.find()
       .populate("user")
       .populate("cartId")
       .populate("productId");
-    res.status(200).json({
-      status: "success",
-      length: allOrders.length,
-      data: allOrders,
-    });
+      res.status(200).json({
+        status: "success",
+        length: allOrders.length,
+        data: allOrders,
+      });
+    } else {
+      const allOrders = await Order.find({ user: req.user.id })
+      .populate("user")
+      .populate("cartId")
+      .populate("productId");
+      res.status(200).json({
+        status: "success",
+        length: allOrders.length,
+        data: allOrders,
+      });
+    }
+    
   } catch (err) {
     res.status(400).json({
       status: "fail",
