@@ -50,7 +50,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     defalt: false
   },
-  
   image: {
     type: String,
     default: null,

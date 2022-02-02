@@ -1,4 +1,5 @@
 const Bidding = require('../models/biddingModal');
+const User = require('../models/userModal');
 const { getAllBrands } = require('./brandController');
 
 exports.createBidding = async (req, res) => {
@@ -28,12 +29,27 @@ exports.createBidding = async (req, res) => {
 };
 exports.getAllbidding = async (req, res) => {
   try {
-    const getAllbidding = await Bidding.find();
-    res.status(200).json({
-      status: 'success',
-      length: getAllbidding.length,
-      data: getAllbidding,
-    });
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (user.roles === 'admin') {
+      const getAllbidding = await Bidding.find()
+      .populate("user")
+      .populate("product");
+      res.status(200).json({
+        status: 'success',
+        length: getAllbidding.length,
+        data: getAllbidding,
+      });
+    } else {
+      const getAllbidding = await Bidding.find({user: id})
+      .populate("user")
+      .populate("product");
+      res.status(200).json({
+        status: 'success',
+        length: getAllbidding.length,
+        data: getAllbidding,
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
