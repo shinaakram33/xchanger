@@ -707,43 +707,48 @@ exports.getAllProduct = async (req, res) => {
     status: "not_sold"
   };
   let sortingQuery = {};
-  if (req.query.search) {
-    searchCriteria = {
-      $or: [
-        {
-          title: {
-            regex: new RegExp(
-              ".*" + req.query.search.toLowerCase() + ".*",
-              "i"
-            ),
-          },
-        },
-        {
-          brand: {
-            regex: new RegExp(
-              ".*" + req.query.search.toLowerCase() + ".*",
-              "i"
-            ),
-          },
-        },
-        {
-          subject: {
-            regex: new RegExp(
-              ".*" + req.query.search.toLowerCase() + ".*",
-              "i"
-            ),
-          },
-        },
-        {
-          season: {
-            regex: new RegExp(
-              ".*" + req.query.search.toLowerCase() + ".*",
-              "i"
-            ),
-          },
-        },
-      ],
-    };
+  if (req.query.title) {
+
+    searchCriteria.title = new RegExp(
+      ".*" + req.query.title.toLowerCase() + ".*",
+      "i"
+    );
+    // searchCriteria = {
+    //   $or: [
+    //     {
+    //       title: {
+    //         regex: new RegExp(
+    //           ".*" + req.query.search.toLowerCase() + ".*",
+    //           "i"
+    //         ),
+    //       },
+    //     },
+    //     {
+    //       brand: {
+    //         regex: new RegExp(
+    //           ".*" + req.query.search.toLowerCase() + ".*",
+    //           "i"
+    //         ),
+    //       },
+    //     },
+    //     {
+    //       subject: {
+    //         regex: new RegExp(
+    //           ".*" + req.query.search.toLowerCase() + ".*",
+    //           "i"
+    //         ),
+    //       },
+    //     },
+    //     {
+    //       season: {
+    //         regex: new RegExp(
+    //           ".*" + req.query.search.toLowerCase() + ".*",
+    //           "i"
+    //         ),
+    //       },
+    //     },
+    //   ],
+    // };
   }
   if (req.query.condition) {
     searchCriteria = {
