@@ -12,11 +12,13 @@ const {
   updatePrivacteStatus,
   getAllUsers,
   getUserById,
-  deleteUser
+  deleteUser,
+  searchUsers
 } = require("../controllers/authController");
 const router = express.Router();
 
 router.route("/").get(getAllUsers)
+router.route("/search").get(searchUsers)
 router.route("/:userId")
 .patch(protected, updateUser).get(getUserById)
 .delete(protected, restrictTo('admin'), deleteUser);

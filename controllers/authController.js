@@ -3,6 +3,8 @@ const { promisify } = require('util');
 const bycript = require('bcryptjs');
 const User = require('../models/userModal');
 const sendEmail = require('../utils/sendEmail');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_TOKEN, {
@@ -21,6 +23,14 @@ exports.signup = async (req, res) => {
     } else {
       const newUser = await User.create(req.body);
       const token = signToken(newUser._id);
+      // if(newUser.roles === 'seller') {
+      //   console.log('in if');
+      //   const account = await stripe.accounts.create({type: 'standard'});
+      //   console.log(account);
+      //   newUser.connAccount = account.id;
+      //   newUser.save();
+      // }
+      console.log(newUser);
       res.status(201).json({
         status: 'success',
         token,
@@ -410,6 +420,46 @@ exports.deleteUser = async (req, res) => {
     return res.status(400).json({
       status: 'fail',
       message: err,
+    });
+  }
+}
+
+
+exports.searchUsers = async (req, res) => {
+  try {
+    let searchCriteria = {}
+
+    if (req.query.name) {
+      searchCriteria.name = new RegExp(
+        ".*" + req.query.name.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.email) {
+      searchCriteria.email = new RegExp(
+        ".*" + req.query.email.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.phone) {
+      searchCriteria.phone = new RegExp(
+        ".*" + req.query.phone.toLowerCase() + ".*",
+        "i"
+      );
+    }
+
+    const users = await User.find(searchCriteria);
+
+    return res.status(200).json({
+      status: 'successful',
+      users: users,
+    });
+
+
+  } catch (error) {
+    return res.status(400).json({
+      status: 'fail',
+      message: error,
     });
   }
 }
