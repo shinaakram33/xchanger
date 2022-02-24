@@ -571,3 +571,51 @@ exports.deleteOrder = async (req, res) => {
   });
 }
 }
+
+exports.searchOrder = async (req, res) => {
+  try {
+    let searchCriteria = {}
+
+    if (req.query.name) {
+      searchCriteria.name = new RegExp(
+        ".*" + req.query.name.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.email) {
+      searchCriteria.email = new RegExp(
+        ".*" + req.query.email.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.phoneNumber) {
+      searchCriteria.phoneNumber = new RegExp(
+        ".*" + req.query.phoneNumber.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.location) {
+      searchCriteria.location = new RegExp(
+        ".*" + req.query.location.toLowerCase() + ".*",
+        "i"
+      );
+    }
+
+    const orders = await Order.find(searchCriteria)
+    .populate("user")
+    .populate("cartId")
+    .populate("productId");
+
+    return res.status(200).json({
+      status: 'successful',
+      orders: orders,
+    });
+
+
+  } catch (error) {
+    return res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+}
