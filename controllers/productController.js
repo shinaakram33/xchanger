@@ -8,9 +8,20 @@ const cron = require("node-cron");
 const moment = require("moment");
 const schedule = require("node-schedule");
 const fetch = require("node-fetch");
+const User = require("../models/userModal");
 
 exports.createProduct = async (req, res) => {
   try {
+    // const user = await User.findById(req.user.id);
+    // console.log(user);
+    // if (user.roles === 'user' && (user.connAccount === undefined || user.connAccount === '')) {
+    //   console.log('in if');
+    //   const account = await stripe.accounts.create({type: 'express'});
+    //     console.log(account);
+    //     user.connAccount = account.id;
+    //     // user.save();
+    // }
+
     let pakageSize = {};
     const obj = {
       small: {
@@ -27,6 +38,16 @@ exports.createProduct = async (req, res) => {
         type: 'L',
         price: 20.5,
         maxWeight: 30
+      },
+      xlarge: {
+        type: 'XL',
+        price: 25,
+        maxWeight: 30
+      },
+      xxlarge: {
+        type: 'XXL',
+        price: 50,
+        maxWeight: 35
       }
     };
 
@@ -121,7 +142,7 @@ exports.createProduct = async (req, res) => {
     res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
-      product: newProduct,
+      // product: newProduct,
     });
   } catch (err) {
     res.status(400).json({
