@@ -42,6 +42,9 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  connAccount: {
+    type: String
+  },
   gender: {
     type: String,
     default: null,

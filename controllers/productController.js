@@ -9,7 +9,7 @@ const moment = require("moment");
 const schedule = require("node-schedule");
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
-const { createNewAccount, updateAccount } = require("./stripeController")
+// const { createNewAccount, updateAccount } = require("./stripeController")
 
 exports.createProduct = async (req, res) => {
   try {

@@ -23,13 +23,6 @@ exports.signup = async (req, res) => {
     } else {
       const newUser = await User.create(req.body);
       const token = signToken(newUser._id);
-      // if(newUser.roles === 'seller') {
-      //   console.log('in if');
-      //   const account = await stripe.accounts.create({type: 'standard'});
-      //   console.log(account);
-      //   newUser.connAccount = account.id;
-      //   newUser.save();
-      // }
       console.log(newUser);
       res.status(201).json({
         status: 'success',
@@ -57,6 +50,7 @@ exports.login = async (req, res) => {
     console.log(email, password);
     const user = await User.findOne({ email });
     // const user = await User.findOne({ email: email }).select('password');
+    console.log(user);
     const correctPassword = await user.correctPassword(password, user.password);
     if (!user || !correctPassword) {
       return res.status(401).json({
