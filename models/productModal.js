@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema(
     price: {
       orignalPrice: {
         type: Number,
-        required: [true, 'Original Price of product is required'],
+        // required: [true, 'Original Price of product is required'],
       },
       sellingPrice: {
         type: Number,
@@ -29,8 +29,8 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Size of a product is required'],
       enum: {
-        values: ['XXL', 'XL', 'M'],
-        message: 'Size of product must be XXL, XL or M',
+        values: ['XXL', 'XL', 'L', 'M', 'S'],
+        message: 'Size of product must be XXL, XL, L, M or S',
       },
     },
     categoryName: {
@@ -47,7 +47,7 @@ const productSchema = new mongoose.Schema(
     },
     season: {
       type: String,
-      required: [true, 'Season of a product is required'],
+      // required: [true, 'Season of a product is required'],
       enum: {
         values: ['spring', 'summer', 'autumn', 'winter'],
         message: 'Season must be spring, summer, autumn, or winter',
