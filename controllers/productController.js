@@ -9,18 +9,25 @@ const moment = require("moment");
 const schedule = require("node-schedule");
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
+const { createNewAccount, updateAccount } = require("./stripeController")
 
 exports.createProduct = async (req, res) => {
   try {
     // const user = await User.findById(req.user.id);
+    // if(!user) {
+    //   res.status(404).json({
+    //     status: 'fail',
+    //     message: 'User not found',
+    //   });
+    // }
     // console.log(user);
     // if (user.roles === 'user' && (user.connAccount === undefined || user.connAccount === '')) {
     //   console.log('in if');
-    //   const account = await stripe.accounts.create({type: 'express'});
-    //     console.log(account);
-    //     user.connAccount = account.id;
-    //     // user.save();
+    //   const { account, accountLink } = createNewAccount();
+    //   user.connAccount = account.id;
     // }
+    // const accountUpdateLink = updateAccount(user.connAccount);
+    // console.log(accountUpdateLink);
 
     let pakageSize = {};
     const obj = {
@@ -142,7 +149,7 @@ exports.createProduct = async (req, res) => {
     res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
-      // product: newProduct,
+      product: newProduct,
     });
   } catch (err) {
     res.status(400).json({
