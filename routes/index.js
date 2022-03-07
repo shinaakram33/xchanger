@@ -44,4 +44,13 @@ router.use('/notification', notificationRoute);
 router.use('/chats', chatRoute);
 router.use('/t&c', termConditionsRoute);
 
+// Stripe urls
+router.route('/stripe/refresh').get(function(req, res) {
+    return res.send('You refreshed');
+});
+
+router.route('/stripe/return').get(function(req, res) {
+    return res.send('Return url');
+});
+
 module.exports = router;
