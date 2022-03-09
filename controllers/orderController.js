@@ -638,6 +638,27 @@ exports.searchOrder = async (req, res) => {
     .populate("cartId")
     .populate("productId");
 
+
+    // const orders = await Order.aggregate([
+    //   {
+    //     $match: searchCriteria
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'Product',
+    //       localField: 'productId',
+    //       foreignField: '_id',
+    //       as: 'Products'
+    //     }
+    //   },
+    //   {$unwind: "$Product"},
+    //   {$match: {"Product.title": {$regex: req.query.productTitle}}}
+    // ])
+    // .populate("user")
+    // .populate("cartId")
+    // .populate("productId");
+    // console.log('here', orders);
+
     return res.status(200).json({
       status: 'successful',
       orders: orders,
