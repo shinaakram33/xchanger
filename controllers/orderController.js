@@ -343,22 +343,22 @@ exports.orderAccepted = async (req, res) => {
             { new: true }
           );
           console.log("2");
-          console.log('--------------------------------------------------');
+          // console.log('--------------------------------------------------');
           
-          console.log('user', updatedProduct.user);
-          let productUser = await User.findById(updatedProduct.user);
-          console.log('account', productUser.connAccount);
-          console.log(updatedProduct.price);
-          console.log(paymentIntentCapture.transfer_group);
+          // console.log('user', updatedProduct.user);
+          // let productUser = await User.findById(updatedProduct.user);
+          // console.log('account', productUser.connAccount);
+          // console.log(updatedProduct.price);
+          // console.log(paymentIntentCapture.transfer_group);
           
-          let transfer = await stripe.transfers.create({
-            amount: updatedProduct.price.sellingPrice * 100,
-            currency: 'usd',
-            destination: productUser.connAccount,
-            transfer_group: paymentIntentCapture.transfer_group
-          });
-          console.log(transfer);
-          console.log('--------------------------------------------------');
+          // let transfer = await stripe.transfers.create({
+          //   amount: updatedProduct.price.sellingPrice * 100,
+          //   currency: 'usd',
+          //   destination: productUser.connAccount,
+          //   transfer_group: paymentIntentCapture.transfer_group
+          // });
+          // console.log(transfer);
+          // console.log('--------------------------------------------------');
           let data = {
             user: updatedProduct.user,
             product: updatedProduct.id,
@@ -618,25 +618,13 @@ exports.deleteOrder = async (req, res) => {
 
 exports.searchOrder = async (req, res) => {
   try {
-    let searchCriteria = {}
+      let searchCriteria = {}
 
-    if (req.query.name) {
-      searchCriteria.name = new RegExp(
-        ".*" + req.query.name.toLowerCase() + ".*",
-        "i"
-      );
+    if (req.query.status) {
+      searchCriteria.status = req.query.status.toLowerCase();
     }
-    if (req.query.email) {
-      searchCriteria.email = new RegExp(
-        ".*" + req.query.email.toLowerCase() + ".*",
-        "i"
-      );
-    }
-    if (req.query.phoneNumber) {
-      searchCriteria.phoneNumber = new RegExp(
-        ".*" + req.query.phoneNumber.toLowerCase() + ".*",
-        "i"
-      );
+    if (req.query.accepted) {
+      searchCriteria.accepted = req.query.accepted.toLowerCase();
     }
     if (req.query.location) {
       searchCriteria.location = new RegExp(
