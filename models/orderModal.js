@@ -52,7 +52,7 @@ const orderSchema = new mongoose.Schema(
     },
     orderNumber: {
       type : String,
-      reqired: [true, "Order number is mandatory."],
+      required: [true, "Order number is mandatory."],
     }
   },
   { timestamps: true }

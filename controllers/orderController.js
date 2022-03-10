@@ -93,11 +93,11 @@ exports.createOrder = async (req, res) => {
       console.log("payment created", paymentIntent);
     
     let orderNumber = Math.random().toString(36).slice(5)
-    let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
+    let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
 
     while(checkExistingOrderNumber != null){
       orderNumber = Math.random().toString(36).slice(5)
-      checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
+      checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
     }
     
     const createOrderTable = await Order.create({
@@ -655,6 +655,7 @@ exports.searchOrder = async (req, res) => {
         "i"
       );
     }
+    console.log('SEARCH', req.query.name)
 
     // orders = await Order.find(searchCriteria)
     //   // .populate("user")
