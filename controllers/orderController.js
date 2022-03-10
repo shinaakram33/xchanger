@@ -92,6 +92,14 @@ exports.createOrder = async (req, res) => {
     if (paymentIntent.created) {
       console.log("payment created", paymentIntent);
     
+    let orderNUmber = Math.random().toString(36).slice(5)
+    let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
+
+    while(checkExistingOrderNumber != null){
+      orderNUmber = Math.random().toString(36).slice(5)
+      checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
+    }
+    
     const createOrderTable = await Order.create({
       name: req.body.name,
       email: req.body.email,
@@ -102,6 +110,7 @@ exports.createOrder = async (req, res) => {
       checkoutId: paymentIntent.id,
       status: "pending",
       price: req.body.price,
+      orderNUmber: orderNUmber
     });
     console.log("createdOrderTable");
 
@@ -631,6 +640,12 @@ exports.searchOrder = async (req, res) => {
     if (req.query.location) {
       searchCriteria.location = new RegExp(
         ".*" + req.query.location.toLowerCase() + ".*",
+        "i"
+      );
+    }
+    if (req.query.orderNumber) {
+      searchCriteria.orderNumber = new RegExp(
+        ".*" + req.query.orderNumber.toLowerCase() + ".*",
         "i"
       );
     }
