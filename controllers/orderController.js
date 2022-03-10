@@ -92,11 +92,11 @@ exports.createOrder = async (req, res) => {
     if (paymentIntent.created) {
       console.log("payment created", paymentIntent);
     
-    let orderNUmber = Math.random().toString(36).slice(5)
+    let orderNumber = Math.random().toString(36).slice(5)
     let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
 
     while(checkExistingOrderNumber != null){
-      orderNUmber = Math.random().toString(36).slice(5)
+      orderNumber = Math.random().toString(36).slice(5)
       checkExistingOrderNumber = await Order.findOne({orderNumber: orderNUmber})
     }
     
@@ -110,7 +110,7 @@ exports.createOrder = async (req, res) => {
       checkoutId: paymentIntent.id,
       status: "pending",
       price: req.body.price,
-      orderNUmber: orderNUmber
+      orderNumber: orderNumber
     });
     console.log("createdOrderTable");
 

@@ -50,6 +50,10 @@ const orderSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    orderNumber: {
+      type : String,
+      reqired: [true, "Order number is mandatory."],
+    }
   },
   { timestamps: true }
 );
