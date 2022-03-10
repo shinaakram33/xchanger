@@ -649,6 +649,12 @@ exports.searchOrder = async (req, res) => {
         "i"
       );
     }
+    if (req.query.name) {
+      searchCriteria.name = new RegExp(
+        ".*" + req.query.name.toLowerCase() + ".*",
+        "i"
+      );
+    }
 
     // orders = await Order.find(searchCriteria)
     //   // .populate("user")
