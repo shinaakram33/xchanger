@@ -655,7 +655,10 @@ exports.searchOrder = async (req, res) => {
         "i"
       );
     }
-    console.log('SEARCH', req.query.name)
+    if (req.query.date) {
+      searchCriteria.createdAt = {$gte: new Date(req.query.date)}
+    }
+    
 
     // orders = await Order.find(searchCriteria)
     //   // .populate("user")
