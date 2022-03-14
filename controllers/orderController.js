@@ -482,6 +482,7 @@ exports.getAllOrders = async (req, res) => {
     const user = await User.findById(id);
     if (user.roles === 'admin') {
       const allOrders = await Order.find()
+      .sort({"createdAt": -1})
       .populate("user")
       .populate("cartId")
       .populate("productId");
@@ -492,6 +493,7 @@ exports.getAllOrders = async (req, res) => {
       });
     } else {
       const allOrders = await Order.find({ user: req.user.id })
+      .sort({"createdAt": -1})
       .populate("user")
       .populate("cartId")
       .populate("productId");
