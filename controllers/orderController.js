@@ -4,6 +4,7 @@ const Product = require("../models/productModal");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
+const moment = require("moment");
 
 exports.createOrder = async (req, res) => {
   try {
@@ -631,9 +632,7 @@ exports.deleteOrder = async (req, res) => {
 
 exports.searchOrder = async (req, res) => {
   try {
-    let products;
     let searchCriteria = {}
-    let orders;
 
     if (req.query.status) {
       searchCriteria.status = req.query.status.toLowerCase();
@@ -660,66 +659,16 @@ exports.searchOrder = async (req, res) => {
       );
     }
     if (req.query.date) {
-      searchCriteria.createdAt = {$gte: new Date(req.query.date)}
+      searchCriteria.createdAt = {$gte: new Date(req.query.date), $lte: moment(req.query.date).endOf('day').toDate()}
     }
     
 
-    // orders = await Order.find(searchCriteria)
-    //   // .populate("user")
-    //   // .populate("cartId")
-    //   // .populate("productId");
+    const orders = await Order.find(searchCriteria)
+    .sort({"createdAt": -1})
+    .populate("user")
+    .populate("cartId")
+    .populate("productId");
 
-    // if(req.query.productTitle) {
-    //   console.log('Inside');
-    //   products = await Product.find({ title : new RegExp(
-    //     ".*" + req.query.productTitle.toLowerCase() + ".*",
-    //     "i"
-    //   )
-    //   });
-    //   console.log('Length of products: ', products.length);
-    //   console.log('Length of orders: ', orders.length);
-
-
-    //   orders = orders.map((order) => {
-    //     console.log('productId of order', order.productId);
-    //     for(let product in products){
-    //       let found = false;
-    //       console.log('From product array', products[product].id);
-    //       if(order.productId.includes(products[product].id))
-    //       {
-    //         return order;
-    //       } 
-    //     }
-    // });
-    // console.log(products.length);
-    // console.log(orders.length);
-    // }
-
-    if(req.query.productTitle) {
-      orders = await Order.aggregate([
-        {
-          $match: searchCriteria
-        },
-        {
-          $lookup: {
-            from: 'Product',
-            localField: 'productId',
-            foreignField: '_id',
-            as: 'Products'
-          }
-        },
-        {$unwind: "$Product"},
-        {$match: {title: {$regex: req.query.productTitle}}}
-      ]);
-      console.log('here', orders);
-    }
-    else {
-      orders = await Order.find(searchCriteria)
-      .sort({"createdAt": -1})
-      .populate("user")
-      .populate("cartId")
-      .populate("productId");
-  }
     return res.status(200).json({
       status: 'successful',
       orders: orders,
