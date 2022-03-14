@@ -517,7 +517,9 @@ exports.getPendingOrders = async (req, res) => {
     const orders = await Order.find({
       user: req.user.id,
       status: "pending",
-    }).populate("productId");
+    })
+    .sort({"createdAt": -1})
+    .populate("productId");
     if (!orders) return res.status(201).send("No pending orders.");
 
     return res.status(200).json({
@@ -713,6 +715,7 @@ exports.searchOrder = async (req, res) => {
     }
     else {
       orders = await Order.find(searchCriteria)
+      .sort({"createdAt": -1})
       .populate("user")
       .populate("cartId")
       .populate("productId");
