@@ -31,10 +31,30 @@ exports.signup = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
+    if (err.errors.name){
+      res.status(400).json({
+        status: 'fail',
+        message: err.errors.name.message,
+      });
+    }
+    else if (err.errors.email){
+      res.status(400).json({
+        status: 'fail',
+        message: err.errors.email.message,
+      });
+    }
+    else if (err.errors.password){
+      res.status(400).json({
+        status: 'fail',
+        message: err.errors.password.message,
+      });
+    }
+    else {
+      res.status(400).json({
+        status: 'fail',
+        message: err,
+      });
+    }
   }
 };
 
