@@ -208,14 +208,15 @@ exports.forgetPassword = async (req, res) => {
     const message = `Forget your password? Submit a patch request with your new password and password Confirm to ${resetToken}.\n If you don't forget your password then ignore this email!`;
 
     try {
-      await sendEmail({
-        email: user.email,
-        subject: 'Your password reset token (Valid for 10 mints)',
-        message,
-      });
+      // await sendEmail({
+      //   email: user.email,
+      //   subject: 'Your password reset token (Valid for 10 mints)',
+      //   message,
+      // });
       res.status(200).json({
         status: 'success',
         message: 'Token sent to email',
+        token: resetToken
       });
     } catch (err) {
       user.passwordResetToken = undefined;
