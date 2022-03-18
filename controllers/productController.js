@@ -876,10 +876,11 @@ exports.getAllProduct = async (req, res) => {
 
   if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria)
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .sort(sortingQuery);
+    .sort({"createdAt": -1})
+    .populate("category")
+    .populate("subCategoryId")
+    .populate("subCategoryOptionId")
+    .sort(sortingQuery);
     return res.status(200).json({
       status: "success",
       length: allProduct.length,
@@ -1191,7 +1192,9 @@ exports.updateRating = async (req, res) => {
 
 exports.getRandomProducts = async (req, res) => {
   try {
-    let product = await Product.aggregate([{ $sample: { size: 10 }}, { $match: { flag: "Approved" }}]);
+    let product = await Product.aggregate([{ $sample: { size: 10 }}, { $match: { flag: "Approved" }}])
+    .sort({"createdAt": -1});
+
     if (!product) {
       res.status(400).json({
         status: "fail",
