@@ -49,10 +49,16 @@ exports.login = async (req, res) => {
     }
     console.log(email, password);
     const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'User does not exists',
+      });
+    }
     // const user = await User.findOne({ email: email }).select('password');
     console.log(user);
     const correctPassword = await user.correctPassword(password, user.password);
-    if (!user || !correctPassword) {
+    if (!correctPassword) {
       return res.status(401).json({
         status: 'fail',
         message: 'Invalid email or password',
