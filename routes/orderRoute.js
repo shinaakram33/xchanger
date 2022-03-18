@@ -25,6 +25,6 @@ router
   .route("/")
   .get(protected, getAllOrders)
   .post(protected, createImmediateOrder);
-router.route("/user/:userId").get(getUserOrders);
+router.route("/user/:userId").get(protected, getUserOrders);
 
 module.exports = router;
