@@ -107,6 +107,13 @@ exports.getAllSpecificBidProduct = async (req, res) => {
 };
 exports.getuserbidding = async (req, res) => {
   try {
+    const user = await User.findById(req.params.userId);
+    if(!user){
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User does not exist',
+      });
+    }
     const getuserbidding = await Bidding.find({ user: { $in: req.params.userId } });
     if (!getuserbidding) {
       return res.status(400).json({
