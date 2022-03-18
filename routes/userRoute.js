@@ -13,7 +13,8 @@ const {
   getAllUsers,
   getUserById,
   deleteUser,
-  searchUsers
+  searchUsers,
+  rateSeller
 } = require("../controllers/authController");
 const router = express.Router();
 
@@ -29,5 +30,6 @@ router.route("/pinCompare").post(pinCodeCompare);
 router.route("/resetPassword/:pin").post(resetPassword);
 router.route("/changePassword/:userId").post(protected, changePassword);
 router.route("/private").put(updatePrivacteStatus);
+router.route("/rating/:userId").patch(protected, rateSeller);
 
 module.exports = router;

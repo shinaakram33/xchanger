@@ -111,20 +111,20 @@ exports.updateUser = async (req, res) => {
       });
     }
 
-    if(updates.sellerRating){
-
-      if(!user.sellerRating){
-        let dummyrating = 0;
-      }else{
-        let dummyrating = user.sellerRating;
-      }
+    // if(updates.sellerRating){
+    //   let dummyrating;
+    //   if(!user.sellerRating){
+    //     dummyrating = 0;
+    //   }else{
+    //     dummyrating = user.sellerRating;
+    //   }
       
-      let prevRating = dummyrating;
+    //   let prevRating = dummyrating;
     
-      let newRating = (prevRating + updates.sellerRating)/2;
+    //   let newRating = (prevRating + updates.sellerRating)/2;
 
-      updates.sellerRating = newRating;
-    }
+    //   updates.sellerRating = newRating;
+    // }
 
     const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true
@@ -483,3 +483,51 @@ exports.searchUsers = async (req, res) => {
     });
   }
 }
+
+exports.rateSeller = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User does not exist',
+      });
+    }
+    console.log(user);
+    console.log(req.body)
+
+    if (!req.body.sellerRating) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'You must enter rating',
+      });
+    }
+    
+    let dummyrating;
+    if(!user.sellerRating){
+      dummyrating = 0;
+    }else{
+      dummyrating = user.sellerRating;
+    }
+    
+    let prevRating = dummyrating;
+  
+    let newRating = (prevRating + req.body.sellerRating)/2;
+
+    user.sellerRating = Math.round(newRating);
+    await user.save();
+
+    // const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
+    //   new: true
+    // });
+    res.status(200).json({
+      status: 'success',
+      data: user,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
