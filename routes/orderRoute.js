@@ -8,7 +8,8 @@ const {
   getOrderById,
   updateOrder,
   deleteOrder,
-  searchOrder
+  searchOrder,
+  getUserOrders
 } = require("../controllers/orderController");
 const { protected, restrictTo } = require("../controllers/authController");
 const router = express.Router();
@@ -24,5 +25,6 @@ router
   .route("/")
   .get(protected, getAllOrders)
   .post(protected, createImmediateOrder);
+router.route("/user/:userId").get(getUserOrders);
 
 module.exports = router;

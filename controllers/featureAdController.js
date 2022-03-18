@@ -1,4 +1,5 @@
 const featureAd = require('../models/featureAdModel');
+const User = require('../models/userModal');
 
 exports.createFeatureAd = async (req,res) =>{
   try{
@@ -102,3 +103,34 @@ exports.deleteSpecificFeatureAd = async (req,res) =>{
     
 
 }
+
+exports.getUserAds = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      if(!user){
+        return res.status(400).json({
+          status: 'fail',
+          message: 'User does not exist',
+        });
+      }
+      console.log(req.params.userId);
+      const userAds = await featureAd.find({ user: { $in: req.params.userId } });
+      if (!userAds) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'No ad exists',
+        });
+      }
+      res.status(200).json({
+        status: 'success',
+        length: userAds.length,
+        data: userAds,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        status: 'fail',
+        message: err,
+      });
+    }
+  };
+  

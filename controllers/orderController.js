@@ -682,3 +682,32 @@ exports.searchOrder = async (req, res) => {
     });
   }
 }
+
+exports.getUserOrders = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if(!user){
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User does not exist',
+      });
+    }
+    const userOrders = await Order.find({ user: { $in: req.params.userId } });
+    if (!userOrders) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'No orders exists',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      length: userOrders.length,
+      data: userOrders,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
