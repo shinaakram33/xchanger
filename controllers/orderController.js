@@ -685,14 +685,18 @@ exports.searchOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId)
     if(!user){
       return res.status(400).json({
         status: 'fail',
         message: 'User does not exist',
       });
     }
-    const userOrders = await Order.find({ user: { $in: req.params.userId } });
+    const userOrders = await Order.find({ user: { $in: req.params.userId } })
+    .sort({"createdAt": -1})
+    .populate("user")
+    .populate("cartId")
+    .populate("productId");
     if (!userOrders) {
       return res.status(400).json({
         status: 'fail',

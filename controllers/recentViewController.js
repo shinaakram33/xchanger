@@ -39,7 +39,11 @@ exports.createRecentViews = async (req, res, next) => {
 
 exports.getRecentViews = async (req, res) => {
   try {
-    const getAllRecentViews = await RecentView.findOne({ user: req.user.id }).populate('products');
+    const getAllRecentViews = await RecentView.findOne({ user: req.user.id })
+    .populate({
+      path: 'products',
+      options: { sort: { 'createdAt': -1 } }
+    });
     res.status(200).json({
       status: 'success',
       data: getAllRecentViews,
