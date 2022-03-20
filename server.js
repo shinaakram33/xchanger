@@ -72,8 +72,22 @@ io.on("connection", (socket) => {
       body: JSON.stringify(textNotificaton),
       headers: { "Content-Type": "application/json" },
     })
-      .then((res) => res.json())
-      .then((json) => console.log(json));
+      // .then((res) => res.json())
+      // .then((json) => console.log(json));
+      .then(async (res) => {
+        try {
+          console.log("res ", res);
+          const dataa = await res.json();
+          console.log("response data?", dataa);
+        } catch (err) {
+          console.log("error");
+          console.log(err);
+        }
+      })
+      // .then((json) => console.log("json ", json))
+      .catch((error) => {
+        console.log(error);
+      });
 
     if (chatMessage.text.trim().length > 0) {
       console.log(data);

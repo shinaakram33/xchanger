@@ -158,7 +158,7 @@ exports.createOrder = async (req, res) => {
             console.log(err);
           }
         })
-        .then((json) => console.log("json ", json))
+        // .then((json) => console.log("json ", json))
         .catch((error) => {
           console.log(error);
         });
@@ -297,7 +297,7 @@ exports.createImmediateOrder = async (req, res) => {
             console.log(err);
           }
         })
-        .then((json) => console.log("json ", json))
+        // .then((json) => console.log("json ", json))
         .catch((error) => {
           console.log(error);
         });
@@ -391,7 +391,7 @@ exports.orderAccepted = async (req, res) => {
                 console.log(err);
               }
             })
-            .then((json) => console.log("json ", json))
+            // .then((json) => console.log("json ", json))
             .catch((error) => {
               console.log(error);
             });
@@ -446,7 +446,7 @@ exports.orderAccepted = async (req, res) => {
                   console.log(err);
                 }
               })
-              .then((json) => console.log("json ", json))
+              // .then((json) => console.log("json ", json))
               .catch((error) => {
                 console.log(error);
               });
