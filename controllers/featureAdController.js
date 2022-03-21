@@ -114,8 +114,8 @@ exports.getUserAds = async (req, res) => {
         });
       }
       console.log(req.params.userId);
-      const userAds = await featureAd.find({ user: { $in: req.params.userId } });
-      if (!userAds) {
+      const userAds = await featureAd.find({ user: req.params.userId });
+      if (userAds.length <= 0) {
         return res.status(400).json({
           status: 'fail',
           message: 'No ad exists',

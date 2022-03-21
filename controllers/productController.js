@@ -9,38 +9,9 @@ const moment = require("moment");
 const schedule = require("node-schedule");
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
-// const { createNewAccount, retrieveAccount, createAccountLink } = require("./stripeController")
 
 exports.createProduct = async (req, res) => {
   try {
-    // const user = await User.findById(req.user.id);
-    // if(!user) {
-    //   res.status(404).json({
-    //     status: 'fail',
-    //     message: 'User not found',
-    //   });
-    // }
-    // // console.log(user);
-    // if (user.roles === 'user') {
-    //   console.log('in if');
-    //   if (user.connAccount === undefined || user.connAccount === '') {
-    //     console.log('creating account');
-    //     var { account, accountLink } = await createNewAccount(user);
-    //     console.log(account.id);
-    //     user.connAccount = account.id;
-    //     await user.save();
-    //   }
-    //   else {
-    //     console.log('creating link');
-    //     var account = await retrieveAccount(user.connAccount);
-    //     if (account.requirements.currently_due.length > 0) {
-    //       const accountLink = await createAccountLink(user.connAccount);
-    //       console.log(accountLink);
-    //     }
-    //   }
-    // }
-
-    let pakageSize = {};
     const obj = {
       small: {
         type: 'S',
@@ -161,7 +132,6 @@ exports.createProduct = async (req, res) => {
       status: "success",
       message: "Product has been Created Successfully",
       product: newProduct,
-      // accountLink: accountLink,
     });
   } catch (err) {
     res.status(400).json({
