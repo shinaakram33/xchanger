@@ -21,7 +21,7 @@ const featureAddSchema = new mongoose.Schema({
       type:Number,
       required:[true, 'Number of Days is Required!']
   }
-});
+}, { timestamps: true });
 
 const featureAd = mongoose.model('FeatureAd', featureAddSchema);
 
