@@ -842,11 +842,12 @@ exports.getAllProduct = async (req, res) => {
     var sortBy = req.query.sortBy;
     var sortingOrder = req.query.sortingOrder;
     sortingQuery[sortBy] = sortingOrder;
+  } else {
+    sortingQuery = { "createdAt": -1 }
   }
 
   if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria)
-    .sort({"createdAt": -1})
     .populate("category")
     .populate("subCategoryId")
     .populate("subCategoryOptionId")
@@ -858,9 +859,10 @@ exports.getAllProduct = async (req, res) => {
     });
   } else {
     const allProduct = await Product.find({ status: "not_sold" })
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId");
+    .sort({"createdAt": -1})
+    .populate("category")
+    .populate("subCategoryId")
+    .populate("subCategoryOptionId");
     if (!allProduct) {
       return res.status(400).json({
         status: "fail",
