@@ -2,34 +2,33 @@ const Cart = require('../models/cartModal');
 
 exports.createCart = async (req, res, next) => {
   try {
-    let data = '';
+    let products = [];
     const alreadyExist = await Cart.findOne({ user: req.user.id });
-    console.log(alreadyExist.id);
+
     if (!alreadyExist) {
       await Cart.create({
         user: req.user.id,
         products: req.body.products,
       });
+    } else if (alreadyExist.products.length === 0){
+      products = req.body.products;
     } else {
-      await alreadyExist.products.forEach((i, index) => {
-        if (i.toString() === req.body.products) {
-          res.status(400).json({
-            status: 'fail',
-            message: 'This product is already exist in the Cart',
-          });
-          data = 'aaaa';
-        }
+      await req.body.products.forEach((i) => {
+        if (!alreadyExist.products.includes(i)) {
+          products.push(i);
+        } 
       });
-      if (data === '') {
+    }
+      console.log(products);
+      if (products.length > 0) {
         await Cart.updateOne(
           {
             user: req.user.id,
           },
-          { $push: { products: req.body.products } }
+          { $push: { products: products } }
         );
       }
-    }
-    res.status(201).json({
+    return res.status(201).json({
       status: 'success',
       message: 'Added into Cart successfully',
     });
