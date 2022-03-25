@@ -2,47 +2,54 @@ const Cart = require('../models/cartModal');
 
 exports.createCart = async (req, res, next) => {
   try {
-    let products = [];
+    let check;
     const alreadyExist = await Cart.findOne({ user: req.user.id });
-
+    console.log(alreadyExist.products);
     if (!alreadyExist) {
+      console.log('creating new cart');
       await Cart.create({
         user: req.user.id,
         products: req.body.products,
       });
-    } else if (alreadyExist.products.length === 0){
-      products = req.body.products;
     } else {
-      await req.body.products.forEach((i) => {
-        if (!alreadyExist.products.includes(i)) {
-          products.push(i);
-        } 
+      console.log('matching items of  cart');
+      check = alreadyExist.products.find((i) => {
+        if(i.toString() === req.body.products)
+          return true;
+        else return false;
       });
-    }
-      console.log(products);
-      if (products.length > 0) {
+      if (check) {
+        return res.status(400).json({
+              status: 'fail',
+              message: 'This product is already exist in the Cart',
+        });
+      } else{
         await Cart.updateOne(
           {
             user: req.user.id,
           },
-          { $push: { products: products } }
+          { $push: { products: req.body.products } }
         );
       }
+    }
     return res.status(201).json({
       status: 'success',
       message: 'Added into Cart successfully',
     });
   } catch (err) {
-    res.status(400).json({
+    console.log(err);
+    return res.status(400).json({
       status: 'fail',
       message: err,
     });
   }
 };
+  
 
 exports.getAllCartProducts = async (req, res) => {
   try {
-    const getCartList = await Cart.findOne({ user: req.user.id }).populate('user').populate('products').select('-selectedProducts');
+    const getCartList = await Cart.findOne({ user: req.user.id })
+    // .populate('user').populate('products').select('-selectedProducts');
     if (!getCartList) {
       return res.status(400).json({
         status: 'fail',
