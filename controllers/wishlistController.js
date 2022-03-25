@@ -2,7 +2,7 @@ const WishList = require('../models/wishlistModal');
 
 exports.createWishList = async (req, res) => {
   try {
-    let data = '';
+    let check;
     const alreadyExist = await WishList.findOne({ user: req.user.id });
     if (!alreadyExist) {
       await WishList.create({
@@ -10,16 +10,17 @@ exports.createWishList = async (req, res) => {
         products: req.body.products,
       });
     } else {
-      await alreadyExist.products.forEach((i, index) => {
-        if (i.toString() === req.body.products) {
-          res.status(400).json({
-            status: 'fail',
-            message: 'This product is already exist in the wishlist',
-          });
-          data = 'aaaa';
-        }
+      check = alreadyExist.products.find((i) => {
+        if(i.toString() === req.body.products)
+          return true;
+        else return false;
       });
-      if (data === '') {
+      if (check) {
+        return res.status(400).json({
+              status: 'fail',
+              message: 'This product is already exist in the Wishlish',
+        });
+      } else {
         await WishList.updateOne(
           {
             user: req.user.id,
