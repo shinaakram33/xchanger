@@ -49,7 +49,7 @@ exports.createCart = async (req, res, next) => {
 exports.getAllCartProducts = async (req, res) => {
   try {
     const getCartList = await Cart.findOne({ user: req.user.id })
-    // .populate('user').populate('products').select('-selectedProducts');
+    .populate('user').populate('products').select('-selectedProducts');
     if (!getCartList) {
       return res.status(400).json({
         status: 'fail',
