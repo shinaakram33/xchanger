@@ -338,7 +338,7 @@ exports.orderAccepted = async (req, res) => {
     const accepted = req.body.accepted;
     if (accepted) {
       const paymentIntentCapture = await stripe.paymentIntents.capture(
-        order.checkoutId
+        order.checkoutId,
       );
       console.log(paymentIntentCapture);
       order.accepted = true;
@@ -353,29 +353,33 @@ exports.orderAccepted = async (req, res) => {
             { new: true }
           );
           console.log("2");
-          // console.log('--------------------------------------------------');
+          console.log('--------------------------------------------------');
           
-          // console.log('user', updatedProduct.user);
-          // let productUser = await User.findById(updatedProduct.user);
-          // console.log('account', productUser.connAccount);
-          // console.log(updatedProduct.price);
-          // console.log(paymentIntentCapture.transfer_group);
+          console.log('user', updatedProduct.user);
+          let productUser = await User.findById(updatedProduct.user);
+          console.log('account', productUser.connAccount);
+          console.log(updatedProduct.price);
+          console.log(paymentIntentCapture.transfer_group);
+          // try{
+          //   let transfer = await stripe.transfers.create({
+          //     amount: updatedProduct.price.sellingPrice * 100,
+          //     currency: 'usd',
+          //     destination: productUser.connAccount,
+          //     transfer_group: paymentIntentCapture.transfer_group
+          //   });
+          //   console.log(transfer);
+          // } catch (err) {
+          //   console.log(err);
+          // }
           
-          // let transfer = await stripe.transfers.create({
-          //   amount: updatedProduct.price.sellingPrice * 100,
-          //   currency: 'usd',
-          //   destination: productUser.connAccount,
-          //   transfer_group: paymentIntentCapture.transfer_group
-          // });
-          // console.log(transfer);
-          // console.log('--------------------------------------------------');
+          console.log('--------------------------------------------------');
           let data = {
             user: updatedProduct.user,
             product: updatedProduct.id,
             text: `Your product ${updatedProduct.title} has been sold`,
           };
-          console.log("check2", data);
-          console.log("check2", updatedProduct);
+          // console.log("check2", data);
+          // console.log("check2", updatedProduct);
           fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
             method: "POST",
             body: JSON.stringify(data),
@@ -383,9 +387,9 @@ exports.orderAccepted = async (req, res) => {
           })
             .then(async (res) => {
               try {
-                console.log("res ", res);
+                // console.log("res ", res);
                 const dataa = await res.json();
-                console.log("response data?", dataa);
+                // console.log("response data?", dataa);
               } catch (err) {
                 console.log("error");
                 console.log(err);
