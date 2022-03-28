@@ -43,7 +43,13 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
   connAccount: {
-    type: String
+    id: {
+      type: String
+    },
+    flag: {
+      type: Boolean,
+      default: false,
+    }
   },
   gender: {
     type: String,

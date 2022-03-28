@@ -1,17 +1,25 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const User = require("../models/userModal");
 
 exports.createNewAccount = async (req, res) => {
     try{
+        const user = await User.findById(req.user.id);
+        console.log(user);
         const account = await stripe.accounts.create({
             type: 'express',
             business_type: 'individual',
+            individual: {
+                email: user.email,
+            },
             capabilities: {
             card_payments: {requested: true},
             transfers: {requested: true},
-        },
+            },
         });
         console.log(account);
         console.log('-------------------------------------------------------------------');
+        user.connAccount.id = account.id;
+        await user.save();
         const accountLink = await this.createAccountLink(account.id);
         console.log(accountLink);
         return res.send({ 
