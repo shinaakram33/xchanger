@@ -76,7 +76,7 @@ exports.createOrder = async (req, res) => {
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: req.body.price * 100,
-      currency: "usd",
+      currency: 'usd',
       payment_method_types: ["card"],
       payment_method: paymentMethod.id,
       confirm: true,
@@ -92,6 +92,7 @@ exports.createOrder = async (req, res) => {
 
     if (paymentIntent.created) {
       console.log("payment created", paymentIntent);
+      console.log('=====', paymentIntent.charges);
     
     let orderNumber = Math.random().toString(36).slice(5)
     let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
@@ -357,20 +358,22 @@ exports.orderAccepted = async (req, res) => {
           
           console.log('user', updatedProduct.user);
           let productUser = await User.findById(updatedProduct.user);
-          console.log('account', productUser.connAccount);
+          console.log('account', productUser.connAccount.id);
           console.log(updatedProduct.price);
           console.log(paymentIntentCapture.transfer_group);
-          // try{
-          //   let transfer = await stripe.transfers.create({
-          //     amount: updatedProduct.price.sellingPrice * 100,
-          //     currency: 'usd',
-          //     destination: productUser.connAccount,
-          //     transfer_group: paymentIntentCapture.transfer_group
-          //   });
-          //   console.log(transfer);
-          // } catch (err) {
-          //   console.log(err);
-          // }
+          console.log(paymentIntentCapture.id);
+          try{
+            let transfer = await stripe.transfers.create({
+              amount: updatedProduct.price.sellingPrice * 100,
+              currency: 'usd',
+              destination: productUser.connAccount.id,
+              source_transaction: paymentIntentCapture.charges.data[0].id,
+              transfer_group: paymentIntentCapture.transfer_group
+            });
+            console.log(transfer);
+          } catch (err) {
+            console.log(err);
+          }
           
           console.log('--------------------------------------------------');
           let data = {
@@ -696,11 +699,11 @@ exports.getUserOrders = async (req, res) => {
         message: 'User does not exist',
       });
     }
-    const userOrders = await Order.find({ user: { $in: req.params.userId } })
+    const userOrders = await Order.find({ user: req.params.userId })
     .sort({"createdAt": -1})
-    .populate("user")
-    .populate("cartId")
-    .populate("productId");
+    // .populate("user")
+    // .populate("cartId")
+    // .populate("productId");
     if (!userOrders) {
       return res.status(400).json({
         status: 'fail',
