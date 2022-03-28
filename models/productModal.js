@@ -28,10 +28,10 @@ const productSchema = new mongoose.Schema(
     size: {
       type: String,
       required: [true, 'Size of a product is required'],
-      enum: {
-        values: ['XXL', 'XL', 'L', 'M', 'S'],
-        message: 'Size of product must be XXL, XL, L, M or S',
-      },
+      // enum: {
+      //   values: ['XXL', 'XL', 'L', 'M', 'S'],
+      //   message: 'Size of product must be XXL, XL, L, M or S',
+      // },
     },
     categoryName: {
       type: String,
