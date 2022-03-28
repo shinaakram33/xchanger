@@ -14,12 +14,15 @@ const {
   scheduleAndAddToCart,
   updateWishlistStatus,
   getRandomProducts,
-  getProductByTitle
+  getProductByTitle,
+  getFeaturedPosts,
 } = require('../controllers/productController');
 const { protected, restrictTo } = require('../controllers/authController');
 
 const router = express.Router({ mergeParams: true });
 
+
+router.route('/featured').get(getFeaturedPosts);
 router.route('/').post(protected, createProduct);
 router.route('/').get(getCategoryProduct);
 router.route('/bidding').post(protected, createBiddingProduct).get(getBiddingProducts);
@@ -29,7 +32,7 @@ router.route('/recomended').get(getRandomProducts);
 router.route('/:title').get(getProductByTitle);
 router.route('/pending').get(protected, restrictTo('admin'), getBiddingPendingProduct);
 router.route('/wishlistStatus').put(updateWishlistStatus)
-router.route('/product/:productId').get(getSpecificProductDetail)
+router.route('/product/:productId').get(getSpecificProductDetail),
 router
   .route('/:productId')
   .patch(protected, updateProducts)

@@ -683,16 +683,41 @@ exports.createFeaturedProduct = async (req, res) => {
   }
 };
 
-exports.getFeaturedPosts = async (req, res) => {};
+exports.getFeaturedPosts = async (req, res) => {
+  try{
+    console.log(moment.duration(featureAd.createdAt.diff(moment(new Date()))));
+    // {days: {$gte: moment.duration(featureAd.createdAt.diff(moment(new Date()))}}
+    // searchCriteria.createdAt = {$gte: new Date(req.query.date), $lte: moment(req.query.date).endOf('day').toDate()}
+
+    // const featuredPosts = await Product.find({
+    //   adType: 'featured', 
+    //   days: {$gte: moment.duration(featureAd.createdAt.diff(moment(new Date())))}
+    // });
+    // console.log(featuredPosts);
+    // res.status(200).json({
+    //   status: "success",
+    //   data: featuredPosts,
+    // });
+
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err,
+    });
+  }
+};
 
 exports.getUserProducts = async (req, res) => {
   try { 
     let userPosts;   
     if(req.query.flag) {
       let flag = req.query.flag;
-      userPosts = await Product.find({ user: { $in: req.params.userId }, flag });
+      userPosts = await Product.find({ user: { $in: req.params.userId }, flag })
+      .sort({"createdAt": -1})
     }
-    userPosts = await Product.find({ user: { $in: req.params.userId } });
+    else 
+      userPosts = await Product.find({ user: { $in: req.params.userId } })
+      .sort({"createdAt": -1});
     if (!userPosts) {
       res.status(400).json({
         status: "fail",
