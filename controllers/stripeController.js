@@ -23,11 +23,13 @@ exports.createNewAccount = async (req, res) => {
         const accountLink = await this.createAccountLink(account.id);
         console.log(accountLink);
         return res.send({ 
+            status: 'Success',
             account: account.id, 
             link: accountLink.url,
         });
     } catch (err) {
         return res.send({ 
+            status: 'Fail',
             message: 'Something went wrong', 
             error: err 
         });
@@ -44,16 +46,19 @@ exports.updateAccount = async (req, res) => {
         if (account.requirements.currently_due.length > 0) {
             accountLink = await this.createAccountLink(accountId);
             return res.send({
+                status: 'Success',
                 link: accountLink, 
             });
         }
         else {
             return res.send({
+                status: 'Success',
                 message: 'Account updated'
             });
         }
     } catch (err) {
         return res.send({ 
+            status: 'Fail',
             message: 'Something went wrong', 
             error: err 
         });
