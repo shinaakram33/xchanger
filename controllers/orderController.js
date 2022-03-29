@@ -701,9 +701,9 @@ exports.getUserOrders = async (req, res) => {
     }
     const userOrders = await Order.find({ user: req.params.userId })
     .sort({"createdAt": -1})
-    // .populate("user")
-    // .populate("cartId")
-    // .populate("productId");
+    .populate("user")
+    .populate("cartId")
+    .populate("productId");
     if (!userOrders) {
       return res.status(400).json({
         status: 'fail',
