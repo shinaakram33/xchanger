@@ -487,6 +487,12 @@ exports.searchUsers = async (req, res) => {
 
 exports.rateSeller = async (req, res) => {
   try {
+    if(req.user.id === req.params.userId) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'You do not have access to do this',
+      });
+    }
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(400).json({
@@ -504,23 +510,16 @@ exports.rateSeller = async (req, res) => {
       });
     }
     
-    let dummyrating;
-    if(!user.sellerRating){
-      dummyrating = 0;
+    if(!user.sellerRating || user.sellerRating === 0){
+      user.sellerRating = Math.round(req.body.sellerRating);
+      await user.save();
     }else{
-      dummyrating = user.sellerRating;
+      let dummyrating = user.sellerRating; 
+      let prevRating = dummyrating;
+      let newRating = (prevRating + req.body.sellerRating)/2;
+      user.sellerRating = Math.round(newRating);
+      await user.save();
     }
-    
-    let prevRating = dummyrating;
-  
-    let newRating = (prevRating + req.body.sellerRating)/2;
-
-    user.sellerRating = Math.round(newRating);
-    await user.save();
-
-    // const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
-    //   new: true
-    // });
     res.status(200).json({
       status: 'success',
       data: user,
