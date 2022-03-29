@@ -24,7 +24,7 @@ exports.createNewAccount = async (req, res) => {
         console.log(accountLink);
         return res.send({ 
             account: account.id, 
-            link: accountLink 
+            link: accountLink.url,
         });
     } catch (err) {
         return res.send({ 
