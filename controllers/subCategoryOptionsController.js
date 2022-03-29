@@ -88,10 +88,10 @@ exports.deleteSubCategoryOptions = async (req, res) => {
         message: 'No Sub Category Option Found',
       });
     }
-    await SubCategoryOptions.findByIdAndDelete(req.params.subCategoryOptionId, req.body, { new: true });
+    await SubCategoryOptions.findByIdAndDelete(req.params.subCategoryOptionId);
     res.status(200).json({
-      status: 'fail',
-      message: 'Sub Category Option is updated successfully',
+      status: 'success',
+      message: 'Sub Category Option is deleted successfully',
     });
   } catch (err) {
     res.status(400).json({
