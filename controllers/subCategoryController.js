@@ -74,18 +74,20 @@ exports.deleteSubCategory = async (req, res) => {
   try {
     const subCategory = await SubCategory.findById(req.params.subCategoryId);
     if (!subCategory) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Sub Category does not exist',
       });
     }
-
-    const result = await SubCategory.findByIdAndDelete(id);
-    res.status(200).json({
+    const result = await SubCategory.findByIdAndDelete(req.params.subCategoryId);
+    return res.status(200).json({
       status: 'success',
       message: 'Sub Category is delete successfully',
     });
   } catch (error) {
-    console.log(message.error);
+    res.status(200).json({
+      status: 'fail',
+      message: error,
+    });
   }
 };
