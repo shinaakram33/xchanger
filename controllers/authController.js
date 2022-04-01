@@ -281,7 +281,7 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         status: 'fail',
-        message: 'invalid Pin or pin expired',
+        message: 'Your pin is invalid or expired',
       });
     }
     else if (password !== confirmPassword) {
@@ -297,7 +297,7 @@ exports.resetPassword = async (req, res) => {
       await user.save();
       res.status(200).json({
         status: 'success',
-        message: 'Password Changed Successfully!',
+        message: 'Password changed successfully!',
       });
     }
   } catch (err) {
@@ -337,7 +337,7 @@ exports.changePassword = async (req, res) => {
     await user.save();
     res.status(200).json({
       status: 'success',
-      message: 'Password Changed Successfully!',
+      message: 'Password changed successfully!',
     });
   } catch (err) {
     res.status(400).json({
@@ -356,7 +356,7 @@ exports.updatePrivacteStatus = async (req, res) => {
     if (!user) {
       res.status(400).json({
         status: 'fail',
-        message: 'user does not exist',
+        message: 'User does not exist',
       });
     }
     
@@ -365,7 +365,7 @@ exports.updatePrivacteStatus = async (req, res) => {
 
     res.send(200).json({
       status: 'successful',
-      message: 'User Updated successfully',
+      message: 'User updated successfully',
     });
   } catch (error) {
     res.status(400).json({
