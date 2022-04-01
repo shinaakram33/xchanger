@@ -164,9 +164,9 @@ const productSchema = new mongoose.Schema(
         default: undefined,
       },
     },
-    adPrice: {
-      type: String,
-    },
+    // adPrice: {
+    //   type: String,
+    // },
     checkoutId: {
       type: String,
     },

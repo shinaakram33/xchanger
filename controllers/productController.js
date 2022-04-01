@@ -1,7 +1,7 @@
 const { json } = require("express");
 const Product = require("../models/productModal");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const featureAd = require("../models/featureAdModel");
+const FeatureAd = require("../models/featureAdModel");
 const PlaceBid = require("../models/placebidModal");
 const Cart = require("../models/cartModal");
 const cron = require("node-cron");
@@ -667,13 +667,31 @@ exports.changeBiddingStatus = async (req, res) => {
 
 exports.createFeaturedProduct = async (req, res) => {
   try {
-    if (!req.body) {
+    const id = req.params.productId;
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(400).json({
         status: "fail",
-        message: "Please provide body of a product",
+        message: "Product does not exist",
       });
     }
-    if (req.body.adType === "featured") {
+    else {
+      const featureAd = await FeatureAd.create({
+        user: req.body.user,
+        AddTitle: req.body.AddTitle,
+        description: req.body.description,
+        price: req.body.price,
+        noOfDays: req.body.noOfDays
+      });
+      console.log(featureAd);
+      product.featureAd = featureAd.id;
+      product.adType = 'featured';
+      await product.save();
+      res.status(200).json({
+        status: 'success',
+        message: 'Product is featured',
+        data: product
+      });
     }
   } catch (err) {
     res.status(400).json({
@@ -1187,7 +1205,7 @@ exports.getRandomProducts = async (req, res) => {
     if (!product || product.length<1) {
       return res.status(400).json({
         status: "fail",
-        message: "product does not exist",
+        message: "No random products to show",
       });
     }
 
