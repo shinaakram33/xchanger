@@ -685,15 +685,6 @@ exports.createFeaturedProduct = async (req, res) => {
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    console.log(moment.duration(featureAd.createdAt.diff(moment(new Date()))));
-    // {days: {$gte: moment.duration(featureAd.createdAt.diff(moment(new Date()))}}
-    // searchCriteria.createdAt = {$gte: new Date(req.query.date), $lte: moment(req.query.date).endOf('day').toDate()}
-
-    // const featuredPosts = await Product.find({
-    //   adType: 'featured', 
-    //   days: {$gte: moment.duration(featureAd.createdAt.diff(moment(new Date())))}
-    // });
-    // console.log(featuredPosts);
     // res.status(200).json({
     //   status: "success",
     //   data: featuredPosts,
@@ -1189,17 +1180,17 @@ exports.updateRating = async (req, res) => {
 
 exports.getRandomProducts = async (req, res) => {
   try {
-    let product = await Product.aggregate([{ $sample: { size: 10 }}, { $match: { flag: "Approved" }}])
+    let product = await Product.aggregate([{ $match: { flag: "Approved" }}])
+    .limit(10)
     .sort({"createdAt": -1});
 
-    if (!product) {
-      res.status(400).json({
+    if (!product || product.length<1) {
+      return res.status(400).json({
         status: "fail",
         message: "product does not exist",
       });
     }
 
-    console.log(product);
     let products = { products: product };
     return res.json({
       status: "successful",
