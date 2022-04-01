@@ -249,11 +249,12 @@ exports.pinCodeCompare = async (req, res) => {
         status: 'fail',
         message: 'invalid Pin or pin expired',
       });
+    } else {
+      res.status(200).json({
+        status: 'success',
+        message: 'Pin is valid',
+      });
     }
-    res.status(200).json({
-      status: 'success',
-      message: 'Pin is valid',
-    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -264,15 +265,16 @@ exports.pinCodeCompare = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   try {
+    let user;
     const { pin } = req.params;
     const { password, confirmPassword } = req.body;
     if (!confirmPassword) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Please give the confirm password',
       });
     }
-    const user = await User.findOne({
+      user = await User.findOne({
       passwordResetToken: pin,
       passwordResetTokenExpire: { $gt: Date.now() },
     });
@@ -282,21 +284,22 @@ exports.resetPassword = async (req, res) => {
         message: 'invalid Pin or pin expired',
       });
     }
-    if (password !== confirmPassword) {
+    else if (password !== confirmPassword) {
       return res.status(400).json({
         status: 'fail',
         message: 'Passwords are not match with each other',
       });
+    } else {
+      user.password = password;
+      user.confirmPassword = undefined;
+      user.passwordResetToken = undefined;
+      user.passwordResetTokenExpire = undefined;
+      await user.save();
+      res.status(200).json({
+        status: 'success',
+        message: 'Password Changed Successfully!',
+      });
     }
-    user.password = password;
-    user.confirmPassword = undefined;
-    user.passwordResetToken = undefined;
-    user.passwordResetTokenExpire = undefined;
-    await user.save();
-    res.status(200).json({
-      status: 'success',
-      message: 'Password Changed Successfully!',
-    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
