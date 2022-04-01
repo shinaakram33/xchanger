@@ -2,6 +2,7 @@ const { json } = require("express");
 const Product = require("../models/productModal");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const FeatureAd = require("../models/featureAdModel");
+const { createFeatureAd } = ("./featureAdController.js");
 const PlaceBid = require("../models/placebidModal");
 const Cart = require("../models/cartModal");
 const cron = require("node-cron");
@@ -676,7 +677,7 @@ exports.createFeaturedProduct = async (req, res) => {
       });
     }
     else {
-      const featureAd = await FeatureAd.create({
+      const featureAd = await createFeatureAd({
         user: req.body.user,
         AddTitle: req.body.AddTitle,
         description: req.body.description,
