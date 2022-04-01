@@ -202,31 +202,32 @@ exports.forgetPassword = async (req, res) => {
         status: 'fail',
         message: 'There is no user of this email',
       });
-    }
-    const resetToken = await user.createResetPasswordToken();
-    await user.save();
+    } else {
+      const resetToken = await user.createResetPasswordToken();
+      await user.save();
 
-    const message = `Forget your password? Submit a patch request with your new password and password Confirm to ${resetToken}.\n If you don't forget your password then ignore this email!`;
+      const message = `Forget your password? Submit a patch request with your new password and password Confirm to ${resetToken}.\n If you don't forget your password then ignore this email!`;
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: 'Your password reset token (Valid for 10 mints)',
-        message,
-      });
-      res.status(200).json({
-        status: 'success',
-        message: 'Token sent to email',
-      });
-    } catch (err) {
-      user.passwordResetToken = undefined;
-      user.passwordResetExpires = undefined;
-      await user.save({ validateBeforeSave: false });
-      res.status(500).json({
-        status: 'fail',
-        message: 'Error in sending an email. Try again later!',
-        error: err,
-      });
+      try {
+        await sendEmail({
+          email: user.email,
+          subject: 'Your password reset token (Valid for 10 mints)',
+          message,
+        });
+        res.status(200).json({
+          status: 'success',
+          message: 'Token sent to email',
+        });
+      } catch (err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+        res.status(500).json({
+          status: 'fail',
+          message: 'Error in sending an email. Try again later!',
+          error: err,
+        });
+      }
     }
   } catch (err) {
     res.status(400).json({
