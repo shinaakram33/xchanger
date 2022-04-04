@@ -22,7 +22,7 @@ const featureAddSchema = new mongoose.Schema({
       required:[true, 'Number of Days is Required!']
   },
   expirationDate:{
-      type: String
+      type: Date
   }
 }, { timestamps: true });
 

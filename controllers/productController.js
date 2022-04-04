@@ -455,7 +455,7 @@ exports.createBiddingProduct = async (req, res) => {
       adType: "bidding",
       status: "pending",
     });
-    res.status(201).json({
+    return res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
       product: newProduct,
@@ -463,7 +463,7 @@ exports.createBiddingProduct = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -690,8 +690,9 @@ exports.createFeaturedProduct = async (req, res) => {
         price: req.body.price,
         noOfDays: req.body.noOfDays
       });
-      featureAd.expirationDate = moment(moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toISOString();
-      featureAd.save();
+      featureAd.expirationDate = (moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toDate();
+      console.log(featureAd.expirationDate);
+      await featureAd.save();
       console.log(featureAd);
       product.featureAd = featureAd.id;
       product.adType = 'featured';
@@ -705,20 +706,18 @@ exports.createFeaturedProduct = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    console.log(moment().toISOString(), moment(moment("2022-04-01T12:39:47.595Z").add(3, 'd')).toISOString());
-    console.log(typeof(moment().toISOString()), typeof("2022-04-01T12:39:47.595Z"));
-    const post = await Product.findById("623d6723dbdc01094477d901").populate('featureAd');
-    const ad = await FeatureAd.findById('624a926e39561c247c9b829b')
-    console.log(typeof(ad.expirationDate));
-    let date = moment().toISOString();
-    console.log(date, typeof(date.getDate()));
+    const ad = await FeatureAd.findById("624ac770ff7e040648bb9da9");
+    console.log(typeof(ad.expirationDate))
+
+    let date = moment().toDate();
+    console.log(date, typeof(date));
     const featuredPosts = await Product.aggregate([
       {
         $lookup: {
@@ -729,15 +728,13 @@ exports.getFeaturedPosts = async (req, res) => {
         }
       },
       {
-        $unwind: { path: "$featureAd", preserveNullAndEmptyArrays: false}
+        $unwind: "$featureAd"
       },    
       {
-        $match: {
-          "featureAd.expirationDate": {
-            $gt: {date}
-          },
+        "$match": {
+          "featureAd.expirationDate": {$gt: date}
         }
-      }                           
+      },                           
     ])
     
     // .sort({ "createdAt": -1 })
@@ -979,7 +976,7 @@ exports.getSpecificProductDetail = async (req, res) => {
         message: "No Product Found",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
       data: specificProduct,
     });
