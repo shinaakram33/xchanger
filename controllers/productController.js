@@ -718,7 +718,7 @@ exports.getFeaturedPosts = async (req, res) => {
     const ad = await FeatureAd.findById('624a926e39561c247c9b829b')
     console.log(typeof(ad.expirationDate));
     let date = moment().toISOString();
-    console.log(date, typeof(date));
+    console.log(date, typeof(date.getDate()));
     const featuredPosts = await Product.aggregate([
       {
         $lookup: {
@@ -930,6 +930,8 @@ exports.getAllProduct = async (req, res) => {
   } else {
     sortingQuery = { "createdAt": -1 }
   }
+  searchCriteria.adType = { $in: [ "normal", "featured" ]  }
+  console.log(searchCriteria);
 
   if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria)
