@@ -121,7 +121,7 @@ exports.getuserbidding = async (req, res) => {
         message: 'Products does not exist',
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       status: 'success',
       length: getuserbidding.length,
       data: getuserbidding,
