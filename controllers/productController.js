@@ -677,13 +677,21 @@ exports.createFeaturedProduct = async (req, res) => {
       });
     }
     else {
-      const featureAd = await createFeatureAd({
-        user: req.body.user,
+      if(!req.body.AddTitle || !req.body.description || !req.body.price || !req.body.noOfDays) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Please provide required fields",
+        });
+      }
+      const featureAd = await FeatureAd.create({
+        user: req.user.id,
         AddTitle: req.body.AddTitle,
         description: req.body.description,
         price: req.body.price,
         noOfDays: req.body.noOfDays
       });
+      featureAd.expirationDate = moment(moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toISOString();
+      featureAd.save();
       console.log(featureAd);
       product.featureAd = featureAd.id;
       product.adType = 'featured';
@@ -704,15 +712,56 @@ exports.createFeaturedProduct = async (req, res) => {
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    // res.status(200).json({
-    //   status: "success",
-    //   data: featuredPosts,
-    // });
+    console.log(moment().toISOString(), moment(moment("2022-04-01T12:39:47.595Z").add(3, 'd')).toISOString());
+    console.log(typeof(moment().toISOString()), typeof("2022-04-01T12:39:47.595Z"));
+    const post = await Product.findById("623d6723dbdc01094477d901").populate('featureAd');
+    const ad = await FeatureAd.findById('624a926e39561c247c9b829b')
+    console.log(typeof(ad.expirationDate));
+    let date = moment().toISOString();
+    console.log(date, typeof(date));
+    const featuredPosts = await Product.aggregate([
+      {
+        $lookup: {
+          from: "FeatureAd",
+          localField: "featureAd",
+          foreignField: "_id",
+          as: "featureAd",
+        }
+      },
+      {
+        $unwind: { path: "$featureAd", preserveNullAndEmptyArrays: false}
+      },    
+      {
+        $match: {
+          "featureAd.expirationDate": {
+            $gt: {date}
+          },
+        }
+      }                           
+    ])
+    
+    // .sort({ "createdAt": -1 })
+    // .populate('featureAd');
+   // createdAt: {$gte: moment().endOf('d').subtract("$featureAd.noOfDays", 'd')}
+
+    if(!featuredPosts || featuredPosts.length < 1)
+    {
+      return res.status(400).json({
+        status: "fail",
+        message: 'No featured posts to show',
+      });
+    }
+    console.log(featuredPosts.length);
+
+    return res.status(200).json({
+      status: "success",
+      data: featuredPosts,
+    });
 
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -749,7 +798,8 @@ exports.getUserProducts = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
   let searchCriteria = {
-    status: "not_sold"
+    status: "not_sold",
+    adType: { $in: [ "normal", "featured" ]  } 
   };
   let sortingQuery = {};
   if (req.query.title) {
@@ -886,6 +936,7 @@ exports.getAllProduct = async (req, res) => {
     .populate("category")
     .populate("subCategoryId")
     .populate("subCategoryOptionId")
+    .populate("user")
     .sort(sortingQuery);
     return res.status(200).json({
       status: "success",
@@ -893,11 +944,15 @@ exports.getAllProduct = async (req, res) => {
       data: allProduct,
     });
   } else {
-    const allProduct = await Product.find({ status: "not_sold" })
+    const allProduct = await Product.find({
+      status: "not_sold",
+      adType: { $in: [ "normal", "featured" ]  } 
+    })
     .sort({"createdAt": -1})
     .populate("category")
     .populate("subCategoryId")
-    .populate("subCategoryOptionId");
+    .populate("subCategoryOptionId")
+    .populate("user");
     if (!allProduct) {
       return res.status(400).json({
         status: "fail",
