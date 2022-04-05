@@ -716,8 +716,12 @@ exports.createFeaturedProduct = async (req, res) => {
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    let date = moment().toDate();
+    const ad = await FeatureAd.findById('624c7eead4c178227888b57a');
+    console.log(ad.expirationDate, typeof(ad.expirationDate));
+    let date =  new Date();
     console.log(date, typeof(date));
+    if (date > ad.expirationDate)
+      console.log('a');
     const featuredPosts = await Product.aggregate([
       {
         $lookup: {
@@ -732,7 +736,7 @@ exports.getFeaturedPosts = async (req, res) => {
       },    
       {
         "$match": {
-          "featureAd.expirationDate": {$gt: new Date(date).toISOString()}
+          "featureAd.noOfDays": {$gt: date}
         }
       },                           
     ])
