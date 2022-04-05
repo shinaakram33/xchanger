@@ -24,27 +24,27 @@ exports.createOrder = async (req, res) => {
         message: "You dont have an access to perform this action",
       });
     }
-    // if (!req.body.source) {
-    //   return res.status(400).json({
-    //     status: "fail",
-    //     message: "Invalid credentials",
-    //   });
-    // }
+    if (!req.body.source) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid credentials",
+      });
+    }
 
-    const token = await stripe.tokens.create({
-      card: {
-        number: "4242424242424242",
-        exp_month: 1,
-        exp_year: 2023,
-        cvc: "314",
-      },
-    });
-    console.log(token.id);
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
+    // console.log(token.id);
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
-        token: token.id,
+        token: req.body.source,
       },
     });
     console.log("paymentMethod ", paymentMethod);
