@@ -146,11 +146,11 @@ const productSchema = new mongoose.Schema(
     },
     date_for_auction: {
       starting_date: {
-        type: Date,
+        type: String,
         default: undefined,
       },
       ending_date: {
-        type: Date,
+        type: String,
         default: undefined,
       },
     },
