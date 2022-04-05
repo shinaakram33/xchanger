@@ -75,7 +75,7 @@ exports.createOrder = async (req, res) => {
     // shippingFee = pakageSize.price;
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.price * 100,
+      amount: Math.round(req.body.price * 100),
       currency: 'usd',
       payment_method_types: ["card"],
       payment_method: paymentMethod.id,
