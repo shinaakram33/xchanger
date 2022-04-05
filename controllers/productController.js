@@ -716,9 +716,6 @@ exports.createFeaturedProduct = async (req, res) => {
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    const ad = await FeatureAd.findById("624ac770ff7e040648bb9da9");
-    console.log(typeof(ad.expirationDate))
-
     let date = moment().toDate();
     console.log(date, typeof(date));
     const featuredPosts = await Product.aggregate([
