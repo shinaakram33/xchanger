@@ -447,8 +447,8 @@ exports.createBiddingProduct = async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       date_for_auction: {
-        starting_date: new Date(req.body.starting_date),
-        ending_date: new Date(req.body.ending_date)
+        starting_date: new Date(req.body.date_for_auction.starting_date),
+        ending_date: new Date(req.body.date_for_auction.ending_date)
       },
       category: req.params.categoryId,
       categoryName: req.body.categoryName,
