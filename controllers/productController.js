@@ -456,7 +456,7 @@ exports.createBiddingProduct = async (req, res) => {
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
       adType: "bidding",
-      status: "pending",
+      status: "not_sold",
     });
     return res.status(201).json({
       status: "success",
@@ -735,7 +735,7 @@ exports.getFeaturedPosts = async (req, res) => {
       },    
       {
         "$match": {
-          "featureAd.expirationDate": {$gt: date}
+          "featureAd.expirationDate": {$gt: new Date(date).toISOString()}
         }
       },                           
     ])
