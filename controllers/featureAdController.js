@@ -6,13 +6,13 @@ exports.createFeatureAd = async (req,res) =>{
 
     const newFeatureAd = await featureAd.create({
         user: req.body.user,
-        AddTitle: req.body.AddTitle,
-        description: req.body.description,
+        // AddTitle: req.body.AddTitle,
+        // description: req.body.description,
         price: req.body.price,
         noOfDays: req.body.noOfDays
     })
 
-    res.status(200).json({
+    return res.status(200).json({
         status:'success',
         message:'Feature Ad Created successfully!',
         featureAd: newFeatureAd

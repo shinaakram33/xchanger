@@ -680,7 +680,7 @@ exports.createFeaturedProduct = async (req, res) => {
       });
     }
     else {
-      if(!req.body.AddTitle || !req.body.description || !req.body.price || !req.body.noOfDays) {
+      if(!req.body.price || !req.body.noOfDays) {
         return res.status(400).json({
           status: "fail",
           message: "Please provide required fields",
@@ -696,11 +696,26 @@ exports.createFeaturedProduct = async (req, res) => {
       featureAd.expirationDate = (moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toDate();
       console.log(featureAd.expirationDate);
       await featureAd.save();
-      console.log(featureAd);
       product.featureAd = featureAd.id;
       product.adType = 'featured';
       await product.save();
-      res.status(200).json({
+
+      let min = moment(featureAd.expirationDate, 'HH:MM').minutes();
+      let hour = moment(featureAd.expirationDate, 'HH:MM').hours();
+      let day = moment(featureAd.expirationDate).format('D');
+      let month = moment(featureAd.expirationDate).format('M');
+      let year = moment(featureAd.expirationDate).format('Y');
+
+      console.log(min, (hour), day, month, year)
+
+      let modifyAd = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
+          console.log('Cron job executed.')
+          const ad = await FeatureAd.findByIdAndDelete(featureAd.id);
+          product.adType = 'normal';
+          product.featureAd = undefined;
+          await product.save();
+          });
+    return res.status(200).json({
         status: 'success',
         message: 'Product is featured',
         data: product
@@ -733,17 +748,8 @@ exports.getFeaturedPosts = async (req, res) => {
       },
       {
         $unwind: "$featureAd"
-      },    
-      {
-        "$match": {
-          "featureAd.noOfDays": {$gt: date}
-        }
-      },                           
+      },                               
     ])
-    
-    // .sort({ "createdAt": -1 })
-    // .populate('featureAd');
-   // createdAt: {$gte: moment().endOf('d').subtract("$featureAd.noOfDays", 'd')}
 
     if(!featuredPosts || featuredPosts.length < 1)
     {
