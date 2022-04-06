@@ -7,11 +7,11 @@ const featureAddSchema = new mongoose.Schema({
   },
   AddTitle:{
       type:String,
-      required: [true, 'Add Title is Required!'],
+    //   required: [true, 'Add Title is Required!'],
   },
   description:{
       type:String,
-      required: [true, 'Add Description is Required!'],
+    //   required: [true, 'Add Description is Required!'],
   },
   price:{
       type:Number,
