@@ -17,11 +17,11 @@ exports.createplaceBid = async (req, res) => {
         status: 'Fail',
         message: 'Product not found',
       });
-    } else if (biddingProduct.price.orignalPrice <= req.body.price) {
-      return res.status(400).json({
-        status: 'fails',
-        message: 'Entering biding price is greater than product existing price!',
-      });
+    // } else if (biddingProduct.price.orignalPrice <= req.body.price) {
+    //   return res.status(400).json({
+    //     status: 'fails',
+    //     message: 'Entering biding price is greater than product existing price!',
+    //   });
     } else {
       const placeBid = await placebid.create({
         product: req.body.product,
