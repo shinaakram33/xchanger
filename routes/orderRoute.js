@@ -14,6 +14,7 @@ const {
 const { protected, restrictTo } = require("../controllers/authController");
 const router = express.Router();
 
+router.route("/").get(protected, getAllOrders).post(protected, createImmediateOrder);
 router.route("/search").get(searchOrder);
 router.route("/cart/:cartId").post(protected, createOrder);
 router.route("/:orderId").patch(protected, orderAccepted)
@@ -21,10 +22,6 @@ router.route("/:orderId").patch(protected, orderAccepted)
   .delete(protected, restrictTo('admin'), deleteOrder);
 router.route("/update/:orderId").patch(protected, restrictTo('admin'), updateOrder);
 router.route("/pending").get(protected, getPendingOrders);
-router
-  .route("/")
-  .get(protected, getAllOrders)
-  .post(protected, createImmediateOrder);
 router.route("/user/:userId").get(protected, getUserOrders);
 
 module.exports = router;

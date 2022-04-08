@@ -44,8 +44,9 @@ exports.createWishList = async (req, res) => {
 exports.getAllWishList = async (req, res) => {
   try {
     const getWishList = await WishList.findOne({ user: req.user.id })
-      .populate('user')
-      .populate('products');
+    .sort({createdAt: -1})
+    .populate('user')
+    .populate('products');
     res.status(200).json({
       status: 'success',
       data: getWishList,
