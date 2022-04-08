@@ -28,8 +28,9 @@ exports.getAllUserNotifications = async (req, res) => {
 
   try {
     const notifications = await Notification.find({ user: userId })
-      .populate("user")
-      .populate("product");
+    .sort({createdAt: -1})
+    .populate("user")
+    .populate("product");
     if (!notifications) {
       return res.status(400).json({
         status: "fail",
