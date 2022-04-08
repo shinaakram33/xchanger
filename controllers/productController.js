@@ -654,6 +654,7 @@ exports.getBiddingProducts = async (req, res) => {
     }
     if (Object.keys(req.query).length !== 0) {
       pendingProduct = await Product.find(searchCriteria)
+      .sort({createdAt: -1})
         .populate("category")
         .populate("subCategoryId")
         .populate("subCategoryOptionId");
@@ -662,6 +663,7 @@ exports.getBiddingProducts = async (req, res) => {
         adType: "bidding",
         status: "not_sold",
       })
+      .sort({createdAt: -1})
         .populate("category")
         .populate("subCategoryId")
         .populate("subCategoryOptionId");

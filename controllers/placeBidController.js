@@ -44,7 +44,10 @@ exports.createplaceBid = async (req, res) => {
 
 exports.getAllplacebid = async (req, res) => {
   try {
-    const getAllplacebid = await placebid.find({ user: req.user.id }).populate('user').populate('product');
+    const getAllplacebid = await placebid.find({ user: req.user.id })
+    .sort({createdAt: -1})
+    .populate('user')
+    .populate('product');
     res.status(200).json({
       status: 'success',
       length: getAllplacebid.length,
