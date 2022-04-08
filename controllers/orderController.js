@@ -280,7 +280,7 @@ exports.createImmediateOrder = async (req, res) => {
         phoneNumber: req.body.phoneNumber,
         location: req.body.location,
         user: req.user.id,
-        checkoutId: paymentIntent.id,
+        checkoutId: charge.id,
         status: "pending",
         price: req.body.price,
         productId: req.body.productId,
