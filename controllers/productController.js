@@ -413,10 +413,12 @@ exports.getCategoryProduct = async (req, res) => {
       products = await Product.find({
         category: req.params.categoryId,
         status: "not_sold",
+        adType: {$in: ['normal', 'featured']}
       })
-        .populate("category")
-        .populate("subCategoryId")
-        .populate("subCategoryOptionId");
+      .sort({adType: 1, createdAt: -1})
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId");
     }
 
     res.status(200).json({
