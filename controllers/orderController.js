@@ -249,6 +249,92 @@ deleteSoldItems = async(id) => {
 
 exports.createImmediateOrder = async (req, res) => {
   try {
+    console.log("req.boy", req.body);
+
+    if (!req.body.source) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid credentials",
+      });
+    }
+
+    const charge = await stripe.charges.create({
+      amount: req.body.price * 100,
+      currency: "usd",
+      source: req.body.source,
+    });
+
+    if (!charge) res.status(403).send("Payment method not created");
+
+    if (charge.paid) {
+      const updatedProduct = await Product.findOneAndUpdate(
+        req.body.productId,
+        { status: "pending" }
+      );
+
+      //let product = await Product.findById(req.body.productId);
+
+      let createOrderTable = new Order({
+        name: req.body.name,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber,
+        location: req.body.location,
+        user: req.user.id,
+        checkoutId: paymentIntent.id,
+        status: "pending",
+        price: req.body.price,
+        productId: req.body.productId,
+      });
+      await createOrderTable.save();
+      console.log("createdOrderTable");
+
+      let data = {
+        user: updatedProduct.user,
+        product: updatedProduct.id,
+        text: `Your product ${updatedProduct.title} has been sold`,
+      };
+
+      fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      })
+        .then(async (res) => {
+          try {
+            const dataa = await res.json();
+            console.log("response data?", dataa);
+          } catch (err) {
+            console.log("error");
+            console.log(err);
+          }
+        })
+        .then((json) => console.log("json ", json))
+        .catch((error) => {
+          console.log(error);
+        });
+      console.log("Check 2", updatedProduct);
+
+      return res.status(200).json({
+        status: "success",
+        message: "Product is purchased successfully",
+        data: createOrderTable,
+      });
+    } else {
+      return res.status(400).json({
+        status: "fail",
+        message: "Stripe error",
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+/*
+  try {
     let updatedProduct, createOrderTable, product;
     console.log("req.body", req.body);
 
@@ -415,7 +501,7 @@ exports.createImmediateOrder = async (req, res) => {
       });
       return res.status(200).json({
         status: "success",
-        message: "Your bid has been successfully ",
+        message: "Your  ",
         data: createOrderTable,
       });
     } else {
@@ -430,7 +516,7 @@ exports.createImmediateOrder = async (req, res) => {
       message: err.message,
     });
   }
-};
+};*/
 
 exports.orderAccepted = async (req, res) => {
   try {
