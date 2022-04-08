@@ -966,7 +966,7 @@ exports.getAllProduct = async (req, res) => {
     var sortingOrder = req.query.sortingOrder;
     sortingQuery[sortBy] = sortingOrder;
   } else {
-    sortingQuery = { "createdAt": -1 }
+    sortingQuery = { adType:1, "createdAt": -1 }
   }
   searchCriteria.adType = { $in: [ "normal", "featured" ]  }
   console.log(searchCriteria);
@@ -988,7 +988,7 @@ exports.getAllProduct = async (req, res) => {
       status: "not_sold",
       adType: { $in: [ "normal", "featured" ]  } 
     })
-    .sort({"createdAt": -1})
+    .sort({adType: 1, createdAt: -1})
     .populate("category")
     .populate("subCategoryId")
     .populate("subCategoryOptionId")
@@ -1009,7 +1009,8 @@ exports.getAllProduct = async (req, res) => {
 
 exports.getSpecificProductDetail = async (req, res) => {
   try {
-    const specificProduct = await Product.findById(req.params.productId);
+    const specificProduct = await Product.findById(req.params.productId)
+    .populate('user');
 
     if (!specificProduct) {
       return res.status(400).json({
