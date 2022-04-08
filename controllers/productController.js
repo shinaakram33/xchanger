@@ -434,6 +434,36 @@ exports.getCategoryProduct = async (req, res) => {
 
 exports.createBiddingProduct = async (req, res) => {
   try {
+    const obj = {
+      small: {
+        type: 'S',
+        price: 7,
+        maxWeight: 2
+      },
+      medium: {
+        type: 'M',
+        price: 9.7,
+        maxWeight: 10
+      },
+      large: {
+        type: 'L',
+        price: 20.5,
+        maxWeight: 30
+      },
+      xlarge: {
+        type: 'XL',
+        price: 25,
+        maxWeight: 30
+      },
+      xxlarge: {
+        type: 'XXL',
+        price: 50,
+        maxWeight: 35
+      }
+    };
+    const pkgSize = obj[req.body.pakageSize];
+    console.log(pkgSize);
+
     const newProduct = await Product.create({
       price: req.body.price,
       color: req.body.color,
@@ -457,6 +487,7 @@ exports.createBiddingProduct = async (req, res) => {
       user: req.user.id,
       adType: "bidding",
       status: "not_sold",
+      pakageSize: pkgSize,
     });
     return res.status(201).json({
       status: "success",
