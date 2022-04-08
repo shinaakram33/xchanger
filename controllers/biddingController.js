@@ -1,5 +1,6 @@
 const Bidding = require('../models/biddingModal');
 const User = require('../models/userModal');
+const Product = require('../models/productModal');
 const { getAllBrands } = require('./brandController');
 
 exports.createBidding = async (req, res) => {
@@ -93,7 +94,7 @@ exports.getAllSpecificBidProduct = async (req, res) => {
         message: 'No Specific Bid found',
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       status: 'success',
       length: SpecificBidProduct.length,
       data: SpecificBidProduct,
@@ -114,7 +115,7 @@ exports.getuserbidding = async (req, res) => {
         message: 'User does not exist',
       });
     }
-    const getuserbidding = await Bidding.find({ user: { $in: req.params.userId } });
+    const getuserbidding = await Product.find({ user: req.params.userId , adType: 'bidding' });
     if (!getuserbidding) {
       return res.status(400).json({
         status: 'fail',
