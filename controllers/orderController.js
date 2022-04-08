@@ -169,6 +169,7 @@ exports.createOrder = async (req, res) => {
     });
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save();
+
     return res.status(200).json({
       status: "success",
       message: "Product is ordered successfully",
@@ -258,19 +259,33 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
+
     const charge = await stripe.charges.create({
       amount: req.body.price * 100,
       currency: "usd",
       source: req.body.source,
     });
 
-    if (!charge) res.status(403).send("Payment method not created");
-
+    if (!charge) {
+      return res.status(403).send({
+        status: "fail",
+        message: "Payment method not created"
+      });
+    }
+      
     if (charge.paid) {
-      const updatedProduct = await Product.findOneAndUpdate(
-        req.body.productId,
-        { status: "pending" }
-      );
+        updatedProduct = await Product.findById(req.body.productId);
+        updatedProduct.status = 'pending';
+        await updatedProduct.save();
+        console.log(updatedProduct);
 
       //let product = await Product.findById(req.body.productId);
 
@@ -287,6 +302,17 @@ exports.createImmediateOrder = async (req, res) => {
       });
       await createOrderTable.save();
       console.log("createdOrderTable");
+      
+      const productSeller = await User.findById(updatedProduct.user);
+      console.log(productSeller);
+
+      const transfer = await stripe.transfers.create({
+        amount: Math.round((req.body.price - req.body.shippingFee) * 100),
+        currency: 'usd',
+        destination: productSeller.connAccount.id,
+        source_transaction: charge.id,
+      });
+      console.log(transfer);
 
       let data = {
         user: updatedProduct.user,
@@ -308,7 +334,7 @@ exports.createImmediateOrder = async (req, res) => {
             console.log(err);
           }
         })
-        .then((json) => console.log("json ", json))
+        // .then((json) => console.log("json ", json))
         .catch((error) => {
           console.log(error);
         });
@@ -333,190 +359,6 @@ exports.createImmediateOrder = async (req, res) => {
   }
 };
 
-/*
-  try {
-    let updatedProduct, createOrderTable, product;
-    console.log("req.body", req.body);
-
-    // if (!req.body.source) {
-    //   return res.status(400).json({
-    //     status: "fail",
-    //     message: "Invalid credentials",
-    //   });
-    // }
-
-    const token = await stripe.tokens.create({
-        card: {
-          number: "4242424242424242",
-          exp_month: 1,
-          exp_year: 2023,
-          cvc: "314",
-        },
-      });
-      const paymentMethod = await stripe.paymentMethods.create({
-        type: "card",
-        card: {
-          token: token.id,
-        },
-      });
-      console.log("paymentMethod ", paymentMethod);
-  
-      if (!paymentMethod.created)
-        return res.status(403).send("Payment method not created");
-
-    // const charge = await stripe.charges.create({
-    //   amount: Math.round(req.body.price * 100),
-    //   currency: "usd",
-    //   source: token.id,
-    // });
-
-    // if (!charge) return res.status(403).send({
-    //   status: "fail",
-    //   message: "Payment method not created"
-    // });
-
-    // if (charge.paid) {
-    //   updatedProduct = await Product.findById(req.body.productId);
-    //   updatedProduct.status = 'pending';
-    //   await updatedProduct.save();
-    //   console.log(updatedProduct);
-
-    let string = (new Date()).toISOString();
-    console.log(string, typeof string);
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(req.body.price * 100),
-      currency: 'usd',
-      payment_method_types: ["card"],
-      payment_method: paymentMethod.id,
-      confirm: true,
-      capture_method: "manual",
-      transfer_group: string
-    });
-
-    if (paymentIntent.created) {
-      console.log("payment created", paymentIntent);
-      console.log('=====', paymentIntent.charges);
-
-      let orderNumber = Math.random().toString(36).slice(5)
-      let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
-
-      while(checkExistingOrderNumber != null){
-        orderNumber = Math.random().toString(36).slice(5)
-        checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
-      }
-      console.log(req.user);
-      createOrderTable = new Order({
-        name: req.body.name,
-        email: req.body.email,
-        phoneNumber: req.body.phoneNumber,
-        location: req.body.location,
-        user: req.user.id,
-        checkoutId: paymentIntent.id,
-        status: "pending",
-        price: req.body.price,
-        productId: req.body.productId,
-        orderNumber: orderNumber,
-      });
-      await createOrderTable.save();
-      console.log("createdOrderTable");
-      console.log('--------------------------------------------------------------------')
-
-      product = await Product.findById(req.body.productId);
-      console.log(product);
-
-      // let min = moment(product.date_for_auction.ending_date, 'HH:MM').minutes();
-      // let hour = moment(product.date_for_auction.ending_date, 'HH:MM').hours();
-      // let day = moment(product.date_for_auction.ending_date).format('D');
-      // let month = moment(product.date_for_auction.ending_date).format('M');
-      // let year = moment(product.date_for_auction.ending_date).format('Y');
-      let date = moment().add(3, 'minutes');
-      console.log(date);
-      let min = moment(date, 'HH:MM').minutes();
-      let hour = moment(date, 'HH:MM').hours();
-      let day = moment(date).format('D');
-      let month = moment(date).format('M');
-      let year = moment(date).format('Y');
-
-      console.log(min, (hour), day, month, year)
-
-      let modifyAd = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
-        console.log('Cron job executed.')
-        
-        const paymentIntentCapture = await stripe.paymentIntents.capture(
-          createOrderTable.checkoutId,
-        );
-        console.log(paymentIntentCapture);
-        if (paymentIntentCapture.status === "succeeded") {
-
-          createOrderTable.accepted = true;
-          createOrderTable.status = "Sold";
-          await createOrderTable.save();
-          console.log("status ", paymentIntentCapture.status);
-          product.status = 'sold';
-          await product.save();
-                            
-          const productSeller = await User.findById(product.user);
-          console.log(productSeller);
-
-          const transfer = await stripe.transfers.create({
-            amount: Math.round((req.body.price - req.body.shippingFee) * 100),
-            currency: 'usd',
-            destination: productSeller.connAccount.id,
-            source_transaction: paymentIntentCapture.charges.data[0].id,
-            transfer_group: paymentIntentCapture.transfer_group
-          });
-          console.log(transfer);
-
-          let data = {
-            user: product.user,
-            product: product.id,
-            text: `Your product ${product.title} has been sold`,
-          };
-
-          fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" },
-          })
-            .then(async (res) => {
-              try {
-                const dataa = await res.json();
-                console.log("response data?", dataa);
-              } catch (err) {
-                console.log("error");
-                console.log(err);
-              }
-            })
-            // .then((json) => console.log("json ", json))
-            .catch((error) => {
-              console.log(error);
-            });
-        } else {
-          return res.status(400).json({
-            status: "fail",
-            message: "Stripe error",
-          });
-        }
-      });
-      return res.status(200).json({
-        status: "success",
-        message: "Your  ",
-        data: createOrderTable,
-      });
-    } else {
-      return res.status(400).json({
-        status: "fail",
-        message: "Stripe error",
-      });
-    }
-  } catch (err) {
-    return res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
-  }
-};*/
 
 exports.orderAccepted = async (req, res) => {
   try {

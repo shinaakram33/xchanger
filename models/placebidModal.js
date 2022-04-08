@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const placeBidSchema = new mongoose.Schema(
   {
     price: {
-      type: String,
+      type: Number,
       required: [true, 'price of product is required'],
     },
     // date: {
