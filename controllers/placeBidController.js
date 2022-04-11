@@ -24,11 +24,11 @@ exports.createplaceBid = async (req, res) => {
         status: 'Fail',
         message: 'Product not found',
       });
-    } else if (biddingProduct.price.immediate_purchase_price < req.body.price) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'Price must be greater than or equal to immediate purchase price',
-      });
+    // } else if (biddingProduct.price.immediate_purchase_price < req.body.price) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: 'Price must be greater than or equal to immediate purchase price',
+    //   });
     } else {
       const placeBid = await placebid.create({
         product: req.body.product,
@@ -36,25 +36,25 @@ exports.createplaceBid = async (req, res) => {
         price: req.body.price,
       });
   
-      // if (!req.body.source) {
-      //   return res.status(400).json({
-      //     status: "fail",
-      //     message: "Invalid credentials",
-      //   });
-      // }
-  
-      const token = await stripe.tokens.create({
-          card: {
-            number: "4242424242424242",
-            exp_month: 1,
-            exp_year: 2023,
-            cvc: "314",
-          },
+      if (!req.body.source) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Invalid credentials",
         });
+      }
+  
+      // const token = await stripe.tokens.create({
+      //     card: {
+      //       number: "4242424242424242",
+      //       exp_month: 1,
+      //       exp_year: 2023,
+      //       cvc: "314",
+      //     },
+      //   });
         const paymentMethod = await stripe.paymentMethods.create({
           type: "card",
           card: {
-            token: token.id,
+            token: req.body.source,
           },
         });
     

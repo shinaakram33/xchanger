@@ -23,7 +23,7 @@ exports.getChatOfParticularROom = async (req, res) => {
     }
   };
 
-  exports.createChatRoom = async (req, res) => {
+  exports.createChat = async (req, res) => {
     try {
       console.log(req.body)
       const chatRoom = await Chat.create(req.body);
