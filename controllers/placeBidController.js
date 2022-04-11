@@ -170,13 +170,13 @@ exports.getAllplacebid = async (req, res) => {
     const getAllplacebid = await placebid.aggregate([
       {
         $match: {
-          user: mongoose.Types.ObjectId(JSON.stringify(req.user.id))
+          user: mongoose.Types.ObjectId(req.user.id)
         }
       },
       {
         $lookup: {
-          from: "placebids",       // other table name
-            localField: "product",   // name of users table field
+          from: "placebids",      
+            localField: "product",   
             foreignField: "product",
             as: "bids" 
         },    
