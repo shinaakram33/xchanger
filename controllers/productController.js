@@ -1318,7 +1318,11 @@ exports.updateRating = async (req, res) => {
 
 exports.getRandomProducts = async (req, res) => {
   try {
-    let product = await Product.aggregate([{ $match: { flag: "Approved" }}])
+    let product = await Product.find({ flag: "Approved" })
+    .populate("category")
+    .populate("subCategoryId")
+    .populate("subCategoryOptionId")
+    .populate("user")
     .limit(10)
     .sort({"createdAt": -1});
 
