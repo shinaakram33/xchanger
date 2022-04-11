@@ -265,6 +265,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         .populate("category")
         .populate("subCategoryId")
         .populate("subCategoryOptionId")
+        .populate("user")
         .sort(sortingQuery);
       return res.status(200).json({
         status: "success",
@@ -280,7 +281,8 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       })
         .populate("category")
         .populate("subCategoryId")
-        .populate("subCategoryOptionId");
+        .populate("subCategoryOptionId")
+        .populate("user");
       return res.status(200).json({
         status: "success",
         length: products.length,
@@ -408,6 +410,7 @@ exports.getCategoryProduct = async (req, res) => {
         .populate("category")
         .populate("subCategoryId")
         .populate("subCategoryOptionId")
+        .populate("user")
         .sort(sortingQuery);
     } else {
       products = await Product.find({
@@ -418,7 +421,8 @@ exports.getCategoryProduct = async (req, res) => {
       .sort({adType: 1, createdAt: -1})
       .populate("category")
       .populate("subCategoryId")
-      .populate("subCategoryOptionId");
+      .populate("subCategoryOptionId")
+      .populate("user");
     }
 
     res.status(200).json({
@@ -509,7 +513,8 @@ exports.getBiddingPendingProduct = async (req, res) => {
     const pendingProduct = await Product.find({ status: "pending", flag: "Approved" })
       .populate("category")
       .populate("subCategoryId")
-      .populate("subCategoryOptionId");
+      .populate("subCategoryOptionId")
+      .populate("user");
     res.status(200).json({
       status: "success",
       length: pendingProduct.length,
@@ -657,7 +662,8 @@ exports.getBiddingProducts = async (req, res) => {
       .sort({createdAt: -1})
         .populate("category")
         .populate("subCategoryId")
-        .populate("subCategoryOptionId");
+        .populate("subCategoryOptionId")
+        .populate("user");
     } else {
       pendingProduct = await Product.find({
         adType: "bidding",
@@ -666,7 +672,8 @@ exports.getBiddingProducts = async (req, res) => {
       .sort({createdAt: -1})
         .populate("category")
         .populate("subCategoryId")
-        .populate("subCategoryOptionId");
+        .populate("subCategoryOptionId")
+        .populate("user");
     }
     res.status(200).json({
       status: "success",
@@ -766,12 +773,6 @@ exports.createFeaturedProduct = async (req, res) => {
 
 exports.getFeaturedPosts = async (req, res) => {
   try{
-    const ad = await FeatureAd.findById('624c7eead4c178227888b57a');
-    console.log(ad.expirationDate, typeof(ad.expirationDate));
-    let date =  new Date();
-    console.log(date, typeof(date));
-    if (date > ad.expirationDate)
-      console.log('a');
     const featuredPosts = await Product.aggregate([
       {
         $lookup: {
@@ -783,8 +784,14 @@ exports.getFeaturedPosts = async (req, res) => {
       },
       {
         $unwind: "$featureAd"
-      },                               
-    ])
+      },
+      {
+        $sort: {
+          createdAt: -1
+        }
+      }                               
+    ]);
+    // await Product.populate(featuredPosts, {path: "user", path: "category"});
 
     if(!featuredPosts || featuredPosts.length < 1)
     {
@@ -815,10 +822,19 @@ exports.getUserProducts = async (req, res) => {
       let flag = req.query.flag;
       userPosts = await Product.find({ user: { $in: req.params.userId }, flag })
       .sort({"createdAt": -1})
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
+      
     }
     else 
       userPosts = await Product.find({ user: { $in: req.params.userId } })
-      .sort({"createdAt": -1});
+      .sort({"createdAt": -1})
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     if (!userPosts) {
       res.status(400).json({
         status: "fail",
@@ -1014,8 +1030,11 @@ exports.getAllProduct = async (req, res) => {
 exports.getSpecificProductDetail = async (req, res) => {
   try {
     const specificProduct = await Product.findById(req.params.productId)
-    .populate('user');
-
+    .populate("category")
+    .populate("subCategoryId")
+    .populate("subCategoryOptionId")
+    .populate("user");
+    
     if (!specificProduct) {
       return res.status(400).json({
         status: "fail",
@@ -1329,9 +1348,17 @@ exports.getProductByTitle = async (req, res) => {
     let product;
     if (req.query.flag) {
       let flag = req.query.flag;
-      product = await Product.find({ title: req.params.title, flag });
+      product = await Product.find({ title: req.params.title, flag })
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     }
-    product = await Product.find({ title: req.params.title });
+    product = await Product.find({ title: req.params.title })
+    .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     if (!product) {
       res.status(400).json({
         status: "fail",
