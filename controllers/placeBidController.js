@@ -167,15 +167,10 @@ exports.createplaceBid = async (req, res) => {
 
 exports.getAllplacebid = async (req, res) => {
   try {
-    // const getAllplacebid = await placebid.find({ user: '620617a43e9914001603cf3b' })
-    // // .sort({createdAt: -1})
-    // // .populate('user')
-    // // .populate('product');
-
     const getAllplacebid = await placebid.aggregate([
       {
         $match: {
-          user: mongoose.Types.ObjectId('620617a43e9914001603cf3b')
+          user: mongoose.Types.ObjectId(req.user.id)
         }
       },
       {
