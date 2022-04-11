@@ -170,7 +170,7 @@ exports.getAllplacebid = async (req, res) => {
     const getAllplacebid = await placebid.aggregate([
       {
         $match: {
-          user: mongoose.Types.ObjectId(req.user.id)
+          user: mongoose.Types.ObjectId(JSON.stringify(req.user.id))
         }
       },
       {
