@@ -182,6 +182,7 @@ exports.getAllplacebid = async (req, res) => {
         },    
       },
     ]);
+    await placebid.populate(getAllplacebid, {path: 'product'});
 
     res.status(200).json({
       status: 'success',
