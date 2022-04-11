@@ -174,15 +174,52 @@ exports.getAllplacebid = async (req, res) => {
         }
       },
       {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          product: {
+            $addToSet: "$product"
+          },
+        }
+      },
+      {
+        $limit: 1
+      },
+      {
+        $unwind: "$product"
+      },
+      {
         $lookup: {
           from: "placebids",      
             localField: "product",   
             foreignField: "product",
+            pipeline: [
+              {
+                $sort: {
+                  createdAt: -1
+                }
+              },
+              {
+                $match: {
+                  user: {
+                    $ne: mongoose.Types.ObjectId(req.user.id)
+                  }
+                }
+              },
+              {
+                $unwind: "$user"
+              }
+            ],
             as: "bids" 
         },    
-      },
+      },    
     ]);
-    await placebid.populate(getAllplacebid, {path: 'product'});
+    // await placebid.populate(getAllplacebid, {path: 'product'});
+    console.log(getAllplacebid.length)
 
     res.status(200).json({
       status: 'success',
