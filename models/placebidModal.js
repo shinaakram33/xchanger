@@ -24,6 +24,9 @@ const placeBidSchema = new mongoose.Schema(
       ref: 'Product',
       required: [true, 'product data is required'],
     },
+    intentId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

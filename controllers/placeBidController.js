@@ -17,14 +17,13 @@ exports.createplaceBid = async (req, res) => {
       });
     }
     console.log(req.body)
-    const biddingProduct = await Product.findById(req.body.product);
-    console.log(biddingProduct);
-    if (!biddingProduct) {
+    const product = await Product.findById(req.body.product);
+    if (!product) {
       return res.status(400).json({
         status: 'Fail',
         message: 'Product not found',
       });
-    // } else if (biddingProduct.price.immediate_purchase_price < req.body.price) {
+    // } else if (product.price.immediate_purchase_price < req.body.price) {
     //   return res.status(400).json({
     //     status: 'fail',
     //     message: 'Price must be greater than or equal to immediate purchase price',
@@ -60,7 +59,7 @@ exports.createplaceBid = async (req, res) => {
         }
   
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(req.body.price * 100),
+        amount: Math.round((req.body.price + req.body.shippingFee) * 100),
         currency: 'usd',
         payment_method_types: ["card"],
         payment_method: paymentMethod.id,
@@ -76,10 +75,34 @@ exports.createplaceBid = async (req, res) => {
           product: req.body.product,
           user: req.user.id,
           price: req.body.price,
+          intentId: paymentIntent.id
         });
-  
-        let product = await Product.findById(req.body.product);
-        console.log(product);
+
+        let data = {
+          user: product.user,
+          product: product.id,
+          text: `New bid placed on your product ${product.title}`,
+        };
+
+        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then(async (res) => {
+            try {
+              const dataa = await res.json();
+              console.log("response data?", dataa);
+            } catch (err) {
+              console.log("error");
+              console.log(err);
+            }
+          })
+          // .then((json) => console.log("json ", json))
+          .catch((error) => {
+            console.log(error);
+          });
+        
         console.log(product.date_for_auction);
   
         let min = moment(product.date_for_auction.ending_date).minutes();
@@ -88,39 +111,83 @@ exports.createplaceBid = async (req, res) => {
         let month = moment(product.date_for_auction.ending_date).format('M');
         let year = moment(product.date_for_auction.ending_date).format('Y');
   
-        console.log(min, (hour), day, month, year)
+        console.log(min, hour, day, month, year)
   
         let paymentIntentCaptureJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
           console.log('Cron job executed.')
           
+          await Product.updateOne({product: product.id}, {status: 'sold'});
+          console.log(product);
+
+          //find all bids on the product
+          let allBidsOfProduct = await placebid.find({product: product.id})
+          .sort({price: -1, createdAt: -1});
+          console.log(allBidsOfProduct.length, allBidsOfProduct);
+
+          if(!allBidsOfProduct || allBidsOfProduct.length < 0){
+            return res.status(404).send({
+              status: "fail",
+              message: "No bids on the product"
+            });
+          }
+          
+          //inform user about purchase
+          let highestBid = allBidsOfProduct.shift();
+          console.log('highest', highestBid)
+          
           const paymentIntentCapture = await stripe.paymentIntents.capture(
-            paymentIntent.id
+            highestBid.intentId
           );
+          let userData = {
+            user: highestBid.user,
+            product: product.id,
+            text: `Your bid on product ${product.title} has been successful.`,
+          };
+
+          fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+            method: "POST",
+            body: JSON.stringify(userData),
+            headers: { "Content-Type": "application/json" },
+          })
+            .then(async (res) => {
+              try {
+                const dataa = await res.json();
+                console.log("response data?", dataa);
+              } catch (err) {
+                console.log("error");
+                console.log(err);
+              }
+            })
+            // .then((json) => console.log("json ", json))
+            .catch((error) => {
+              console.log(error);
+            });
           console.log(paymentIntentCapture);
           if (paymentIntentCapture.status === "succeeded") {
   
             console.log("status ", paymentIntentCapture.status);
-                              
+                          
+            //make payment to seller
             const productSeller = await User.findById(product.user);
             console.log(productSeller);
   
             const transfer = await stripe.transfers.create({
-              amount: Math.round((req.body.price - req.body.shippingFee) * 100),
+              amount: Math.round(highestBid.price * 100),
               currency: 'usd',
               destination: productSeller.connAccount.id,
               source_transaction: paymentIntentCapture.charges.data[0].id,
             });
             console.log(transfer);
   
-            let data = {
+            let sellerData = {
               user: product.user,
               product: product.id,
-              text: `New bid placed on your product product ${product.title}`,
+              text: `Your  product ${product.title} has been sold`,
             };
-  
+
             fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
               method: "POST",
-              body: JSON.stringify(data),
+              body: JSON.stringify(sellerData),
               headers: { "Content-Type": "application/json" },
             })
               .then(async (res) => {
@@ -142,6 +209,50 @@ exports.createplaceBid = async (req, res) => {
               message: "Stripe error",
             });
           }
+
+          console.log(allBidsOfProduct.length, 'laal');
+
+          //delete other bids
+          let set = new Set();
+          allBidsOfProduct.forEach(async (bid) => {
+            if(!set[bid.user])
+              set.add(bid.user);
+            await stripe.paymentIntents.cancel(bid.intentId);
+            await placebid.remove({_id: bid.id});
+          });
+          
+          //send notification to other users
+          console.log(allBidsOfProduct);
+          console.log('users', set);
+          let otherBidUsers = Array.from(set);
+          console.log(otherBidUsers)
+          otherBidUsers.forEach((user) => {
+            let data = {
+              user: user,
+              product: product.id,
+              text: `Your bid on product ${product.title} failed. The product has been sold`,
+            };
+
+            fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(async (res) => {
+                try {
+                  const dataa = await res.json();
+                  console.log("response data?", dataa);
+                } catch (err) {
+                  console.log("error");
+                  console.log(err);
+                }
+              })
+              // .then((json) => console.log("json ", json))
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+
         });
         return res.status(201).json({
           status: 'success',
