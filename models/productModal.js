@@ -49,7 +49,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       // required: [true, 'Season of a product is required'],
       enum: {
-        values: ['spring', 'summer', 'autumn', 'winter'],
+        values: ['Spring', 'Summer', 'Autumn', 'Winter'],
         message: 'Season must be spring, summer, autumn, or winter',
       },
     },
@@ -58,8 +58,8 @@ const productSchema = new mongoose.Schema(
         type: String,
         required: [true, 'Condition of a product is required'],
         enum: {
-          values: ['new', 'very_good', 'good'],
-          message: 'Condition is either: new, very_good or good',
+          values: ['New', 'Very good', 'Good'],
+          message: 'Condition is either: New, Very good or Good',
         },
       },
       wornPriceTag: {

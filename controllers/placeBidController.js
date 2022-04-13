@@ -30,19 +30,13 @@ exports.createplaceBid = async (req, res) => {
     //     message: 'Price must be greater than or equal to immediate purchase price',
     //   });
     } else {
-      const placeBid = await placebid.create({
-        product: req.body.product,
-        user: req.user.id,
-        price: req.body.price,
-      });
-  
       if (!req.body.source) {
         return res.status(400).json({
           status: "fail",
           message: "Invalid credentials",
         });
       }
-  
+          
       // const token = await stripe.tokens.create({
       //     card: {
       //       number: "4242424242424242",
@@ -77,6 +71,12 @@ exports.createplaceBid = async (req, res) => {
       if (paymentIntent.created) {
         console.log("payment created", paymentIntent);
         console.log(req.user);
+
+        const placeBid = await placebid.create({
+          product: req.body.product,
+          user: req.user.id,
+          price: req.body.price,
+        });
   
         let product = await Product.findById(req.body.product);
         console.log(product);
@@ -100,8 +100,6 @@ exports.createplaceBid = async (req, res) => {
           if (paymentIntentCapture.status === "succeeded") {
   
             console.log("status ", paymentIntentCapture.status);
-            product.status = 'sold';
-            await product.save();
                               
             const productSeller = await User.findById(product.user);
             console.log(productSeller);
@@ -117,7 +115,7 @@ exports.createplaceBid = async (req, res) => {
             let data = {
               user: product.user,
               product: product.id,
-              text: `Your product ${product.title} has been sold`,
+              text: `New bid placed on your product product ${product.title}`,
             };
   
             fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
@@ -168,6 +166,11 @@ exports.createplaceBid = async (req, res) => {
 exports.getAllplacebid = async (req, res) => {
   try {
     const getAllplacebid = await placebid.aggregate([
+      // {
+      //   $project: {
+      //     _id: 1, user: 1, product:1, price: 1, createdAt: 1, updatedAt: 1
+      //   }
+      // },
       {
         $match: {
           user: mongoose.Types.ObjectId(req.user.id)
@@ -210,13 +213,10 @@ exports.getAllplacebid = async (req, res) => {
                   }
                 }
               },
-              {
-                $unwind: "$user"
-              }
             ],
             as: "bids" 
         },    
-      },    
+      },
     ]);
     // await placebid.populate(getAllplacebid, {path: 'product'});
     console.log(getAllplacebid.length)

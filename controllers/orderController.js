@@ -283,7 +283,7 @@ exports.createImmediateOrder = async (req, res) => {
       
     if (charge.paid) {
         updatedProduct = await Product.findById(req.body.productId);
-        updatedProduct.status = 'pending';
+        updatedProduct.status = 'sold';
         await updatedProduct.save();
         console.log(updatedProduct);
 
