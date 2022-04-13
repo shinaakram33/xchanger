@@ -28,16 +28,6 @@ exports.createProduct = async (req, res) => {
         type: 'L',
         price: 20.5,
         maxWeight: 30
-      },
-      Xlarge: {
-        type: 'XL',
-        price: 25,
-        maxWeight: 30
-      },
-      XXlarge: {
-        type: 'XXL',
-        price: 50,
-        maxWeight: 35
       }
     };
 
@@ -459,16 +449,6 @@ exports.createBiddingProduct = async (req, res) => {
         type: 'L',
         price: 20.5,
         maxWeight: 30
-      },
-      Xlarge: {
-        type: 'XL',
-        price: 25,
-        maxWeight: 30
-      },
-      XXlarge: {
-        type: 'XXL',
-        price: 50,
-        maxWeight: 35
       }
     };
     const pkgSize = obj[req.body.pakageSize];
