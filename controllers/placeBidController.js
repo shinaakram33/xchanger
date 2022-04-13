@@ -218,7 +218,7 @@ exports.getAllplacebid = async (req, res) => {
         },    
       },
     ]);
-    // await placebid.populate(getAllplacebid, {path: 'product'});
+    await placebid.populate(getAllplacebid, {path: 'product'});
     console.log(getAllplacebid.length)
 
     res.status(200).json({
