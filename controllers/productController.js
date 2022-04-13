@@ -14,27 +14,27 @@ const User = require("../models/userModal");
 exports.createProduct = async (req, res) => {
   try {
     const obj = {
-      small: {
+      Small: {
         type: 'S',
         price: 7,
         maxWeight: 2
       },
-      medium: {
+      Medium: {
         type: 'M',
         price: 9.7,
         maxWeight: 10
       },
-      large: {
+      Large: {
         type: 'L',
         price: 20.5,
         maxWeight: 30
       },
-      xlarge: {
+      Xlarge: {
         type: 'XL',
         price: 25,
         maxWeight: 30
       },
-      xxlarge: {
+      XXlarge: {
         type: 'XXL',
         price: 50,
         maxWeight: 35
@@ -445,27 +445,27 @@ exports.getCategoryProduct = async (req, res) => {
 exports.createBiddingProduct = async (req, res) => {
   try {
     const obj = {
-      small: {
+      Small: {
         type: 'S',
         price: 7,
         maxWeight: 2
       },
-      medium: {
+      Medium: {
         type: 'M',
         price: 9.7,
         maxWeight: 10
       },
-      large: {
+      Large: {
         type: 'L',
         price: 20.5,
         maxWeight: 30
       },
-      xlarge: {
+      Xlarge: {
         type: 'XL',
         price: 25,
         maxWeight: 30
       },
-      xxlarge: {
+      XXlarge: {
         type: 'XXL',
         price: 50,
         maxWeight: 35
