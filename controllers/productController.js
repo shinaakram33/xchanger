@@ -173,8 +173,8 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       };
     }
     if (req.query.season) {
-      let season = (req.query.season.charAt(0).toUpperCase() + req.query.season.slice(1).toLowerCase());
-      console.log(season);
+      // let season = (req.query.season.charAt(0).toUpperCase() + req.query.season.slice(1).toLowerCase());
+      // console.log(season);
       searchCriteria.season = new RegExp(
         ".*" + req.query.season.toLowerCase() + ".*",
         "i"
@@ -203,10 +203,9 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      console.log(req.query.color)
-      // var array = req.query.color.split(",");
-      // console.log(array);
-      searchCriteria.color = {$in: req.query.color};
+      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      console.log(array);
+      searchCriteria.color = {$in: array};
     }
 
     if (req.query.subject) {
