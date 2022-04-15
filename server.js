@@ -65,8 +65,8 @@ io.on("connection", (socket) => {
     console.log(chatMessage.user.ownerId);
 
     let ids = [];
-    ids[0] = chatroomId.slice(0, (chatroomId.length)/2);
-    ids[1]=chatroomId.slice((chatroomId.length)/2)
+    ids[0] = chatMessage.user.chatroomId.slice(0, (chatroomId.length)/2);
+    ids[1]=chatMessage.user.chatroomId.slice((chatroomId.length)/2)
     console.log(ids);
     let user;
     user = chatMessage.user.ownerId === ids[0]? ids[1]: ids[0];
