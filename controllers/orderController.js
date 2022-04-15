@@ -529,7 +529,7 @@ exports.getAllOrders = async (req, res) => {
       const allOrders = await Order.find()
       .sort({"createdAt": -1})
       .populate("user")
-      .populate("cartId")
+      .populate({path: "cartId", populate: {path: "products", model: "Product", }, populate: {path: "selectedProducts", model: "Product"}})
       .populate("productId");
       res.status(200).json({
         status: "success",
@@ -540,7 +540,7 @@ exports.getAllOrders = async (req, res) => {
       const allOrders = await Order.find({ user: req.user.id })
       .sort({"createdAt": -1})
       .populate("user")
-      .populate("cartId")
+      .populate({path: "cartId", populate: {path: "products", model: "Product", }, populate: {path: "selectedProducts", model: "Product"}})
       .populate("productId");
       res.status(200).json({
         status: "success",
@@ -548,7 +548,6 @@ exports.getAllOrders = async (req, res) => {
         data: allOrders,
       });
     }
-    
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -590,8 +589,8 @@ exports.getOrderById = async (req, res) => {
             });
       }
       const order = await Order.findById(id)
-      .populate("user")
-      .populate("cartId")
+      .populate("user")      
+      .populate({path: "cartId", populate: {path: "products", model: "Product", }, populate: {path: "selectedProducts", model: "Product"}})
       .populate("productId");
       if (!order) {
           return res.status(200).json({
@@ -739,7 +738,7 @@ exports.getUserOrders = async (req, res) => {
     const userOrders = await Order.find({ user: req.params.userId })
     .sort({"createdAt": -1})
     .populate("user")
-    .populate("cartId")
+    .populate({path: "cartId", populate: {path: "products", model: "Product", }, populate: {path: "selectedProducts", model: "Product"}})
     .populate("productId");
     if (!userOrders) {
       return res.status(400).json({
