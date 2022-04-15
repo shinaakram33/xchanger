@@ -45,6 +45,7 @@ io.on("connection", (socket) => {
   });
   var connectedClients = {};
   socket.on("joinRoom", ({ chatroomId, id }) => {
+    console.log(chatroomId, id);
     socket.join(chatroomId);
     connectedClients[id] = socket.id;
     console.log(`A user joined chatroom: ${chatroomId} with id : ${id}`);
@@ -61,8 +62,17 @@ io.on("connection", (socket) => {
     const chatMessage = data[0];
     console.log(chatMessage);
     console.log(chatMessage.user.chatroomId, "RoomId");
+    console.log(chatMessafe.user.ownerId);
+
+    let ids = [];
+    ids[0] = chatroomId.slice(0, (chatroomId.length)/2);
+    ids[1]=chatroomId.slice((chatroomId.length)/2)
+    console.log(ids);
+    let user;
+    user = chatMessage.user.ownerId === ids[0]? ids[1]: ids[0];
+    console.log('')
     let textNotificaton = {
-      user: chatMessage.user.ownerId,
+      user: user,
       text: `You have a new message`,
       chat_room_id: chatMessage.user.chatroomId,
     };
