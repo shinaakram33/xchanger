@@ -315,20 +315,15 @@ exports.createImmediateOrder = async (req, res) => {
       .sort({price: -1, createdAt: -1});
       console.log(allBidsOfProduct.length, allBidsOfProduct);
 
-      let set = new Set();
       allBidsOfProduct.forEach(async (bid) => {
-        if(!(set[bid.user]))
-          set.add(bid.user);
         await stripe.paymentIntents.cancel(bid.intentId);
-        await placebid.remove({_id: bid.id});
+        await placebid.deleteOne({_id: bid.id});
       });
       
       //send notification to other users
-      console.log(allBidsOfProduct);
-      console.log('users', set);
-      let otherBidUsers = Array.from(set);
-      console.log(otherBidUsers)
-      otherBidUsers.forEach((user) => {
+      let failedBidUsers = await placebid.distinct('user', {"product": product.id});
+      console.log('failedBidUsers', failedBidUsers);
+      failedBidUsers.forEach((user) => {
         let data = {
           user: user,
           product: product.id,

@@ -37,19 +37,19 @@ exports.createplaceBid = async (req, res) => {
         });
       }
           
-      // const token = await stripe.tokens.create({
-      //     card: {
-      //       number: "4242424242424242",
-      //       exp_month: 1,
-      //       exp_year: 2023,
-      //       cvc: "314",
-      //     },
-      //   });
+      const token = await stripe.tokens.create({
+          card: {
+            number: "4242424242424242",
+            exp_month: 1,
+            exp_year: 2023,
+            cvc: "314",
+          },
+        });
         const paymentMethod = await stripe.paymentMethods.create({
           type: "card",
           card: {
-            token: req.body.source,
-            // token: token.id
+            // token: req.body.source,
+            token: token.id
           },
         });
     
@@ -106,6 +106,7 @@ exports.createplaceBid = async (req, res) => {
           });
         
         console.log(product.date_for_auction);
+        product.date_for_auction = moment();
   
         let min = moment(product.date_for_auction.ending_date).minutes();
         let hour = moment(product.date_for_auction.ending_date).hours();
@@ -115,7 +116,7 @@ exports.createplaceBid = async (req, res) => {
   
         console.log(min, hour, day, month, year)
   
-        let paymentIntentCaptureJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
+        let paymentIntentCaptureJob = schedule.scheduleJob(`${min+2} ${hour} ${day} ${month} *`, async () => {
           console.log('Cron job executed.')
           
           const order = await Order.create({
@@ -181,13 +182,13 @@ exports.createplaceBid = async (req, res) => {
             const productSeller = await User.findById(product.user);
             console.log(productSeller);
   
-            const transfer = await stripe.transfers.create({
-              amount: Math.round(highestBid.price * 100),
-              currency: 'usd',
-              destination: productSeller.connAccount.id,
-              source_transaction: paymentIntentCapture.charges.data[0].id,
-            });
-            console.log(transfer);
+            // const transfer = await stripe.transfers.create({
+            //   amount: Math.round(highestBid.price * 100),
+            //   currency: 'usd',
+            //   destination: productSeller.connAccount.id,
+            //   source_transaction: paymentIntentCapture.charges.data[0].id,
+            // });
+            // console.log(transfer);
   
             let sellerData = {
               user: product.user,
@@ -222,20 +223,15 @@ exports.createplaceBid = async (req, res) => {
 
 
           //delete other bids
-          let set = new Set();
           allBidsOfProduct.forEach(async (bid) => {
-            if(!(set[bid.user]))
-              set.add(bid.user);
             await stripe.paymentIntents.cancel(bid.intentId);
-            await placebid.remove({_id: bid.id});
+            await placebid.deleteOne({_id: bid.id});
           });
           
           //send notification to other users
-          console.log(allBidsOfProduct);
-          console.log('users', set);
-          let otherBidUsers = Array.from(set);
-          console.log(otherBidUsers)
-          otherBidUsers.forEach((user) => {
+          let failedBidUsers = await placebid.distinct('user', {"product": product.id});
+          console.log('failedBidUsers', failedBidUsers);
+          failedBidUsers.forEach((user) => {
             let data = {
               user: user,
               product: product.id,
