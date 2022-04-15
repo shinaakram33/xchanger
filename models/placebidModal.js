@@ -27,6 +27,10 @@ const placeBidSchema = new mongoose.Schema(
     intentId: {
       type: String,
     },
+    succeeded: {
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true }
 );

@@ -133,7 +133,9 @@ exports.createplaceBid = async (req, res) => {
           
           //inform user about purchase
           let highestBid = allBidsOfProduct.shift();
-          console.log('highest', highestBid)
+          console.log('highest', highestBid);
+
+          highestBid.succeeded = true;
           
           const paymentIntentCapture = await stripe.paymentIntents.capture(
             highestBid.intentId
@@ -277,11 +279,6 @@ exports.createplaceBid = async (req, res) => {
 exports.getAllplacebid = async (req, res) => {
   try {
     const getAllplacebid = await placebid.aggregate([
-      // {
-      //   $project: {
-      //     _id: 1, user: 1, product:1, price: 1, createdAt: 1, updatedAt: 1
-      //   }
-      // },
       {
         $match: {
           user: mongoose.Types.ObjectId(req.user.id)
@@ -318,6 +315,24 @@ exports.getAllplacebid = async (req, res) => {
                 }
               },
               {
+                $limit: 1
+              },
+            ],
+            as: "userBid" 
+        },    
+      },
+      {
+        $lookup: {
+          from: "placebids",      
+            localField: "product",   
+            foreignField: "product",
+            pipeline: [
+              {
+                $sort: {
+                  createdAt: -1
+                }
+              },
+              {
                 $match: {
                   user: {
                     $ne: mongoose.Types.ObjectId(req.user.id)
@@ -328,8 +343,19 @@ exports.getAllplacebid = async (req, res) => {
             as: "bids" 
         },    
       },
+      {
+        $lookup: {
+          from: "products",      
+          localField: "product",   
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      {
+        $unwind: "$product"
+      },
     ]);
-    await placebid.populate(getAllplacebid, {path: 'product'});
+    // await placebid.populate(getAllplacebid, {path: 'product'});
     console.log(getAllplacebid.length)
 
     res.status(200).json({
