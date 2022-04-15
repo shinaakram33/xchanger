@@ -6,6 +6,7 @@ const fetch = require("node-fetch");
 const User = require("../models/userModal");
 const moment = require("moment");
 const schedule = require("node-schedule");
+const placebid = require("../models/placebidModal");
 
 
 exports.createOrder = async (req, res) => {
@@ -128,6 +129,7 @@ exports.createOrder = async (req, res) => {
       console.log("product updated", updatedProduct);
 
       createOrderTable.productId.push(updatedProduct.id);
+      await createOrderTable.save();
       console.log("product array ", createOrderTable.productId);
 
       await Cart.updateOne(
@@ -249,8 +251,9 @@ deleteSoldItems = async(id) => {
 }
 
 exports.createImmediateOrder = async (req, res) => {
+  let updatedProduct;
   try {
-    console.log("req.boy", req.body);
+    console.log("req.body", req.body);
 
     if (!req.body.source) {
       return res.status(400).json({
@@ -272,6 +275,7 @@ exports.createImmediateOrder = async (req, res) => {
       amount: req.body.price * 100,
       currency: "usd",
       source: req.body.source,
+      // source: token.id,
     });
 
     if (!charge) {
@@ -286,33 +290,71 @@ exports.createImmediateOrder = async (req, res) => {
         updatedProduct.status = 'sold';
         await updatedProduct.save();
         console.log(updatedProduct);
+        
 
       //let product = await Product.findById(req.body.productId);
 
-      let createOrderTable = new Order({
+      const order = await Order.create({
         name: req.body.name,
         email: req.body.email,
         phoneNumber: req.body.phoneNumber,
         location: req.body.location,
         user: req.user.id,
         checkoutId: charge.id,
-        status: "pending",
+        status: "Complete",
         price: req.body.price,
         productId: req.body.productId,
       });
-      await createOrderTable.save();
-      console.log("createdOrderTable");
+      console.log("Order", order);
       
       const productSeller = await User.findById(updatedProduct.user);
       console.log(productSeller);
+      console.log('seller', productSeller.connAccount);
 
-      const transfer = await stripe.transfers.create({
-        amount: Math.round((req.body.price - req.body.shippingFee) * 100),
-        currency: 'usd',
-        destination: productSeller.connAccount.id,
-        source_transaction: charge.id,
+      let allBidsOfProduct = await placebid.find({product: updatedProduct.id})
+      .sort({price: -1, createdAt: -1});
+      console.log(allBidsOfProduct.length, allBidsOfProduct);
+
+      let set = new Set();
+      allBidsOfProduct.forEach(async (bid) => {
+        if(!(set[bid.user]))
+          set.add(bid.user);
+        await stripe.paymentIntents.cancel(bid.intentId);
+        await placebid.remove({_id: bid.id});
       });
-      console.log(transfer);
+      
+      //send notification to other users
+      console.log(allBidsOfProduct);
+      console.log('users', set);
+      let otherBidUsers = Array.from(set);
+      console.log(otherBidUsers)
+      otherBidUsers.forEach((user) => {
+        let data = {
+          user: user,
+          product: product.id,
+          text: `Your bid on product ${product.title} failed. The product has been sold`,
+        };
+
+        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then(async (res) => {
+            try {
+              const dataa = await res.json();
+              console.log("response data?", dataa);
+            } catch (err) {
+              console.log("error");
+              console.log(err);
+            }
+          })
+          // .then((json) => console.log("json ", json))
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      
 
       let data = {
         user: updatedProduct.user,
@@ -340,10 +382,19 @@ exports.createImmediateOrder = async (req, res) => {
         });
       console.log("Check 2", updatedProduct);
 
+      console.log('--------------------------------------');
+      // const transfer = await stripe.transfers.create({
+      //   amount: Math.round(updatedProduct.price * 100),
+      //   currency: 'usd',
+      //   destination: 'acct_1KaeOyQaP12vTx5z',
+      //   source_transaction: charge.id,
+      // });
+      // console.log(transfer);
+
       return res.status(200).json({
         status: "success",
         message: "Product is purchased successfully",
-        data: createOrderTable,
+        data: order,
       });
     } else {
       return res.status(400).json({
@@ -352,6 +403,9 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err.message);
+    updatedProduct.status = 'not_sold';
+    await updatedProduct.save();
     return res.status(400).json({
       status: "fail",
       message: err.message,
@@ -380,7 +434,7 @@ exports.orderAccepted = async (req, res) => {
       );
       console.log(paymentIntentCapture);
       order.accepted = true;
-      order.status = "Sold";
+      order.status = "Complete";
       console.log("status ", paymentIntentCapture.status);
       if (paymentIntentCapture.status === "succeeded") {
         order.productId.map(async (i, index) => {
@@ -629,7 +683,7 @@ exports.updateOrder = async (req, res) => {
       }
       const updated_order = await Order.findByIdAndUpdate(id, updates, { new: true })
       .populate("user")
-      .populate("cartId")
+      .populate({path: "cartId", populate: {path: "products", model: "Product", }, populate: {path: "selectedProducts", model: "Product"}})
       .populate("productId");
       res.status(201).json({
           status: 'success',

@@ -34,7 +34,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      required: [true, "Make status into SOLD"],
+      // required: [true, "Make status into SOLD"],
     },
     productId: [
       {

@@ -6,6 +6,7 @@ const schedule = require("node-schedule");
 const moment = require('moment');
 const fetch = require("node-fetch");
 const mongoose = require('mongoose');
+const Order = require("../models/orderModal");
 
 exports.createplaceBid = async (req, res) => {
   try {
@@ -48,6 +49,7 @@ exports.createplaceBid = async (req, res) => {
           type: "card",
           card: {
             token: req.body.source,
+            // token: token.id
           },
         });
     
@@ -116,7 +118,19 @@ exports.createplaceBid = async (req, res) => {
         let paymentIntentCaptureJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
           console.log('Cron job executed.')
           
-          await Product.updateOne({product: product.id}, {status: 'sold'});
+          const order = await Order.create({
+            name: req.body.name,
+            email: req.body.email,
+            phoneNumber: req.body.phoneNumber,
+            location: req.body.location,
+            user: req.user.id,
+            checkoutId: placeBid.intentId,
+            status: "Complete",
+            price: req.body.price,
+          });
+          console.log("Order", order);
+          product.status = 'sold';
+          await product.save();
           console.log(product);
 
           //find all bids on the product
@@ -124,12 +138,6 @@ exports.createplaceBid = async (req, res) => {
           .sort({price: -1, createdAt: -1});
           console.log(allBidsOfProduct.length, allBidsOfProduct);
 
-          if(!allBidsOfProduct || allBidsOfProduct.length < 0){
-            return res.status(404).send({
-              status: "fail",
-              message: "No bids on the product"
-            });
-          }
           
           //inform user about purchase
           let highestBid = allBidsOfProduct.shift();
@@ -212,12 +220,11 @@ exports.createplaceBid = async (req, res) => {
             });
           }
 
-          console.log(allBidsOfProduct.length, 'laal');
 
           //delete other bids
           let set = new Set();
           allBidsOfProduct.forEach(async (bid) => {
-            if(!set[bid.user])
+            if(!(set[bid.user]))
               set.add(bid.user);
             await stripe.paymentIntents.cancel(bid.intentId);
             await placebid.remove({_id: bid.id});
@@ -355,7 +362,6 @@ exports.getAllplacebid = async (req, res) => {
         $unwind: "$product"
       },
     ]);
-    // await placebid.populate(getAllplacebid, {path: 'product'});
     console.log(getAllplacebid.length)
 
     res.status(200).json({

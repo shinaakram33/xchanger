@@ -287,7 +287,7 @@ exports.resetPassword = async (req, res) => {
     else if (password !== confirmPassword) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Passwords are not match with each other',
+        message: 'Passwords do not match with each other',
       });
     } else {
       user.password = password;

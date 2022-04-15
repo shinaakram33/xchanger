@@ -41,7 +41,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, 'State of a product is required'],
       enum: {
-        values: ['USA', 'UK'],
+        values: ['USA', 'UK', 'EU'],
         message: 'State is required',
       },
     },

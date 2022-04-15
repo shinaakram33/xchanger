@@ -134,6 +134,8 @@ exports.createProduct = async (req, res) => {
 
 exports.getCategoryFilteredProduct = async (req, res) => {
   try {
+    console.log(req.params);
+    console.log(req.query);
     let searchCriteria = {
       status: "not_sold",
     };
@@ -152,7 +154,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         ],
       };
     }
-    if (req.params.category) {
+    if (req.params.categoryId) {
       searchCriteria = {
         categoryId: req.params.categoryId,
       };
@@ -266,6 +268,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         data: products,
       });
     } else {
+      console.log(searchCriteria);
       const products = await Product.find({
         category: req.params.categoryId,
         subCategoryId: req.params.subCategoryId,
@@ -349,7 +352,7 @@ exports.getCategoryProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      var array = req.query.color.split(",");
+      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
       searchCriteria.color = array;
     }
 
@@ -591,7 +594,7 @@ exports.getBiddingProducts = async (req, res) => {
     }
 
     if (req.query.color) {
-      var array = req.query.color.split(",");
+      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
       searchCriteria.color = array;
     }
 
@@ -920,7 +923,7 @@ exports.getAllProduct = async (req, res) => {
   }
 
   if (req.query.color) {
-    var array = req.query.color.split(",");
+    var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
     searchCriteria.color = array;
   }
 
