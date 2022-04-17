@@ -42,7 +42,7 @@ exports.getRecentViews = async (req, res) => {
     const getAllRecentViews = await RecentView.findOne({ user: req.user.id })
     .populate("user")
     .populate({
-      path: 'products',
+      path: 'products', populate: {path: "user", model: "User", },
       options: { sort: { 'createdAt': -1 } }
     });
     res.status(200).json({
