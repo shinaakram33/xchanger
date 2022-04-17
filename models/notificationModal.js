@@ -21,6 +21,10 @@ const notificationSchema = new mongoose.Schema(
     chat_room_id: {
       type: String,
     },
+    message: {
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true }
 );

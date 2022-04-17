@@ -76,6 +76,7 @@ io.on("connection", (socket) => {
       user: user,
       text: `${sender.name} sent you a message`,
       chat_room_id: chatMessage.user.chatroomId,
+      message: true,
     };
 
     fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
