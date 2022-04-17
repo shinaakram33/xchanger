@@ -129,7 +129,6 @@ exports.createOrder = async (req, res) => {
       console.log("product updated", updatedProduct);
 
       createOrderTable.productId.push(updatedProduct.id);
-      await createOrderTable.save();
       console.log("product array ", createOrderTable.productId);
 
       await Cart.updateOne(
