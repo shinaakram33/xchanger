@@ -71,9 +71,10 @@ io.on("connection", (socket) => {
     let user;
     user = chatMessage.user.ownerId === ids[0]? ids[1]: ids[0];
     console.log('')
+    let sender = await User.findById(chatMessage.user.ownerId);
     let textNotificaton = {
       user: user,
-      text: `You have a new message`,
+      text: `${sender.name} sent you a message`,
       chat_room_id: chatMessage.user.chatroomId,
     };
 
