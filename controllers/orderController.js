@@ -139,7 +139,8 @@ exports.createOrder = async (req, res) => {
       );
       console.log('selected products', cart.selectedProducts)
       cart.selectedProducts = undefined;
-
+      await cart.save();
+      
       let data = {
         user: updatedProduct.user,
         product: updatedProduct.id,
