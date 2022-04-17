@@ -181,14 +181,18 @@ exports.createplaceBid = async (req, res) => {
             //make payment to seller
             const productSeller = await User.findById(product.user);
             console.log(productSeller);
-  
-            // const transfer = await stripe.transfers.create({
-            //   amount: Math.round(highestBid.price * 100),
-            //   currency: 'usd',
-            //   destination: productSeller.connAccount.id,
-            //   source_transaction: paymentIntentCapture.charges.data[0].id,
-            // });
-            // console.log(transfer);
+
+            // try{
+              //     let transfer = await stripe.transfers.create({
+              //     amount: Math.round(highestBid * 100),
+            //       currency: 'usd',
+            //       destination: productSeller.connAccount.id,
+            //       source_transaction: paymentIntentCapture.charges.data[0].id,
+            //     });
+            //     console.log(transfer);
+            //   } catch (err) {
+            //     console.log(err);
+            //   }
   
             let sellerData = {
               user: product.user,

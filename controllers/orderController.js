@@ -262,20 +262,20 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
-    // const token = await stripe.tokens.create({
-    //   card: {
-    //     number: "4242424242424242",
-    //     exp_month: 1,
-    //     exp_year: 2023,
-    //     cvc: "314",
-    //   },
-    // });
+    const token = await stripe.tokens.create({
+      card: {
+        number: "4242424242424242",
+        exp_month: 1,
+        exp_year: 2023,
+        cvc: "314",
+      },
+    });
 
     const charge = await stripe.charges.create({
       amount: req.body.price * 100,
       currency: "usd",
-      source: req.body.source,
-      // source: token.id,
+      // source: req.body.source,
+      source: token.id,
     });
 
     if (!charge) {
@@ -321,13 +321,13 @@ exports.createImmediateOrder = async (req, res) => {
       });
       
       //send notification to other users
-      let failedBidUsers = await placebid.distinct('user', {"product": product.id});
+      let failedBidUsers = await placebid.distinct('user', {"product": updatedProduct.id});
       console.log('failedBidUsers', failedBidUsers);
       failedBidUsers.forEach((user) => {
         let data = {
           user: user,
-          product: product.id,
-          text: `Your bid on product ${product.title} failed. The product has been sold`,
+          product: updatedProduct.id,
+          text: `Your bid on product ${updatedProduct.title} failed. The product has been sold`,
         };
 
         fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
@@ -378,13 +378,17 @@ exports.createImmediateOrder = async (req, res) => {
       console.log("Check 2", updatedProduct);
 
       console.log('--------------------------------------');
-      // const transfer = await stripe.transfers.create({
-      //   amount: Math.round(updatedProduct.price * 100),
-      //   currency: 'usd',
-      //   destination: 'acct_1KaeOyQaP12vTx5z',
-      //   source_transaction: charge.id,
-      // });
-      // console.log(transfer);
+      // try{
+      //     let transfer = await stripe.transfers.create({
+      //     amount: Math.round(updatedProduct.price.immediate_purchase_price * 100),
+      //       currency: 'usd',
+      //       destination: productSeller.connAccount.id,
+      //       source_transaction: charge.id,
+      //     });
+      //     console.log(transfer);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
 
       return res.status(200).json({
         status: "success",
@@ -418,7 +422,19 @@ exports.orderAccepted = async (req, res) => {
     // if (!user) return res.status(401).send("User does not exist.");
 
     const order = await Order.findById(orderId);
-    if (!order) return res.status(403).send("Order does not exist.");
+    if (!order) {
+      return res.status(403).json({
+        status: "fail",
+        message: "Order does not exists",
+      });
+    }
+
+    if(order.status === 'Complete'){
+      return res.status(403).json({
+        status: "fail",
+        message: "Order is already completed",
+      });
+    }
     // if (order.user != user.id)
     //   return res.status(403).send("Order ID doesn't match");
 
@@ -448,18 +464,18 @@ exports.orderAccepted = async (req, res) => {
           console.log(updatedProduct.price);
           console.log(paymentIntentCapture.transfer_group);
           console.log(paymentIntentCapture.id);
-          // try{
-          //   let transfer = await stripe.transfers.create({
-          //     amount: updatedProduct.price.sellingPrice * 100,
-          //     currency: 'usd',
-          //     destination: productUser.connAccount.id,
-          //     source_transaction: paymentIntentCapture.charges.data[0].id,
-          //     transfer_group: paymentIntentCapture.transfer_group
-          //   });
-          //   console.log(transfer);
-          // } catch (err) {
-          //   console.log(err);
-          // }
+          try{
+            let transfer = await stripe.transfers.create({
+              amount: updatedProduct.price.sellingPrice * 100,
+              currency: 'usd',
+              destination: productUser.connAccount.id,
+              source_transaction: paymentIntentCapture.charges.data[0].id,
+              transfer_group: paymentIntentCapture.transfer_group
+            });
+            console.log(transfer);
+          } catch (err) {
+            console.log(err);
+          }
           
           console.log('--------------------------------------------------');
           let data = {
