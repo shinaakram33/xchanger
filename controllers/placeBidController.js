@@ -130,7 +130,7 @@ exports.createplaceBid = async (req, res) => {
             price: req.body.price,
           });
           console.log("Order", order);
-          product.status = 'sold';
+          product.status = 'Sold';
           await product.save();
           console.log(product);
 

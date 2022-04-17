@@ -129,10 +129,10 @@ const productSchema = new mongoose.Schema(
     // },
     status: {
       type: String,
-      default: 'not_sold',
+      default: 'Not sold',
       enum: {
-        values: ['sold', 'not_sold', 'pending'],
-        message: 'Condition is either: sold, not_sold',
+        values: ['Sold', 'Not sold', 'Pending'],
+        message: 'Status is can only be: Sold, Not sold or Pending',
       },
     },
     adType: {

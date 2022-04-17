@@ -113,7 +113,7 @@ exports.createOrder = async (req, res) => {
       user: req.user.id,
       cartId: cart._id,
       checkoutId: paymentIntent.id,
-      status: "pending",
+      status: "Pending",
       price: req.body.price,
       orderNumber: orderNumber
     });
@@ -123,7 +123,7 @@ exports.createOrder = async (req, res) => {
       console.log("map", i);
       let updatedProduct = await Product.findByIdAndUpdate(
         i,
-        { status: "pending" },
+        { status: "Pending" },
         { new: true }
       );
       console.log("product updated", updatedProduct);
@@ -286,7 +286,7 @@ exports.createImmediateOrder = async (req, res) => {
       
     if (charge.paid) {
         updatedProduct = await Product.findById(req.body.productId);
-        updatedProduct.status = 'sold';
+        updatedProduct.status = 'Sold';
         await updatedProduct.save();
         console.log(updatedProduct);
         
@@ -402,7 +402,7 @@ exports.createImmediateOrder = async (req, res) => {
     }
   } catch (err) {
     console.log(err.message);
-    updatedProduct.status = 'not_sold';
+    updatedProduct.status = 'Not sold';
     await updatedProduct.save();
     return res.status(400).json({
       status: "fail",
@@ -451,7 +451,7 @@ exports.orderAccepted = async (req, res) => {
           console.log("1");
           let updatedProduct = await Product.findByIdAndUpdate(
             i,
-            { status: "sold" },
+            { status: "Sold" },
             { new: true }
           );
           console.log("2");
@@ -529,7 +529,7 @@ exports.orderAccepted = async (req, res) => {
             console.log("1");
             let updatedProduct = await Product.findByIdAndUpdate(
               i,
-              { status: "not_sold" },
+              { status: "Not sold" },
               { new: true }
             );
             console.log("2");
@@ -624,7 +624,7 @@ exports.getPendingOrders = async (req, res) => {
   try {
     const orders = await Order.find({
       user: req.user.id,
-      status: "pending",
+      status: "Pending",
     })
     .sort({"createdAt": -1})
     .populate("productId");

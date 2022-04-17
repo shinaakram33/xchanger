@@ -137,7 +137,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     console.log(req.params);
     console.log(req.query);
     let searchCriteria = {
-      status: "not_sold",
+      status: "Not sold",
     };
     let sortingQuery = {};
     if (req.query.search) {
@@ -255,6 +255,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       var sortingOrder = req.query.sortingOrder;
       sortingQuery[sortBy] = sortingOrder;
     }
+    console.log(searchCriteria, sortingOrder);
     if (Object.keys(req.query).length !== 0) {
       const products = await Product.find(searchCriteria)
         .populate("category")
@@ -273,7 +274,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         category: req.params.categoryId,
         subCategoryId: req.params.subCategoryId,
         subCategoryOptionId: req.params.subCategoryOptionId,
-        status: "not_sold",
+        status: "Not sold",
       })
         .populate("category")
         .populate("subCategoryId")
@@ -295,7 +296,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
 exports.getCategoryProduct = async (req, res) => {
   try {
     let searchCriteria = {
-      status: "not_sold",
+      status: "Not sold",
     };
     let sortingQuery = {};
     let products = null;
@@ -411,7 +412,7 @@ exports.getCategoryProduct = async (req, res) => {
     } else {
       products = await Product.find({
         category: req.params.categoryId,
-        status: "not_sold",
+        status: "Not sold",
         adType: {$in: ['normal', 'featured']}
       })
       .sort({adType: 1, createdAt: -1})
@@ -478,7 +479,7 @@ exports.createBiddingProduct = async (req, res) => {
       subCategoryOptionId: req.params.subCategoryOptionId,
       user: req.user.id,
       adType: "bidding",
-      status: "not_sold",
+      status: "Not sold",
       pakageSize: pkgSize,
     });
     return res.status(201).json({
@@ -496,7 +497,7 @@ exports.createBiddingProduct = async (req, res) => {
 
 exports.getBiddingPendingProduct = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ status: "pending", flag: "Approved" })
+    const pendingProduct = await Product.find({ status: "Pending", flag: "Approved" })
       .populate("category")
       .populate("subCategoryId")
       .populate("subCategoryOptionId")
@@ -519,7 +520,7 @@ exports.getBiddingProducts = async (req, res) => {
     let pendingProduct = null;
     let searchCriteria = {
       adType: "bidding",
-      status: "not_sold",
+      status: "Not sold",
     };
     let sortingQuery = {};
     if (req.query.search) {
@@ -653,7 +654,7 @@ exports.getBiddingProducts = async (req, res) => {
     } else {
       pendingProduct = await Product.find({
         adType: "bidding",
-        status: "not_sold",
+        status: "Not sold",
       })
       .sort({createdAt: -1})
         .populate("category")
@@ -679,7 +680,7 @@ exports.changeBiddingStatus = async (req, res) => {
     const products = await Product.findByIdAndUpdate(
       req.params.productId,
       {
-        status: "not_sold",
+        status: "Not sold",
         time: req.body.time,
       },
       { new: true }
@@ -842,7 +843,7 @@ exports.getUserProducts = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
   let searchCriteria = {
-    status: "not_sold",
+    status: "Not sold",
     adType: { $in: [ "normal", "featured" ]  } 
   };
   let sortingQuery = {};
@@ -991,7 +992,7 @@ exports.getAllProduct = async (req, res) => {
     });
   } else {
     const allProduct = await Product.find({
-      status: "not_sold",
+      status: "Not sold",
       adType: { $in: [ "normal", "featured" ]  } 
     })
     .sort({adType: 1, createdAt: -1})
