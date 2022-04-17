@@ -211,7 +211,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(",");
+      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -246,8 +246,9 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
-      }
+      } 
+      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
+      // }
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -255,7 +256,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       var sortingOrder = req.query.sortingOrder;
       sortingQuery[sortBy] = sortingOrder;
     }
-    console.log(searchCriteria, sortingOrder);
+    console.log(searchCriteria, sortingQuery);
     if (Object.keys(req.query).length !== 0) {
       const products = await Product.find(searchCriteria)
         .populate("category")
@@ -358,7 +359,7 @@ exports.getCategoryProduct = async (req, res) => {
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(",");
+      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -393,8 +394,9 @@ exports.getCategoryProduct = async (req, res) => {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
-      }
+      } 
+      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
+      // }
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -403,6 +405,7 @@ exports.getCategoryProduct = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
+      console.log(searchCriteria, sortingQuery)
       products = await Product.find(searchCriteria)
         .populate("category")
         .populate("subCategoryId")
@@ -600,7 +603,7 @@ exports.getBiddingProducts = async (req, res) => {
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.split(",");
+      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -635,8 +638,9 @@ exports.getBiddingProducts = async (req, res) => {
         sortingQuery = {
           createdAt: -1,
         };
-      } else if (req.query.sortingOrder.toLowerCase() === "sale") {
       }
+      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
+      // }
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -929,7 +933,7 @@ exports.getAllProduct = async (req, res) => {
   }
 
   if (req.query.subject) {
-    var array = req.query.subject.split(",");
+    var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
     searchCriteria.subject = array;
   }
 
@@ -964,8 +968,9 @@ exports.getAllProduct = async (req, res) => {
       sortingQuery = {
         createdAt: -1,
       };
-    } else if (req.query.sortingOrder.toLowerCase() === "sale") {
-    }
+    } 
+    // else if (req.query.sortingOrder.toLowerCase() === "sale") {
+    // }
   }
 
   if (req.query.sortBy && req.query.sortingOrder) {
