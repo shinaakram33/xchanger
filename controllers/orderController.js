@@ -172,7 +172,7 @@ exports.createOrder = async (req, res) => {
     await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
-    await createOrderTable.save().then(o => o.populate("productId").execPopulate())
+    await createOrderTable.save().then(o => o.populate("productId").execPopulate());
 
     return res.status(200).json({
       status: "success",
@@ -245,13 +245,6 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-deleteSoldItems = async(id) => {
-  const order = await Order.findById(id);
-  order.productId.forEach(async (product) => {
-    await Product.findByIdAndDelete(product);
-  });
-}
-
 exports.createImmediateOrder = async (req, res) => {
   let updatedProduct;
   try {
@@ -264,20 +257,20 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
-    const token = await stripe.tokens.create({
-      card: {
-        number: "4242424242424242",
-        exp_month: 1,
-        exp_year: 2023,
-        cvc: "314",
-      },
-    });
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
 
     const charge = await stripe.charges.create({
       amount: req.body.price * 100,
       currency: "usd",
-      // source: req.body.source,
-      source: token.id,
+      source: req.body.source,
+      // source: token.id,
     });
 
     if (!charge) {
@@ -306,7 +299,7 @@ exports.createImmediateOrder = async (req, res) => {
         status: "Complete",
         price: req.body.price,
         productId: req.body.productId,
-      });
+      }).then(o => o.populate("productId").execPopulate());
       console.log("Order", order);
       
       const productSeller = await User.findById(updatedProduct.user);

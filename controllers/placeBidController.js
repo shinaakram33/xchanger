@@ -129,7 +129,7 @@ exports.createplaceBid = async (req, res) => {
             status: "Complete",
             price: req.body.price,
             productId: product.id
-          });
+          }).then(o => o.populate("productId").execPopulate());
           console.log("Order", order);
           product.status = 'Sold';
           await product.save();
