@@ -172,7 +172,8 @@ exports.createOrder = async (req, res) => {
     await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
-    await createOrderTable.save();
+    let order = await createOrderTable.save().then(o => o.populate("productId").execPopulate())
+    console.log('---------------------------------------------------------------', order);
 
     return res.status(200).json({
       status: "success",
