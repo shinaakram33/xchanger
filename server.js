@@ -78,9 +78,8 @@ io.on("connection", (socket) => {
       chat_room_id: chatMessage.user.chatroomId,
       message: true,
     };
-    console.log('textNotificaton', textNotificaton);
 
-    fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+    fetch("https://x-changer.herokuapp.com/api/v1/notification", {
       method: "POST",
       body: JSON.stringify(textNotificaton),
       headers: { "Content-Type": "application/json" },
