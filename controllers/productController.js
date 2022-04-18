@@ -1205,7 +1205,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Product ${product.title} has been added to your cart`,
         };
 
-        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
           method: "POST",
           body: JSON.stringify(dataOfBidUser),
           headers: { "Content-Type": "application/json" },
@@ -1218,7 +1218,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Your product ${product.title} has been sold`,
         };
 
-        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
           method: "POST",
           body: JSON.stringify(dataOfProductOwner),
           headers: { "Content-Type": "application/json" },

@@ -86,7 +86,7 @@ exports.createplaceBid = async (req, res) => {
           text: `New bid placed on your product ${product.title}`,
         };
 
-        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
           method: "POST",
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
@@ -156,7 +156,7 @@ exports.createplaceBid = async (req, res) => {
             text: `Your bid on product ${product.title} has been successful.`,
           };
 
-          fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
             method: "POST",
             body: JSON.stringify(userData),
             headers: { "Content-Type": "application/json" },
@@ -201,7 +201,7 @@ exports.createplaceBid = async (req, res) => {
               text: `Your  product ${product.title} has been sold`,
             };
 
-            fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+            fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
               method: "POST",
               body: JSON.stringify(sellerData),
               headers: { "Content-Type": "application/json" },
@@ -243,7 +243,7 @@ exports.createplaceBid = async (req, res) => {
               text: `Your bid on product ${product.title} failed. The product has been sold`,
             };
 
-            fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+            fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
               method: "POST",
               body: JSON.stringify(data),
               headers: { "Content-Type": "application/json" },

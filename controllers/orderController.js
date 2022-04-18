@@ -149,7 +149,7 @@ exports.createOrder = async (req, res) => {
       };
       console.log("check2", data);
       console.log("check2", updatedProduct);
-      fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+      fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
@@ -327,7 +327,7 @@ exports.createImmediateOrder = async (req, res) => {
           text: `Your bid on product ${updatedProduct.title} failed. The product has been sold`,
         };
 
-        fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
           method: "POST",
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
@@ -354,7 +354,7 @@ exports.createImmediateOrder = async (req, res) => {
         text: `Your product ${updatedProduct.title} has been sold`,
       };
 
-      fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+      fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
@@ -482,7 +482,7 @@ exports.orderAccepted = async (req, res) => {
           };
           // console.log("check2", data);
           // console.log("check2", updatedProduct);
-          fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+          fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
             method: "POST",
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json" },
@@ -538,7 +538,7 @@ exports.orderAccepted = async (req, res) => {
             };
             console.log("check2", data);
             console.log("check2", updatedProduct);
-            fetch("https://clothingsapp.herokuapp.com/api/v1/notification", {
+            fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
               method: "POST",
               body: JSON.stringify(data),
               headers: { "Content-Type": "application/json" },
