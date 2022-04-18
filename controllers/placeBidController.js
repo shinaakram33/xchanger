@@ -37,19 +37,19 @@ exports.createplaceBid = async (req, res) => {
         });
       }
           
-      const token = await stripe.tokens.create({
-          card: {
-            number: "4242424242424242",
-            exp_month: 1,
-            exp_year: 2023,
-            cvc: "314",
-          },
-        });
+      // const token = await stripe.tokens.create({
+      //     card: {
+      //       number: "4242424242424242",
+      //       exp_month: 1,
+      //       exp_year: 2023,
+      //       cvc: "314",
+      //     },
+      //   });
         const paymentMethod = await stripe.paymentMethods.create({
           type: "card",
           card: {
-            // token: req.body.source,
-            token: token.id
+            token: req.body.source,
+            // token: token.id
           },
         });
     
@@ -106,7 +106,6 @@ exports.createplaceBid = async (req, res) => {
           });
         
         console.log(product.date_for_auction);
-        product.date_for_auction = moment();
   
         let min = moment(product.date_for_auction.ending_date).minutes();
         let hour = moment(product.date_for_auction.ending_date).hours();
@@ -115,8 +114,9 @@ exports.createplaceBid = async (req, res) => {
         let year = moment(product.date_for_auction.ending_date).format('Y');
   
         console.log(min, hour, day, month, year)
+        
   
-        let paymentIntentCaptureJob = schedule.scheduleJob(`${min+2} ${hour} ${day} ${month} *`, async () => {
+        let paymentIntentCaptureJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
           console.log('Cron job executed.')
           
           const order = await Order.create({
@@ -128,6 +128,7 @@ exports.createplaceBid = async (req, res) => {
             checkoutId: placeBid.intentId,
             status: "Complete",
             price: req.body.price,
+            productId: product.id
           });
           console.log("Order", order);
           product.status = 'Sold';
