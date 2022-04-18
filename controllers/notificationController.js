@@ -7,7 +7,7 @@ exports.createNotification = async (req, res) => {
 
   try {
     let notification = new Notification(req.body);
-    await notification.save();
+    await notification.save().then(n => n.populate("sender").execPopulate());
 
     return res.status(200).json({
       status: "success",

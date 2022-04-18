@@ -77,6 +77,7 @@ io.on("connection", (socket) => {
       text: `${sender.name} sent you a message`,
       chat_room_id: chatMessage.user.chatroomId,
       message: true,
+      sender: user,
     };
 
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
