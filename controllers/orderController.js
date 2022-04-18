@@ -139,6 +139,7 @@ exports.createOrder = async (req, res) => {
         { $pull: { products: { $in: cart.selectedProducts } } }
       );
       console.log('selected products', cart.selectedProducts)
+      cart.selectedProducts = undefined;
       
       let data = {
         user: updatedProduct.user,
@@ -168,6 +169,7 @@ exports.createOrder = async (req, res) => {
         });
       console.log("status ", paymentIntent.status);
     });
+    await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save();
@@ -464,18 +466,18 @@ exports.orderAccepted = async (req, res) => {
           console.log(updatedProduct.price);
           console.log(paymentIntentCapture.transfer_group);
           console.log(paymentIntentCapture.id);
-          try{
-            let transfer = await stripe.transfers.create({
-              amount: updatedProduct.price.sellingPrice * 100,
-              currency: 'usd',
-              destination: productUser.connAccount.id,
-              source_transaction: paymentIntentCapture.charges.data[0].id,
-              transfer_group: paymentIntentCapture.transfer_group
-            });
-            console.log(transfer);
-          } catch (err) {
-            console.log(err);
-          }
+          // try{
+          //   let transfer = await stripe.transfers.create({
+          //     amount: updatedProduct.price.sellingPrice * 100,
+          //     currency: 'usd',
+          //     destination: productUser.connAccount.id,
+          //     source_transaction: paymentIntentCapture.charges.data[0].id,
+          //     transfer_group: paymentIntentCapture.transfer_group
+          //   });
+          //   console.log(transfer);
+          // } catch (err) {
+          //   console.log(err);
+          // }
           
           console.log('--------------------------------------------------');
           let data = {
