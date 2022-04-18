@@ -27,27 +27,28 @@ exports.createOrder = async (req, res) => {
         message: "You dont have an access to perform this action",
       });
     }
-    if (!req.body.source) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Invalid credentials",
-      });
-    }
+    // if (!req.body.source) {
+    //   return res.status(400).json({
+    //     status: "fail",
+    //     message: "Invalid credentials",
+    //   });
+    // }
 
-    // const token = await stripe.tokens.create({
-    //   card: {
-    //     number: "4242424242424242",
-    //     exp_month: 1,
-    //     exp_year: 2023,
-    //     cvc: "314",
-    //   },
-    // });
-    // console.log(token.id);
+    const token = await stripe.tokens.create({
+      card: {
+        number: "4242424242424242",
+        exp_month: 1,
+        exp_year: 2023,
+        cvc: "314",
+      },
+    });
+    console.log(token.id);
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
-        token: req.body.source,
+        // token: req.body.source,
+        token: token.id,
       },
     });
     console.log("paymentMethod ", paymentMethod);
@@ -138,8 +139,6 @@ exports.createOrder = async (req, res) => {
         { $pull: { products: { $in: cart.selectedProducts } } }
       );
       console.log('selected products', cart.selectedProducts)
-      cart.selectedProducts = undefined;
-      await cart.save();
       
       let data = {
         user: updatedProduct.user,
@@ -169,6 +168,7 @@ exports.createOrder = async (req, res) => {
         });
       console.log("status ", paymentIntent.status);
     });
+    cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save();
 
