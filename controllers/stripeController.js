@@ -79,3 +79,18 @@ exports.createAccountLink = async ( accountId ) => {
     });
     return accountLink;
 }
+
+exports.completeAccount = async (req, res) => {
+    try{
+        const user = await User.findByIdAndUpdate(req.user.id, user.connAccount.flag = true, { new: true });
+        console.log(user);
+        return res.send('Return url');
+    } catch (err) {
+        return res.send({ 
+            status: 'Fail',
+            message: 'Something went wrong', 
+            error: err 
+        });
+    }
+
+};
