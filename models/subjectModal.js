@@ -5,6 +5,12 @@ const SubjectSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Name of a subject is required'],
   },
+  subCategoryId: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'SubCategory',
+    },
+  ],
 });
 
 const Subject = mongoose.model('Subject', SubjectSchema);
