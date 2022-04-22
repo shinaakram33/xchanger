@@ -108,7 +108,7 @@ exports.createOrder = async (req, res) => {
     
     const createOrderTable = await Order.create({
       name: req.body.name,
-      email: req.body.email,
+      email: req.body.email.trim().toLowerCase(),
       phoneNumber: req.body.phoneNumber,
       location: req.body.location,
       user: req.user.id,
@@ -293,7 +293,7 @@ exports.createImmediateOrder = async (req, res) => {
 
       const order = await Order.create({
         name: req.body.name,
-        email: req.body.email,
+        email: req.body.email.trim().toLowerCase(),
         phoneNumber: req.body.phoneNumber,
         location: req.body.location,
         user: req.user.id,
