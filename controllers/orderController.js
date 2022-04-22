@@ -116,7 +116,8 @@ exports.createOrder = async (req, res) => {
       checkoutId: paymentIntent.id,
       status: "Pending",
       price: req.body.price,
-      orderNumber: orderNumber
+      orderNumber: orderNumber,
+      shippingFee: req.body.shippingFee,
     });
     console.log("createdOrderTable");
 
@@ -301,6 +302,7 @@ exports.createImmediateOrder = async (req, res) => {
         status: "Complete",
         price: req.body.price,
         productId: req.body.productId,
+        shippingFee: req.body.shippingFee,
       }).then(o => o.populate("productId").execPopulate());
       console.log("Order", order);
       

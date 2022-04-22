@@ -128,7 +128,8 @@ exports.createplaceBid = async (req, res) => {
             checkoutId: placeBid.intentId,
             status: "Complete",
             price: req.body.price,
-            productId: product.id
+            productId: product.id,
+            shippingFee: req.body.shippingFee,
           }).then(o => o.populate("productId").execPopulate());
           console.log("Order", order);
           product.status = 'Sold';

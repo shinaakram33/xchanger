@@ -53,7 +53,11 @@ const orderSchema = new mongoose.Schema(
     orderNumber: {
       type : String,
       // required: [true, "Order number is mandatory."],
-    }
+    },
+    shippingFee: {
+      type: Number,
+      required: [true, 'Shipping fee is required'],
+    },
   },
   { timestamps: true }
 );
