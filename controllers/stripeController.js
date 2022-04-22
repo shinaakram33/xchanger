@@ -90,6 +90,26 @@ exports.createAccountLink = async ( accountId ) => {
     return accountLink;
 }
 
+// exports.checkCompleteAccount = async (req, res) => {
+//     try{
+//         console.log(req.user.id);
+//         const user = await User.(req.params.userId);
+//         console.log(user);
+//         return res.send('Return url');
+//     } catch (err) {
+//         return res.send({ 
+//             request: req,
+//             status: 'Fail',
+//             message: 'Something went wrong', 
+//             err: err,
+//             id: req.user.id,
+//             error: err.message
+//         });
+//     }
+
+// };
+
+
 exports.completeAccount = async (req, res) => {
     try{
         console.log(req.user.id);
