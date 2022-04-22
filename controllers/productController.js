@@ -713,25 +713,49 @@ exports.createFeaturedProduct = async (req, res) => {
       });
     }
     else {
-      if(!req.body.price || !req.body.noOfDays) {
+      if(!req.body.id) {
         return res.status(400).json({
           status: "fail",
-          message: "Please provide required fields",
+          message: "Please provide pakage id",
         });
       }
+      // let response;
+      let response = await fetch("https://x-changer.herokuapp.com/api/v1/featureAd/pakages", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(async (res) => {
+        try {
+          return await res.json();
+        } catch (err) {
+          console.log("error");
+          console.log(err);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      let pakages =  response.data;
+      console.log('pakages',  pakages);
+      const adPakage = pakages.find((pakage) => {
+        if(pakage.id === req.body.id)
+          return pakage
+        
+      })
+      console.log(adPakage);
       const featureAd = await FeatureAd.create({
         user: req.user.id,
-        AddTitle: req.body.AddTitle,
-        description: req.body.description,
-        price: req.body.price,
-        noOfDays: req.body.noOfDays
+        AddTitle: adPakage.title,
+        description: adPakage.description,
+        price: adPakage.price,
+        noOfDays: adPakage.days
       });
       featureAd.expirationDate = (moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toDate();
       console.log(featureAd.expirationDate);
       await featureAd.save();
       product.featureAd = featureAd.id;
       product.adType = 'featured';
-      await product.save();
+      await product.save().then(product => product.populate("featureAd").execPopulate());
 
       let min = moment(featureAd.expirationDate, 'HH:MM').minutes();
       let hour = moment(featureAd.expirationDate, 'HH:MM').hours();
