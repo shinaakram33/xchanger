@@ -112,17 +112,19 @@ exports.createAccountLink = async ( accountId ) => {
 
 exports.completeAccount = async (req, res) => {
     try{
-        console.log(req.user.id);
-        const user = await User.findOne(req.user.id, user.connAccount.flag = true, { new: true });
-        console.log(user);
+        console.log(req);
+        // console.log(req.user.id);
+        // const user = await User.findOne(req.user.id, user.connAccount.flag = true, { new: true });
+        // console.log(user);
         return res.send('Return url');
     } catch (err) {
+        console.log(req);
         return res.send({ 
             request: req,
             status: 'Fail',
             message: 'Something went wrong', 
             err: err,
-            id: req.user.id,
+            // id: req.user.id,
             error: err.message
         });
     }
