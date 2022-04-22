@@ -5,6 +5,16 @@ exports.createNewAccount = async (req, res) => {
     try{
         const user = await User.findById(req.user.id);
         console.log(user);
+        if(user.connAccount.id && user.connAccount.flag === false){
+            console.log('In if');
+            const accountLink = await this.createAccountLink(user.connAccount.id);
+            console.log(accountLink);
+            return res.send({
+                status: 'fail',
+                message: 'User already contains an account. Use the link below to complete information',
+                link: accountLink,
+            })
+        }
         const account = await stripe.accounts.create({
             type: 'express',
             business_type: 'individual',
@@ -31,7 +41,7 @@ exports.createNewAccount = async (req, res) => {
         return res.send({ 
             status: 'Fail',
             message: 'Something went wrong', 
-            error: err 
+            error: err.message,
         });
     }
 }
@@ -82,14 +92,18 @@ exports.createAccountLink = async ( accountId ) => {
 
 exports.completeAccount = async (req, res) => {
     try{
-        const user = await User.findByIdAndUpdate(req.user.id, user.connAccount.flag = true, { new: true });
+        console.log(req.user.id);
+        const user = await User.findOne(req.user.id, user.connAccount.flag = true, { new: true });
         console.log(user);
         return res.send('Return url');
     } catch (err) {
         return res.send({ 
+            request: req,
             status: 'Fail',
             message: 'Something went wrong', 
-            error: err 
+            err: err,
+            id: req.user.id,
+            error: err.message
         });
     }
 
