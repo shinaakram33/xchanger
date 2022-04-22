@@ -13,7 +13,7 @@ router.route('/refresh').get(function(req, res) {
 // });
 
 router.route('/createConnectAccount').get(protected, createNewAccount);
-router.route('/updateConnectAccount/:accountId').get(protected, updateAccount);
-router.route('/return').get(completeAccount);
+router.route('/updateConnectAccount').get(protected, updateAccount);
+router.route('/return/:accountId').get(completeAccount);
 
 module.exports = router;
