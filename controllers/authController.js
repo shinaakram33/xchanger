@@ -14,14 +14,20 @@ const signToken = (id) => {
 
 exports.signup = async (req, res) => {
   try {
-    const alreadyExistEmail = await User.findOne({ email: req.body.email });
+    let email = req.body.email.trim().toLowerCase();
+    console.log(email);
+    const alreadyExistEmail = await User.findOne({ email });
     if (alreadyExistEmail) {
       return res.status(404).json({
         status: 'fail',
-        message: 'This email is already Exist!',
+        message: 'This email already Exists!',
       });
     } else {
-      const newUser = await User.create(req.body);
+      const newUser = await User.create({
+        name: req.body.name,
+        email,
+        password: req.body
+      });
       const token = signToken(newUser._id);
       console.log(newUser);
       res.status(201).json({
@@ -68,7 +74,8 @@ exports.login = async (req, res) => {
       });
     }
     console.log(email, password);
-    const user = await User.findOne({ email });
+    let userEmail = req.body.email.trim().toLowerCase();
+    const user = await User.findOne({ userEmail });
     if (!user) {
       return res.status(401).json({
         status: 'fail',
@@ -81,7 +88,7 @@ exports.login = async (req, res) => {
     if (!correctPassword) {
       return res.status(401).json({
         status: 'fail',
-        message: 'Invalid email or password',
+        message: 'Incorrect password',
       });
     }
     const token = signToken(user._id);
@@ -196,7 +203,8 @@ exports.forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
     console.log(email);
-    const user = await User.findOne({ email });
+    let userEmail = req.body.email.trim().toLowerCase();
+    const user = await User.findOne({ userEmail });
     if (!user) {
       res.status(404).json({
         status: 'fail',
