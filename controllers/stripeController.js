@@ -12,7 +12,7 @@ exports.createNewAccount = async (req, res) => {
             return res.send({
                 status: 'fail',
                 message: 'User already contains an account. Use the link below to complete information',
-                link: accountLink,
+                link: accountLink.url,
             })
         }
         const account = await stripe.accounts.create({
@@ -84,7 +84,7 @@ exports.createAccountLink = async ( accountId ) => {
     const accountLink = await stripe.accountLinks.create({
         account: accountId,
         refresh_url: 'https://x-changer.herokuapp.com/api/v1/stripe/refresh',
-        return_url: 'https://x-changer.herokuapp.com/api/v1/stripe/return',
+        return_url: `https://x-changer.herokuapp.com/api/v1/stripe/return/${accountId}`,
         type: 'account_onboarding',
     });
     return accountLink;
@@ -112,20 +112,17 @@ exports.createAccountLink = async ( accountId ) => {
 
 exports.completeAccount = async (req, res) => {
     try{
-        console.log(req);
-        // console.log(req.user.id);
-        // const user = await User.findOne(req.user.id, user.connAccount.flag = true, { new: true });
-        // console.log(user);
+        const user = await User.findOne({'connAccount.id': req.params.accountId});
+        user.connAccount.flag = true;
+        await user.save();
+        console.log(user);
         return res.send('Return url');
     } catch (err) {
         console.log(req);
         return res.send({ 
-            request: req,
             status: 'Fail',
             message: 'Something went wrong', 
-            err: err,
-            // id: req.user.id,
-            error: err.message
+            err: err.message,
         });
     }
 
