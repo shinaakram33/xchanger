@@ -29,7 +29,7 @@ const sendEmail = async (options) => {
   const mailOptions = {
     from: {
       name: 'X-Changer',
-      email: 'Graeme@gskills.com.au'
+      email: process.env.EMAIL
     }, 
     to: options.email,
     subject: options.subject,
