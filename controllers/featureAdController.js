@@ -134,3 +134,54 @@ exports.getUserAds = async (req, res) => {
     }
   };
   
+  exports.getFeatureAdPakages = async (req, res) => {
+    try {
+      const pakages = [
+        {
+          id: 1,
+          title: 'Feature Ad for 30 days',
+          footer: 'Reach upto 6 times more buyers',
+          price: 23.13,
+          days: 30
+        },
+        {
+          id: 2,
+          title: 'Feature Ad for 14 days',
+          footer: 'Reach upto 6 times more buyers',
+          price: 13.88,
+          days: 14
+        },
+        {
+          id: 3,
+          title: 'Feature Ad for 10 days',
+          footer: 'Reach upto 6 times more buyers',
+          price: 9.25,
+          days: 10
+        },
+        {
+          id: 4,
+          title: 'Feature Ad for 5 days',
+          footer: 'Reach upto 6 times more buyers',
+          price: 7.40,
+          days: 5
+        },
+        {
+          id: 5,
+          title: 'Feature Ad for 3 days',
+          footer: 'Reach upto 6 times more buyers',
+          price: 4.63,
+          days: 3
+        },
+      ];
+      res.status(200).json({
+        status: 'success',
+        length: pakages.length,
+        data: pakages,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        status: 'fail',
+        message: err,
+      });
+    }
+  };
