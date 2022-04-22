@@ -40,6 +40,29 @@ exports.getSubjects = async (req, res) => {
   }
 };
 
+exports.getSubjectsBySubCategory = async (req, res) => {
+  try {
+    if(!req.params.subCategoryId){
+      return res.status(400).json({
+        status: 'fail',
+        message: 'SubcategoryId is required',
+      });
+    }
+    console.log(req.params.subCategoryId);
+    const allSubjects = await Subject.find({subCategoryId: req.params.subCategoryId });
+    return res.status(200).json({
+      status: 'success',
+      length: allSubjects.length,
+      data: allSubjects,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 exports.updateSubject = async (req, res) => {
   try {
     const subjectId = req.params.subjectId;
