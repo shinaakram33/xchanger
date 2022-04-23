@@ -131,7 +131,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: 'Not sold',
       enum: {
-        values: ['Sold', 'Not sold', 'Pending'],
+        values: ['Sold', 'Not sold', 'Pending', 'Dismissed'],
         message: 'Status is can only be: Sold, Not sold or Pending',
       },
     },
