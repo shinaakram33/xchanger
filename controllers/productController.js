@@ -2,7 +2,6 @@ const { json } = require("express");
 const Product = require("../models/productModal");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const FeatureAd = require("../models/featureAdModel");
-const { createFeatureAd } = ("./featureAdController.js");
 const PlaceBid = require("../models/placebidModal");
 const Cart = require("../models/cartModal");
 const cron = require("node-cron");
@@ -10,6 +9,7 @@ const moment = require("moment");
 const schedule = require("node-schedule");
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
+const Order = require("../models/orderModal");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -488,6 +488,165 @@ exports.createBiddingProduct = async (req, res) => {
       status: "Not sold",
       pakageSize: pkgSize,
     });
+
+    console.log(newProduct.date_for_auction);
+  
+    let min = moment(newProduct.date_for_auction.ending_date).minutes();
+    let hour = moment(newProduct.date_for_auction.ending_date).hours();
+    let day = moment(newProduct.date_for_auction.ending_date).format('D');
+    let month = moment(newProduct.date_for_auction.ending_date).format('M');
+    let year = moment(newProduct.date_for_auction.ending_date).format('Y');
+
+    console.log(min, hour, day, month, year)
+    let newJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
+      console.log('Cron job executed.');
+      let allBidsOfProduct = await PlaceBid.find({product: newProduct.id})
+      .sort({price: -1, createdAt: -1});
+      console.log(allBidsOfProduct.length, allBidsOfProduct);
+
+      if(allBidsOfProduct.length <=0) {
+        newProduct.status = 'Dismissed';
+        await newProduct.save();
+        console.log(newProduct);
+      } else {
+        let highestBid = allBidsOfProduct.shift();
+        console.log('highest', highestBid);
+        highestBid.succeeded = true;
+        await highestBid.save();
+        console.log('highest after save', highestBid);
+
+
+        const paymentIntentCapture = await stripe.paymentIntents.capture(
+          highestBid.intentId
+        );
+        if (paymentIntentCapture.status === "succeeded") {
+  
+          console.log("status ", paymentIntentCapture.status);
+                        
+          const order = await Order.create({
+            name: highestBid.orderDetails.name,
+            email: (highestBid.orderDetails.email).trim().toLowerCase(),
+            phoneNumber: highestBid.orderDetails.phoneNumber,
+            location: highestBid.orderDetails.location,
+            user: req.user.id,
+            checkoutId: highestBid.intentId,
+            status: "Complete",
+            accepted: true,
+            price: highestBid.price,
+            productId: newProduct.id,
+            shippingFee: highestBid.orderDetails.shippingFee,
+          }).then(o => o.populate("productId").execPopulate());
+          console.log("Order", order);
+          newProduct.status = 'Sold';
+          await newProduct.save();
+          console.log('after save', newProduct.status);
+
+          let userData = {
+            user: highestBid.user,
+            product: newProduct.id,
+            text: `Your bid on product ${newProduct.title} has been successful.`,
+          };
+
+          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+            method: "POST",
+            body: JSON.stringify(userData),
+            headers: { "Content-Type": "application/json" },
+          })
+            .then(async (res) => {
+              try {
+                const dataa = await res.json();
+                console.log("response data?", dataa);
+              } catch (err) {
+                console.log("error");
+                console.log(err);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          console.log(paymentIntentCapture);
+
+          //make payment to seller
+          const productSeller = await User.findById(newProduct.user);
+          console.log(productSeller);
+
+          // try{
+            //     let transfer = await stripe.transfers.create({
+            //     amount: Math.round(highestBid * 100),
+          //       currency: 'usd',
+          //       destination: productSeller.connAccount.id,
+          //       source_transaction: paymentIntentCapture.charges.data[0].id,
+          //     });
+          //     console.log(transfer);
+          //   } catch (err) {
+          //     console.log(err);
+          //   }
+
+          let sellerData = {
+            user: newProduct.user,
+            product: newProduct.id,
+            text: `Your  product ${newProduct.title} has been sold.`,
+          };
+
+          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+            method: "POST",
+            body: JSON.stringify(sellerData),
+            headers: { "Content-Type": "application/json" },
+          })
+            .then(async (res) => {
+              try {
+                const dataa = await res.json();
+                console.log("response data?", dataa);
+              } catch (err) {
+                console.log("error");
+                console.log(err);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          return res.status(400).json({
+            status: "fail",
+            message: "Stripe error",
+          });
+        }
+      }
+      allBidsOfProduct.forEach(async (bid) => {
+        await stripe.paymentIntents.cancel(bid.intentId);
+        await PlaceBid.deleteOne({_id: bid.id});
+      });
+      
+      //send notification to other users
+      let failedBidUsers = await PlaceBid.distinct('user', {"product": newProduct.id});
+      console.log('failedBidUsers', failedBidUsers);
+      failedBidUsers.forEach((user) => {
+        let data = {
+          user: user,
+          product: newProduct.id,
+          text: `Your bid on product ${newProduct.title} failed. The product has been sold`,
+        };
+
+        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then(async (res) => {
+            try {
+              const dataa = await res.json();
+              console.log("response data?", dataa);
+            } catch (err) {
+              console.log("error");
+              console.log(err);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+    });
+
     return res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
@@ -1232,7 +1391,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Product ${product.title} has been added to your cart`,
         };
 
-        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
           method: "POST",
           body: JSON.stringify(dataOfBidUser),
           headers: { "Content-Type": "application/json" },
@@ -1245,7 +1404,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           text: `Your product ${product.title} has been sold`,
         };
 
-        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
           method: "POST",
           body: JSON.stringify(dataOfProductOwner),
           headers: { "Content-Type": "application/json" },

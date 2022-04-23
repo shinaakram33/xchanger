@@ -77,7 +77,14 @@ exports.createplaceBid = async (req, res) => {
           product: req.body.product,
           user: req.user.id,
           price: req.body.price,
-          intentId: paymentIntent.id
+          intentId: paymentIntent.id,
+          orderDetails: {
+            name: req.body.name,
+            email: req.body.email,
+            phoneNumber: req.body.phoneNumber,
+            location: req.body.location,
+            shippingFee: req.body.shippingFee,
+          }
         });
 
         let data = {

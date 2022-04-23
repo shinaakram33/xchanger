@@ -31,6 +31,13 @@ const placeBidSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    orderDetails: {
+      name: String,
+      email: String,
+      phoneNumber: String,
+      location: String,
+      shippingFee: Number,
+    }
   },
   { timestamps: true }
 );
