@@ -14,6 +14,12 @@ const subCategorySchema = new mongoose.Schema({
     ref: 'Category',
     required: [true, 'Categroy Id is required'],
   },
+  size: [
+    {
+      name: String,
+      values: [String],
+    },
+  ],
 });
 
 const SubCategory = mongoose.model('SubCategory', subCategorySchema);
