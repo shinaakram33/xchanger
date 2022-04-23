@@ -75,7 +75,8 @@ exports.login = async (req, res) => {
     }
     console.log(email, password);
     let userEmail = req.body.email.trim().toLowerCase();
-    const user = await User.findOne({ userEmail });
+    console.log(userEmail);
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       return res.status(401).json({
         status: 'fail',
@@ -204,7 +205,7 @@ exports.forgetPassword = async (req, res) => {
     const { email } = req.body;
     console.log(email);
     let userEmail = req.body.email.trim().toLowerCase();
-    const user = await User.findOne({ userEmail });
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       res.status(404).json({
         status: 'fail',
