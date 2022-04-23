@@ -16,17 +16,20 @@ exports.createProduct = async (req, res) => {
     const obj = {
       Small: {
         type: 'S',
-        price: 7,
+        // price: 7,
+        price: 6.7,
         maxWeight: 2
       },
       Medium: {
         type: 'M',
-        price: 9.7,
+        // price: 9.7,
+        price: 9.29,
         maxWeight: 10
       },
       Large: {
         type: 'L',
-        price: 20.5,
+        // price: 20.5,
+        price: 19.63,
         maxWeight: 30
       }
     };
@@ -443,17 +446,17 @@ exports.createBiddingProduct = async (req, res) => {
     const obj = {
       Small: {
         type: 'S',
-        price: 7,
+        price: 6.7,
         maxWeight: 2
       },
       Medium: {
         type: 'M',
-        price: 9.7,
+        price: 9.29,
         maxWeight: 10
       },
       Large: {
         type: 'L',
-        price: 20.5,
+        price: 19.63,
         maxWeight: 30
       }
     };
