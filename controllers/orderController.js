@@ -150,7 +150,7 @@ exports.createOrder = async (req, res) => {
       };
       console.log("check2", data);
       console.log("check2", updatedProduct);
-      fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+      fetch("https://x-changer.herokuapp.com/api/v1/notification", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
@@ -300,6 +300,7 @@ exports.createImmediateOrder = async (req, res) => {
         user: req.user.id,
         checkoutId: charge.id,
         status: "Complete",
+        accepted: true,
         price: req.body.price,
         productId: req.body.productId,
         shippingFee: req.body.shippingFee,
@@ -329,7 +330,7 @@ exports.createImmediateOrder = async (req, res) => {
           text: `Your bid on product ${updatedProduct.title} failed. The product has been sold`,
         };
 
-        fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
           method: "POST",
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
@@ -356,7 +357,7 @@ exports.createImmediateOrder = async (req, res) => {
         text: `Your product ${updatedProduct.title} has been sold`,
       };
 
-      fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+      fetch("https://x-changer.herokuapp.com/api/v1/notification", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
@@ -484,7 +485,7 @@ exports.orderAccepted = async (req, res) => {
           };
           // console.log("check2", data);
           // console.log("check2", updatedProduct);
-          fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
             method: "POST",
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json" },
@@ -540,7 +541,7 @@ exports.orderAccepted = async (req, res) => {
             };
             console.log("check2", data);
             console.log("check2", updatedProduct);
-            fetch("https://x-changer.herokuapp.com/api/v1/notification/notification", {
+            fetch("https://x-changer.herokuapp.com/api/v1/notification", {
               method: "POST",
               body: JSON.stringify(data),
               headers: { "Content-Type": "application/json" },
