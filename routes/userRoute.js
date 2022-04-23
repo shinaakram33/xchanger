@@ -14,10 +14,13 @@ const {
   getUserById,
   deleteUser,
   searchUsers,
-  rateSeller
+  rateSeller,
+  rateMultipleSellers,
 } = require("../controllers/authController");
 const router = express.Router();
 
+
+router.route("/rating").patch(rateMultipleSellers);
 router.route("/").get(getAllUsers)
 router.route("/search").get(searchUsers)
 router.route("/:userId")

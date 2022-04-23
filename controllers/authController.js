@@ -543,3 +543,45 @@ exports.rateSeller = async (req, res) => {
     });
   }
 };
+
+exports.rateMultipleSellers = async (req, res) => {
+  try {
+    const obj = req.body.data;
+    let faultyUsers = [];
+    obj.forEach(async (o) => {
+      const user = await User.findById(o.userId);
+      if (!user || !o.sellerRating) {
+        faultyUsers.push(o.userId)
+      } else {
+        console.log(user);
+        if(!user.sellerRating || user.sellerRating === 0){
+          user.sellerRating = Math.round(o.sellerRating);
+          await user.save();
+        }else{
+          let dummyrating = user.sellerRating; 
+          let prevRating = dummyrating;
+          let newRating = (prevRating + o.sellerRating)/2;
+          user.sellerRating = Math.round(newRating);
+          await user.save();
+        }
+      }      
+    });
+    if(faultyUsers.length>0) {
+      return res.status(200).json({
+        status: 'fail',
+        message: `Either these users do not exist or rating for these users is missing: ${faultyUsers}`,
+      });
+    } else {
+      res.status(200).json({
+        status: 'success',
+        message: "Rating added",
+      });
+    }
+    
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
