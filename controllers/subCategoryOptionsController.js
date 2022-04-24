@@ -24,7 +24,8 @@ exports.createSubCategoryOptions = async (req, res) => {
 
 exports.getAllSubCategoryOptions = async (req, res) => {
   try {
-    const data = await SubCategoryOptions.find().populate('categoryId').populate('subCategoryId');
+    const data = await SubCategoryOptions.find().populate('categoryId')
+    .sort({name: 1}).populate('subCategoryId');
     res.status(200).json({
       status: 'success',
       length: data.length,
@@ -41,8 +42,15 @@ exports.getAllSubCategoryOptions = async (req, res) => {
 exports.getSubCategoryOptions = async (req, res) => {
   try {
     const subCategoryOption = await SubCategoryOptions.find({ categoryId: req.params.categoryId, subCategoryId: req.params.subCategoryId })
-      .populate('categoryId')
-      .populate('subCategoryId');
+    .populate('categoryId')
+    .populate('subCategoryId');
+    await subCategoryOption.sort((a, b) => {
+      if(a.name === 'Other')
+        return 1;
+      else if(a.name < b.name)
+        return -1
+      else return 1;
+    });
     res.status(200).json({
       status: 'success',
       length: subCategoryOption.length,

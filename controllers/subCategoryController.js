@@ -32,6 +32,13 @@ exports.getSubCategory = async (req, res) => {
       });
     }
     const subCategory = await SubCategory.find({ categoryId: req.params.categoryId }).populate('categoryId');
+    await subCategory.sort((a, b) => {
+      if(a.name === 'Other')
+        return 1;
+      else if(a.name < b.name)
+        return -1
+      else return 1;
+    });
     res.status(200).json({
       status: 'success',
       length: subCategory.length,

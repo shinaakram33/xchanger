@@ -27,6 +27,13 @@ exports.createSubject = async (req, res) => {
 exports.getSubjects = async (req, res) => {
   try {
     const allSubjects = await Subject.find();
+    await allSubjects.sort((a, b) => {
+      if(a.name === 'Other')
+        return 1;
+      else if(a.name < b.name)
+        return -1
+      else return 1;
+    });
     res.status(200).json({
       status: 'success',
       length: allSubjects.length,
@@ -50,6 +57,13 @@ exports.getSubjectsBySubCategory = async (req, res) => {
     }
     console.log(req.params.subCategoryId);
     const allSubjects = await Subject.find({subCategoryId: req.params.subCategoryId });
+    await allSubjects.sort((a, b) => {
+      if(a.name === 'Other')
+        return 1;
+      else if(a.name < b.name)
+        return -1
+      else return 1;
+    });
     return res.status(200).json({
       status: 'success',
       length: allSubjects.length,
