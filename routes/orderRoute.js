@@ -9,7 +9,8 @@ const {
   updateOrder,
   deleteOrder,
   searchOrder,
-  getUserOrders
+  getUserOrders,
+  updateOrderStatus
 } = require("../controllers/orderController");
 const { protected, restrictTo } = require("../controllers/authController");
 const router = express.Router();
@@ -23,5 +24,6 @@ router.route("/:orderId").patch(protected, orderAccepted)
 router.route("/update/:orderId").patch(protected, restrictTo('admin'), updateOrder);
 router.route("/pending").get(protected, getPendingOrders);
 router.route("/user/:userId").get(protected, getUserOrders);
+router.route("/updateStatus/:orderId").patch(protected, restrictTo('admin'), updateOrderStatus);
 
 module.exports = router;

@@ -580,12 +580,37 @@ exports.createBiddingProduct = async (req, res) => {
           //     console.log(transfer);
           //   } catch (err) {
           //     console.log(err);
+          // let admin = User.findOne({roles: 'admin'});
+          //   let data = {
+          //     user: admin.id,
+          //     product: newProduct.id,
+          //     text: `Transfer unsuccessful: Seller: ${newProduct.user}, Amount: ${newProduct.price}, Order: ${order.id}`,
+          //   };
+      
+          //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+          //     method: "POST",
+          //     body: JSON.stringify(data),
+          //     headers: { "Content-Type": "application/json" },
+          //   })
+          //     .then(async (res) => {
+          //       try {
+          //         const dataa = await res.json();
+          //         console.log("response data?", dataa);
+          //       } catch (err) {
+          //         console.log("error");
+          //         console.log(err);
+          //       }
+          //     })
+          //     .catch((error) => {
+          //       console.log(error);
+          //     });
+          // }
           //   }
 
           let sellerData = {
             user: newProduct.user,
             product: newProduct.id,
-            text: `Your  product ${newProduct.title} has been sold.`,
+            text: `Your product ${newProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
           };
 
           fetch("https://x-changer.herokuapp.com/api/v1/notification", {

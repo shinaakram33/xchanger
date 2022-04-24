@@ -10,6 +10,10 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "Product",
     },
+    order: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Order",
+    },
     text: {
       type: String,
       required: [true, "Notification text is reqired"],

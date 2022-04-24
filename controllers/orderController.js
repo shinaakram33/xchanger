@@ -368,7 +368,7 @@ exports.createImmediateOrder = async (req, res) => {
       let data = {
         user: updatedProduct.user,
         product: updatedProduct.id,
-        text: `Your product ${updatedProduct.title} has been sold`,
+        text: `Your product ${updatedProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
       };
 
       fetch("https://x-changer.herokuapp.com/api/v1/notification", {
@@ -400,9 +400,33 @@ exports.createImmediateOrder = async (req, res) => {
       //       source_transaction: charge.id,
       //     });
       //     console.log(transfer);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
+      // } catch (err) {
+      //   console.log(err);
+      //   let admin = User.findOne({roles: 'admin'});
+      //   let data = {
+      //     user: admin.id,
+      //     product: updatedProduct.id,
+      //     text: `Transfer unsuccessful: Seller: ${updatedProduct.user}, Amount: ${updatedProduct.price}, Order: ${order.id}`,
+      //   };
+  
+      //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+      //     method: "POST",
+      //     body: JSON.stringify(data),
+      //     headers: { "Content-Type": "application/json" },
+      //   })
+      //     .then(async (res) => {
+      //       try {
+      //         const dataa = await res.json();
+      //         console.log("response data?", dataa);
+      //       } catch (err) {
+      //         console.log("error");
+      //         console.log(err);
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.log(error);
+      //     });
+      // }
 
       return res.status(200).json({
         status: "success",
@@ -489,13 +513,36 @@ exports.orderAccepted = async (req, res) => {
           //   console.log(transfer);
           // } catch (err) {
           //   console.log(err);
+          // let admin = User.findOne({roles: 'admin'});
+          //   let data = {
+          //     user: admin.id,
+          //     product: updatedProduct.id,
+          //     text: `Transfer unsuccessful: Seller: ${updatedProduct.user}, Amount: ${updatedProduct.price}, Order: ${order.id}`,
+          //   };
+      
+          //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+          //     method: "POST",
+          //     body: JSON.stringify(data),
+          //     headers: { "Content-Type": "application/json" },
+          //   })
+          //     .then(async (res) => {
+          //       try {
+          //         const dataa = await res.json();
+          //         console.log("response data?", dataa);
+          //       } catch (err) {
+          //         console.log("error");
+          //         console.log(err);
+          //       }
+          //     })
+          //     .catch((error) => {
+          //       console.log(error);
+          //     });
           // }
-          
           console.log('--------------------------------------------------');
           let data = {
             user: updatedProduct.user,
             product: updatedProduct.id,
-            text: `Your product ${updatedProduct.title} has been sold`,
+            text: `Your product ${updatedProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
           };
           // console.log("check2", data);
           // console.log("check2", updatedProduct);
@@ -702,7 +749,7 @@ exports.updateOrder = async (req, res) => {
       const order = await Order.findById(id);
       if (!order) {
           return res.status(200).json({
-              status: 'successful',
+              status: 'fail',
               message: 'Order does not exist',
             });
       }
@@ -837,3 +884,110 @@ exports.getUserOrders = async (req, res) => {
     });
   }
 };
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+      const id = req.params.orderId;
+      const status = req.body.status;
+      if(!id) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Order id is required',
+            });
+      }
+      const order = await Order.findById(id);
+      if (!order) {
+          return res.status(200).json({
+              status: 'fail',
+              message: 'Order does not exist',
+            });
+      }
+      if(order.status === 'Pending') {
+        return res.status(200).json({
+          status: 'fail',
+          message: 'Your order needs to be approved by admin',
+        });
+      }
+      if(!status) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Status is required',
+          });
+      }
+      order.status = status;
+      await order.save().then(o => o.populate("productId").execPopulate());
+      console.log(order);
+      let userText, sellerText;
+      if(status === 'Dispatched') {
+        userText = `Your order ${order.id} has been dispatched.`;
+        sellerText = `You dispatched order ${order.id}.`;
+      }
+      else if(status === 'Shipped') {
+        userText = `Your order ${order.id} has been shipped.`;
+        sellerText = `You shipped order ${order.id}.`;
+      }
+      else if(status === 'Received') {
+        userText = `Your order ${order.id} has been received.`;
+        sellerText = `Your order ${order.id} has been received by the buyer.`;
+      }
+      let userData = {
+        user: order.user,
+        order: order.id,
+        text: userText,
+      };
+
+      fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(async (res) => {
+        try {
+          const dataa = await res.json();
+          console.log("response data?", dataa);
+        } catch (err) {
+          console.log("error");
+          console.log(err);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      order.productId.forEach(async (o) => {
+        let sellerData = {
+          user: o.user,
+          order: order.id,
+          text: sellerText,
+        };
+  
+        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+          method: "POST",
+          body: JSON.stringify(sellerData),
+          headers: { "Content-Type": "application/json" },
+        })
+        .then(async (res) => {
+          try {
+            const dataa = await res.json();
+            console.log("response data?", dataa);
+          } catch (err) {
+            console.log("error");
+            console.log(err);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      });
+      
+      res.status(201).json({
+          status: 'success',
+          message: 'Order status updated',
+      });
+} catch (err) {
+  res.status(400).json({
+    status: 'fail',
+    message: err,
+  });
+}
+}

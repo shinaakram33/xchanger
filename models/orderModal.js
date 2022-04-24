@@ -34,7 +34,11 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      // required: [true, "Make status into SOLD"],
+      enum: {
+        values: ['Pending', 'Complete', 'Dispatched', 'Shipped', 'Received'],
+        message: 'Status must be Pending, Complete, Dispatched, Shipped or Received',
+      },
+      required: [true, "Order status is required"],
     },
     productId: [
       {
@@ -56,7 +60,7 @@ const orderSchema = new mongoose.Schema(
     },
     shippingFee: {
       type: Number,
-      required: [true, 'Shipping fee is required'],
+      // required: [true, 'Shipping fee is required'],
     },
   },
   { timestamps: true }
