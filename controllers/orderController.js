@@ -7,6 +7,8 @@ const User = require("../models/userModal");
 const moment = require("moment");
 const schedule = require("node-schedule");
 const placebid = require("../models/placebidModal");
+const RecentView = require("../models/recentViewModal");
+const Wishlist = require("../models/wishlistModal");
 
 
 exports.createOrder = async (req, res) => {
@@ -172,6 +174,18 @@ exports.createOrder = async (req, res) => {
       console.log("status ", paymentIntent.status);
     });
     await cart.save({ validateBeforeSave: false });
+    await RecentView.updateOne(
+        {
+          user: req.user.id,
+        },
+        { $pull: { products: { $in: cart.selectedProducts } } }
+    );
+    await Wishlist.updateOne(
+      {
+        user: req.user.id,
+      },
+      { $pull: { products: { $in: cart.selectedProducts } } }
+    );
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save().then(o => o.populate("productId").execPopulate());
