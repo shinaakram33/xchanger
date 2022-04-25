@@ -638,7 +638,6 @@ exports.createBiddingProduct = async (req, res) => {
       }
       allBidsOfProduct.forEach(async (bid) => {
         await stripe.paymentIntents.cancel(bid.intentId);
-        await PlaceBid.deleteOne({_id: bid.id});
       });
       
       //send notification to other users
