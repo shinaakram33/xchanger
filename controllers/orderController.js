@@ -270,7 +270,8 @@ exports.createOrder = async (req, res) => {
 exports.createImmediateOrder = async (req, res) => {
   let updatedProduct;
   try {
-    console.log("req.body", req.body);
+
+    console.log(req.user.id);
 
     if (!req.body.source) {
       return res.status(400).json({
@@ -279,20 +280,20 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
-    // const token = await stripe.tokens.create({
-    //   card: {
-    //     number: "4242424242424242",
-    //     exp_month: 1,
-    //     exp_year: 2023,
-    //     cvc: "314",
-    //   },
-    // });
+    const token = await stripe.tokens.create({
+      card: {
+        number: "4242424242424242",
+        exp_month: 1,
+        exp_year: 2023,
+        cvc: "314",
+      },
+    });
 
     const charge = await stripe.charges.create({
       amount: (req.body.price + req.body.shippingFee) * 100,
       currency: "CHF",
-      source: req.body.source,
-      // source: token.id,
+      // source: req.body.source,
+      source: token.id,
     });
 
     if (!charge) {
@@ -309,8 +310,6 @@ exports.createImmediateOrder = async (req, res) => {
         console.log(updatedProduct);
         
 
-      //let product = await Product.findById(req.body.productId);
-
       const order = await Order.create({
         name: req.body.name,
         email: req.body.email.trim().toLowerCase(),
@@ -325,6 +324,37 @@ exports.createImmediateOrder = async (req, res) => {
         shippingFee: req.body.shippingFee,
       }).then(o => o.populate({path: "productId", populate: "user"}).execPopulate())
       console.log("Order", order);
+
+      let cart = await Cart.findOne({ user: req.user.id });
+      if(cart){
+        await Cart.updateOne(
+          {
+            user: req.user.id,
+          },
+          { $pull: { products: { $in: order.productId } } }
+        );
+      }
+
+      let recentView = await RecentView.findOne({ user: req.user.id });
+      if(recentView){
+        console.log('updating');
+        await RecentView.updateOne(
+          {
+            user: req.user.id,
+          },
+          { $pull: { products: { $in: order.productId } } }
+        );
+      }
+
+      let wishList = await Wishlist.findOne({ user: req.user.id });
+      if(wishList){
+        await Wishlist.updateOne(
+          {
+            user: req.user.id,
+          },
+          { $pull: { products: { $in: order.productId } } }
+        );
+      }
       
       const productSeller = await User.findById(updatedProduct.user);
       console.log(productSeller);

@@ -10,6 +10,8 @@ const schedule = require("node-schedule");
 const fetch = require("node-fetch");
 const User = require("../models/userModal");
 const Order = require("../models/orderModal");
+const RecentView = require("../models/recentViewModal");
+const Wishlist = require("../models/wishlistModal");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -540,6 +542,37 @@ exports.createBiddingProduct = async (req, res) => {
           console.log("Order", order);
           newProduct.status = 'Sold';
           await newProduct.save();
+
+          let cart = await Cart.findOne({ user: req.user.id });
+          if(cart){
+            await Cart.updateOne(
+              {
+                user: req.user.id,
+              },
+              { $pull: { products: { $in: order.productId } } }
+            );
+          }
+
+          let recentView = await RecentView.findOne({ user: req.user.id });
+          if(recentView){
+            console.log('updating');
+            await RecentView.updateOne(
+              {
+                user: req.user.id,
+              },
+              { $pull: { products: { $in: order.productId } } }
+            );
+          }
+
+          let wishList = await Wishlist.findOne({ user: req.user.id });
+          if(wishList){
+            await Wishlist.updateOne(
+              {
+                user: req.user.id,
+              },
+              { $pull: { products: { $in: order.productId } } }
+            );
+          }
           console.log('after save', newProduct.status);
 
           let userData = {
