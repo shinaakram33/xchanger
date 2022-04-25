@@ -47,7 +47,7 @@ const productSchema = new mongoose.Schema(
     },
     season: {
       type: String,
-      required: [true, 'Season of a product is required'],
+      // required: [true, 'Season of a product is required'],
       enum: {
         values: ['Spring', 'Summer', 'Autumn', 'Winter', 'All'],
         message: 'Season must be Spring, Summer, Autumn, Winter or All',
