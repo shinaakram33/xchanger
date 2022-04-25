@@ -96,7 +96,7 @@ exports.completeAccount = async (req, res) => {
         user.connAccount.flag = true;
         await user.save();
         console.log(user);
-        return res.send('Return url');
+        return res.send('Your account has been created successfully. You may go back to app to post ad.');
     } catch (err) {
         console.log(req);
         return res.send({ 
