@@ -512,6 +512,7 @@ exports.createBiddingProduct = async (req, res) => {
         let highestBid = allBidsOfProduct.shift();
         console.log('highest', highestBid);
         highestBid.succeeded = true;
+        highestBid.status = 'Succeeded'
         await highestBid.save();
         console.log('highest after save', highestBid);
 
@@ -638,6 +639,8 @@ exports.createBiddingProduct = async (req, res) => {
       }
       allBidsOfProduct.forEach(async (bid) => {
         await stripe.paymentIntents.cancel(bid.intentId);
+        bid.status = 'Failed';
+        await bid.save();
       });
       
       //send notification to other users

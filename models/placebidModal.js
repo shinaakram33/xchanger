@@ -31,6 +31,13 @@ const placeBidSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    status: {
+      type: String,
+      enum: {
+        values: ['In process', 'Succeeded', 'Failed'],
+      },
+      default: 'In process',
+    },
     orderDetails: {
       name: String,
       email: String,
