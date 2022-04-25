@@ -37,19 +37,19 @@ exports.createplaceBid = async (req, res) => {
         });
       }
           
-      const token = await stripe.tokens.create({
-          card: {
-            number: "4242424242424242",
-            exp_month: 1,
-            exp_year: 2023,
-            cvc: "314",
-          },
-        });
+      // const token = await stripe.tokens.create({
+      //     card: {
+      //       number: "4242424242424242",
+      //       exp_month: 1,
+      //       exp_year: 2023,
+      //       cvc: "314",
+      //     },
+      //   });
         const paymentMethod = await stripe.paymentMethods.create({
           type: "card",
           card: {
-            // token: req.body.source,
-            token: token.id
+            token: req.body.source,
+            // token: token.id
           },
         });
     
