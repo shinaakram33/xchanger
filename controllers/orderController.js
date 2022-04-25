@@ -44,7 +44,7 @@ exports.createOrder = async (req, res) => {
     //     cvc: "314",
     //   },
     // });
-    console.log(token.id);
+    // console.log(token.id);
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
