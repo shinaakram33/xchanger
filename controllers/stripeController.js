@@ -92,11 +92,21 @@ exports.createAccountLink = async ( accountId ) => {
        
 exports.completeAccount = async (req, res) => {
     try{
+        let account = await this.retrieveAccount(req.params.accountId);
+        if(account.requirements.currently_due.length > 0) {
+            let link = await this.createAccountLink(req.params.accountId);
+            return res.send({
+                message: 'Your account is not completed. You must complete your account to post ad. Use the link below to complete your account.',
+                link: link.url,
+            });
+        }
         const user = await User.findOne({'connAccount.id': req.params.accountId});
         user.connAccount.flag = true;
         await user.save();
         console.log(user);
-        return res.send('Your account has been created successfully. You may go back to app to post ad.');
+        return res.send({
+            message: 'Your account has been created successfully. You may go back to app to post ad.'
+        });
     } catch (err) {
         console.log(req);
         return res.send({ 
