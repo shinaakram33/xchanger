@@ -571,9 +571,9 @@ exports.createBiddingProduct = async (req, res) => {
           console.log(productSeller);
 
           // try{
-            //     let transfer = await stripe.transfers.create({
-            //     amount: Math.round(highestBid * 100),
-          //       currency: 'usd',
+          //       let transfer = await stripe.transfers.create({
+          //       amount: Math.round(highestBid.price * 100),
+          //       currency: 'CHF',
           //       destination: productSeller.connAccount.id,
           //       source_transaction: paymentIntentCapture.charges.data[0].id,
           //     });
@@ -605,7 +605,6 @@ exports.createBiddingProduct = async (req, res) => {
           //       console.log(error);
           //     });
           // }
-          //   }
 
           let sellerData = {
             user: newProduct.user,

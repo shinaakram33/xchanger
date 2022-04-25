@@ -62,7 +62,7 @@ exports.createplaceBid = async (req, res) => {
   
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round((req.body.price + req.body.shippingFee) * 100),
-        currency: 'usd',
+        currency: 'CHF',
         payment_method_types: ["card"],
         payment_method: paymentMethod.id,
         confirm: true,

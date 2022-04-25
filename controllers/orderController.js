@@ -36,21 +36,21 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    const token = await stripe.tokens.create({
-      card: {
-        number: "4242424242424242",
-        exp_month: 1,
-        exp_year: 2023,
-        cvc: "314",
-      },
-    });
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
     console.log(token.id);
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
-        // token: req.body.source,
-        token: token.id,
+        token: req.body.source,
+        // token: token.id,
       },
     });
     console.log("paymentMethod ", paymentMethod);
@@ -82,7 +82,7 @@ exports.createOrder = async (req, res) => {
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round((req.body.price + req.body.shippingFee) * 100),
-      currency: 'usd',
+      currency: 'CHF',
       payment_method_types: ["card"],
       payment_method: paymentMethod.id,
       confirm: true,
@@ -285,7 +285,7 @@ exports.createImmediateOrder = async (req, res) => {
 
     const charge = await stripe.charges.create({
       amount: (req.body.price + req.body.shippingFee) * 100,
-      currency: "usd",
+      currency: "CHF",
       source: req.body.source,
       // source: token.id,
     });
@@ -395,7 +395,7 @@ exports.createImmediateOrder = async (req, res) => {
       // try{
       //     let transfer = await stripe.transfers.create({
       //     amount: Math.round(updatedProduct.price.immediate_purchase_price * 100),
-      //       currency: 'usd',
+      //       currency: 'CHF',
       //       destination: productSeller.connAccount.id,
       //       source_transaction: charge.id,
       //     });
@@ -505,7 +505,7 @@ exports.orderAccepted = async (req, res) => {
           // try{
           //   let transfer = await stripe.transfers.create({
           //     amount: updatedProduct.price.sellingPrice * 100,
-          //     currency: 'usd',
+          //     currency: 'CHF',
           //     destination: productUser.connAccount.id,
           //     source_transaction: paymentIntentCapture.charges.data[0].id,
           //     transfer_group: paymentIntentCapture.transfer_group
