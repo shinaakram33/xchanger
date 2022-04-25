@@ -20,7 +20,6 @@ const {
 const router = express.Router();
 
 
-router.route("/rating").patch(rateMultipleSellers);
 router.route("/").get(getAllUsers)
 router.route("/search").get(searchUsers)
 router.route("/:userId")
