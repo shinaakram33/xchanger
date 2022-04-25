@@ -21,6 +21,7 @@ const notificationRoute = require('./notificationRoute');
 const chatRoute = require('./chatRoute')
 const termConditionsRoute = require('./term-conditionsRoute');
 const stripeRoute = require('./stripeRoute');
+const subCategoryRoute = require('./subCategoryRoute');
 
 const router = express.Router();
 
@@ -45,5 +46,6 @@ router.use('/notification', notificationRoute);
 router.use('/chats', chatRoute);
 router.use('/t&c', termConditionsRoute);
 router.use('/stripe', stripeRoute);
+router.use('/subCategory', subCategoryRoute);
 
 module.exports = router;

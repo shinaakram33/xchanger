@@ -1,5 +1,6 @@
 const SubCategory = require('../models/subCategoryModal');
 const Category = require('../models/categoryModal');
+const SubCategoryOption = require("../models/subCategoryOptionsModal");
 
 exports.createSubCategory = async (req, res) => {
   try {
@@ -92,9 +93,53 @@ exports.deleteSubCategory = async (req, res) => {
       message: 'Sub Category is delete successfully',
     });
   } catch (error) {
-    res.status(200).json({
+    return res.status(200).json({
       status: 'fail',
       message: error,
     });
   }
 };
+
+exports.getSize = async (req, res) => {
+  try{
+    if(!req.body.subCategoryId) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'Subcategory is required',
+      });
+    }
+    let subCategory = await SubCategory.findById(req.params.subCategoryId);
+    if(!subCategory) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'Subcategory does not exist',
+      });
+    }
+    if(req.body.subCategoryOptionName) {
+      let data = [];
+      subCategory.size.forEach((s) => {
+        if(s.name === req.body.subCategoryOptionName)
+          data.push(s);
+      });
+      if(!data || data.length<0) {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'Size for subcategoryOption does not exist',
+        });
+      } 
+      return res.status(200).json({
+        status: 'success',
+        data: data,
+      });
+    }
+  return res.status(200).json({
+    status: 'success',
+    data: subCategory.size,
+  });    
+  } catch (err) {
+    return res.status(200).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+}

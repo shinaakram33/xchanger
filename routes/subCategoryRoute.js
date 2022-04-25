@@ -1,10 +1,11 @@
 const express = require('express');
-const { createSubCategory, getSubCategory, updateSubCategory, deleteSubCategory } = require('../controllers/subCategoryController');
+const { createSubCategory, getSubCategory, updateSubCategory, deleteSubCategory, getSize } = require('../controllers/subCategoryController');
 const { protected, restrictTo } = require('../controllers/authController');
 const SubCategoryOptionRoute = require('./subCategoryOptionRoute');
 
 const router = express.Router({ mergeParams: true });
 
+router.route('/size', getSize);
 router.use('/:subCategoryId/subCategoryOptions', SubCategoryOptionRoute);
 
 router.route('/').post(protected, restrictTo('admin'), createSubCategory).get(getSubCategory);
