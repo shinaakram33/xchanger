@@ -81,7 +81,7 @@ exports.createOrder = async (req, res) => {
     // shippingFee = pakageSize.price;
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(req.body.price * 100),
+      amount: Math.round((req.body.price + req.body.shippingFee) * 100),
       currency: 'usd',
       payment_method_types: ["card"],
       payment_method: paymentMethod.id,
@@ -284,7 +284,7 @@ exports.createImmediateOrder = async (req, res) => {
     // });
 
     const charge = await stripe.charges.create({
-      amount: req.body.price * 100,
+      amount: (req.body.price + req.body.shippingFee) * 100,
       currency: "usd",
       source: req.body.source,
       // source: token.id,
