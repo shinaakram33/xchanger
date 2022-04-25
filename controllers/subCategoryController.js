@@ -108,7 +108,7 @@ exports.getSize = async (req, res) => {
         message: 'Subcategory is required',
       });
     }
-    let subCategory = await SubCategory.findById(req.params.subCategoryId);
+    let subCategory = await SubCategory.findById(req.body.subCategoryId);
     if(!subCategory) {
       return res.status(403).json({
         status: 'fail',
@@ -121,7 +121,7 @@ exports.getSize = async (req, res) => {
         if(s.name === req.body.subCategoryOptionName)
           data.push(s);
       });
-      if(!data || data.length<0) {
+      if(!data || data.length<=0) {
         return res.status(403).json({
           status: 'fail',
           message: 'Size for subcategoryOption does not exist',

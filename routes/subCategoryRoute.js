@@ -5,7 +5,8 @@ const SubCategoryOptionRoute = require('./subCategoryOptionRoute');
 
 const router = express.Router({ mergeParams: true });
 
-router.route('/size', getSize);
+router.route('/size').get(getSize);
+
 router.use('/:subCategoryId/subCategoryOptions', SubCategoryOptionRoute);
 
 router.route('/').post(protected, restrictTo('admin'), createSubCategory).get(getSubCategory);
