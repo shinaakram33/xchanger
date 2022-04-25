@@ -174,18 +174,24 @@ exports.createOrder = async (req, res) => {
       console.log("status ", paymentIntent.status);
     });
     await cart.save({ validateBeforeSave: false });
-    await RecentView.updateOne(
+    let recentView = await RecentView.findOne({ user: req.user.id });
+    if(recentView){
+      await RecentView.updateOne(
         {
           user: req.user.id,
         },
         { $pull: { products: { $in: cart.selectedProducts } } }
     );
-    await Wishlist.updateOne(
-      {
-        user: req.user.id,
-      },
-      { $pull: { products: { $in: cart.selectedProducts } } }
-    );
+    }
+    let wishList = await Wishlist.findOne({ user: req.user.id });
+    if(wishList){
+      await Wishlist.updateOne(
+        {
+          user: req.user.id,
+        },
+        { $pull: { products: { $in: cart.selectedProducts } } }
+      );
+    }
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save().then(o => o.populate("productId").execPopulate());

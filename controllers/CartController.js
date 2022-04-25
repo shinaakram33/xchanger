@@ -4,7 +4,6 @@ exports.createCart = async (req, res, next) => {
   try {
     let check;
     const alreadyExist = await Cart.findOne({ user: req.user.id });
-    console.log(alreadyExist.products);
     if (!alreadyExist) {
       console.log('creating new cart');
       await Cart.create({
@@ -40,7 +39,7 @@ exports.createCart = async (req, res, next) => {
     console.log(err);
     return res.status(400).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
