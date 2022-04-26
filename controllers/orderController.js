@@ -36,20 +36,20 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    const token = await stripe.tokens.create({
-      card: {
-        number: "4242424242424242",
-        exp_month: 1,
-        exp_year: 2023,
-        cvc: "314",
-      },
-    });
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
 
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
-        // token: req.body.source,
-        token: token.id,
+        token: req.body.source,
+        // token: token.id,
       },
     });
     console.log("paymentMethod ", paymentMethod);
@@ -179,7 +179,7 @@ exports.createOrder = async (req, res) => {
         {
           user: req.user.id,
         },
-        { $pull: { products: { $in: cart.selectedProducts } } }
+        { $pull: { products: { $in: createOrderTable.productId } } }
     );
     }
     let wishList = await Wishlist.findOne({ user: req.user.id });
@@ -188,7 +188,7 @@ exports.createOrder = async (req, res) => {
         {
           user: req.user.id,
         },
-        { $pull: { products: { $in: cart.selectedProducts } } }
+        { $pull: { products: { $in: createOrderTable.productId } } }
       );
     }
     cart.selectedProducts = undefined;
