@@ -102,6 +102,7 @@ exports.deleteSubCategory = async (req, res) => {
 
 exports.getSize = async (req, res) => {
   try{
+    console.log(req.body);
     if(!req.body.subCategoryId) {
       return res.status(403).json({
         status: 'fail',
