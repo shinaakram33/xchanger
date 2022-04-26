@@ -1,8 +1,23 @@
 const Cart = require('../models/cartModal');
+const Product = require('../models/productModal');
 
 exports.createCart = async (req, res, next) => {
   try {
     let check;
+    const product = await Product.findById(req.body.products);
+    if(!product) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'This product does not exist',
+     });
+    }
+    if(JSON.stringify(req.user.id) === JSON.stringify(product.user)) {
+      console.log("in");
+      return res.status(400).json({
+        status: 'fail',
+        message: 'You do not have permission to do this',
+     });
+    }
     const alreadyExist = await Cart.findOne({ user: req.user.id });
     if (!alreadyExist) {
       console.log('creating new cart');
