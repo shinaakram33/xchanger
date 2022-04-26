@@ -280,20 +280,20 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
-    const token = await stripe.tokens.create({
-      card: {
-        number: "4242424242424242",
-        exp_month: 1,
-        exp_year: 2023,
-        cvc: "314",
-      },
-    });
+    // const token = await stripe.tokens.create({
+    //   card: {
+    //     number: "4242424242424242",
+    //     exp_month: 1,
+    //     exp_year: 2023,
+    //     cvc: "314",
+    //   },
+    // });
 
     const charge = await stripe.charges.create({
       amount: (req.body.price + req.body.shippingFee) * 100,
       currency: "CHF",
-      // source: req.body.source,
-      source: token.id,
+      source: req.body.source,
+      // source: token.id,
     });
 
     if (!charge) {
@@ -306,9 +306,7 @@ exports.createImmediateOrder = async (req, res) => {
     if (charge.paid) {
         updatedProduct = await Product.findById(req.body.productId);
         updatedProduct.status = 'Sold';
-        await updatedProduct.save();
-        console.log(updatedProduct);
-        
+        await updatedProduct.save();        
 
       const order = await Order.create({
         name: req.body.name,
@@ -323,8 +321,8 @@ exports.createImmediateOrder = async (req, res) => {
         productId: req.body.productId,
         shippingFee: req.body.shippingFee,
       }).then(o => o.populate({path: "productId", populate: "user"}).execPopulate())
-      console.log("Order", order);
 
+      
       let cart = await Cart.findOne({ user: req.user.id });
       if(cart){
         await Cart.updateOne(
@@ -366,12 +364,10 @@ exports.createImmediateOrder = async (req, res) => {
 
       allBidsOfProduct.forEach(async (bid) => {
         await stripe.paymentIntents.cancel(bid.intentId);
-        await placebid.deleteOne({_id: bid.id});
       });
       
       //send notification to other users
       let failedBidUsers = await placebid.distinct('user', {"product": updatedProduct.id});
-      console.log('failedBidUsers', failedBidUsers);
       failedBidUsers.forEach((user) => {
         let data = {
           user: user,
@@ -387,7 +383,6 @@ exports.createImmediateOrder = async (req, res) => {
           .then(async (res) => {
             try {
               const dataa = await res.json();
-              console.log("response data?", dataa);
             } catch (err) {
               console.log("error");
               console.log(err);
