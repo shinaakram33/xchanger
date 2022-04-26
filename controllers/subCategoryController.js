@@ -115,7 +115,7 @@ exports.getSize = async (req, res) => {
         message: 'Subcategory does not exist',
       });
     }
-    if(req.body.subCategoryOptionName) {
+    if(req.body.subCategoryOptionName && req.body.subCategoryOptionName !== '') {
       let data = [];
       subCategory.size.forEach((s) => {
         if(s.name === req.body.subCategoryOptionName)
