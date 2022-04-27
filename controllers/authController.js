@@ -500,12 +500,12 @@ exports.searchUsers = async (req, res) => {
 
 exports.rateSeller = async (req, res) => {
   try {
-    if(req.user.id === req.params.userId) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'You do not have access to do this',
-      });
-    }
+    // if(req.user.id === req.params.userId) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: 'You do not have access to do this',
+    //   });
+    // }
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(400).json({

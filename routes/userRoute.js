@@ -15,7 +15,6 @@ const {
   deleteUser,
   searchUsers,
   rateSeller,
-  rateMultipleSellers,
 } = require("../controllers/authController");
 const router = express.Router();
 
