@@ -5,7 +5,7 @@ const SubCategoryOptionRoute = require('./subCategoryOptionRoute');
 
 const router = express.Router({ mergeParams: true });
 
-router.route('/size').get(getSize);
+router.route('/size/:subCategoryId/:subCategoryOptionName').get(getSize);
 
 router.use('/:subCategoryId/subCategoryOptions', SubCategoryOptionRoute);
 

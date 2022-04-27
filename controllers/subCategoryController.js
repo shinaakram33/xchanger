@@ -102,23 +102,23 @@ exports.deleteSubCategory = async (req, res) => {
 
 exports.getSize = async (req, res) => {
   try{
-    if(!req.body.subCategoryId) {
+    if(!req.params.subCategoryId) {
       return res.status(403).json({
         status: 'fail',
         message: 'Subcategory is required',
       });
     }
-    let subCategory = await SubCategory.findById(req.body.subCategoryId);
+    let subCategory = await SubCategory.findById(req.params.subCategoryId);
     if(!subCategory) {
       return res.status(403).json({
         status: 'fail',
         message: 'Subcategory does not exist',
       });
     }
-    if(req.body.subCategoryOptionName && req.body.subCategoryOptionName !== '') {
+    if(req.params.subCategoryOptionName && req.params.subCategoryOptionName !== 'null') {
       let data = [];
       subCategory.size.forEach((s) => {
-        if(s.name === req.body.subCategoryOptionName)
+        if(s.name === req.params.subCategoryOptionName)
           data.push(s);
       });
       if(!data || data.length<=0) {
