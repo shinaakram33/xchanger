@@ -70,8 +70,9 @@ io.on("connection", (socket) => {
     console.log(ids);
     let user;
     user = chatMessage.user.ownerId === ids[0]? ids[1]: ids[0];
-    console.log('')
+    console.log('user', chatMessage.user.ownerId);
     let sender = await User.findById(user);
+    console.log('sender', sender.id);
     let textNotificaton = {
       user:chatMessage.user.ownerId,
       text: `${sender.name} sent you a message`,
@@ -79,7 +80,7 @@ io.on("connection", (socket) => {
       message: true,
       sender: user,
     };
-
+    console.log('TNT',textNotificaton)
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
       method: "POST",
       body: JSON.stringify(textNotificaton),
