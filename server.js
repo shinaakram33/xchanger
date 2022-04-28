@@ -71,12 +71,12 @@ io.on("connection", (socket) => {
     let user;
     user = JSON.stringify(chatMessage.user.ownerId) === JSON.stringify(ids[0])? ids[1]: ids[0];
     console.log('user', user);
-    let sender = await User.findById(chatMessage.user.chatroomId);
+    let sender = await User.findById(chatMessage.user.ownerId);
     // console.log('sender', sender.id);
     let textNotificaton = {
       user: user,
       text: `${sender.name} sent you a message`,
-      chat_room_id: chatMessage.user.ownerId,
+      chat_room_id: chatMessage.user.chatroomId,
       message: true,
       sender: sender.id,
     };
