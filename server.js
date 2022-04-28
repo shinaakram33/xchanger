@@ -69,7 +69,7 @@ io.on("connection", (socket) => {
     ids[1]=chatMessage.user.chatroomId.slice((chatMessage.user.chatroomId.length)/2)
     console.log(ids);
     let user;
-    user = chatMessage.user.ownerId.toString() === ids[0].toString()? ids[1]: ids[0];
+    user = JSON.stringify(chatMessage.user.ownerId) === JSON.stringify(ids[0])? ids[1]: ids[0];
     console.log('user', chatMessage.user.ownerId);
     let sender = await User.findById(user);
     console.log('sender', sender.id);
