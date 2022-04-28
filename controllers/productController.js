@@ -643,7 +643,7 @@ exports.createBiddingProduct = async (req, res) => {
           let sellerData = {
             user: newProduct.user,
             product: newProduct.id,
-            text: `Your product ${newProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
+            text: `Your product ${newProduct.title} has been sold to: ${order.name}.`,
           };
 
           fetch("https://x-changer.herokuapp.com/api/v1/notification", {

@@ -398,7 +398,7 @@ exports.createImmediateOrder = async (req, res) => {
       let data = {
         user: updatedProduct.user,
         product: updatedProduct.id,
-        text: `Your product ${updatedProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
+        text: `Your product ${updatedProduct.title} has been sold to: ${order.name}.`,
       };
 
       fetch("https://x-changer.herokuapp.com/api/v1/notification", {
@@ -572,7 +572,7 @@ exports.orderAccepted = async (req, res) => {
           let data = {
             user: updatedProduct.user,
             product: updatedProduct.id,
-            text: `Your product ${updatedProduct.title} has been sold. Buyer details: Name: ${order.name}, Email: ${order.email}, Phone: ${order.phone}, Location: ${order.location}`,
+            text: `Your product ${updatedProduct.title} has been sold to: ${order.name}.`,
           };
           // console.log("check2", data);
           // console.log("check2", updatedProduct);
