@@ -60,19 +60,19 @@ io.on("connection", (socket) => {
   socket.on("chatroomMessage", async (data) => {
     console.log("hello #####", data);
     const chatMessage = data[0];
-    console.log(chatMessage);
-    console.log(chatMessage.user.chatroomId, "RoomId");
-    console.log('receved', chatMessage.user.ownerId);
+    // console.log(chatMessage);
+    // console.log(chatMessage.user.chatroomId, "RoomId");
+    // console.log('receved', chatMessage.user.ownerId);
 
     let ids = [];
     ids[0] = chatMessage.user.chatroomId.slice(0, (chatMessage.user.chatroomId.length)/2);
     ids[1]=chatMessage.user.chatroomId.slice((chatMessage.user.chatroomId.length)/2)
-    console.log(ids);
+    // console.log(ids);
     let user;
     user = JSON.stringify(chatMessage.user.ownerId) === JSON.stringify(ids[0])? ids[1]: ids[0];
-    console.log('user', chatMessage.user.ownerId);
+    // console.log('user', chatMessage.user.ownerId);
     let sender = await User.findById(user);
-    console.log('sender', sender.id);
+    // console.log('sender', sender.id);
     let textNotificaton = {
       user:chatMessage.user.ownerId,
       text: `${sender.name} sent you a message`,
@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
       message: true,
       sender: user,
     };
-    console.log('TNT',textNotificaton)
+    // console.log('TNT',textNotificaton)
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
       method: "POST",
       body: JSON.stringify(textNotificaton),
@@ -90,21 +90,21 @@ io.on("connection", (socket) => {
       // .then((json) => console.log(json));
       .then(async (res) => {
         try {
-          console.log("res ", res);
+          // console.log("res ", res);
           const dataa = await res.json();
-          console.log("response data?", dataa);
+          // console.log("response data?", dataa);
         } catch (err) {
-          console.log("error");
-          console.log(err);
+          // console.log("error");
+          // console.log(err);
         }
       })
       // .then((json) => console.log("json ", json))
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
 
     if (chatMessage.text.trim().length > 0) {
-      console.log(data);
+      // console.log(data);
       const user = await User.findOne({ _id: chatMessage.user._id });
       const newMessage = new Chat({
         // _id: chatMessage._id,
@@ -113,7 +113,7 @@ io.on("connection", (socket) => {
         text: chatMessage.text,
       });
       const obj = await newMessage.save();
-      console.log(obj);
+      // console.log(obj);
       io.to(obj.chat_room_id).emit("newMessage", {
         obj,
       });
