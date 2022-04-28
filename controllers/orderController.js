@@ -147,7 +147,7 @@ exports.createOrder = async (req, res) => {
       let data = {
         user: updatedProduct.user,
         product: updatedProduct.id,
-        text: `Your product ${updatedProduct.title} has been sold to: ${order.name}.`,
+        text: `Your product ${updatedProduct.title} has been sold to: ${createOrderTable.name}.`,
       };
       console.log("check2", data);
       console.log("check2", updatedProduct);
