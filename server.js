@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
     let textNotificaton = {
       user: user,
       text: `${sender.name} sent you a message`,
-      chat_room_id: chatMessage.user.chatroomId,
+      chat_room_id: chatMessage.user.ownerId,
       message: true,
       sender: sender.id,
     };
