@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
     const chatMessage = data[0];
     console.log(chatMessage);
     console.log(chatMessage.user.chatroomId, "RoomId");
-    console.log(chatMessage.user.ownerId);
+    console.log('receved', chatMessage.user.ownerId);
 
     let ids = [];
     ids[0] = chatMessage.user.chatroomId.slice(0, (chatMessage.user.chatroomId.length)/2);
