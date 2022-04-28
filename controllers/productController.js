@@ -872,20 +872,20 @@ exports.getBiddingProducts = async (req, res) => {
     if (Object.keys(req.query).length !== 0) {
       pendingProduct = await Product.find(searchCriteria)
       .sort({createdAt: -1})
-        .populate("category")
-        .populate("subCategoryId")
-        .populate("subCategoryOptionId")
-        .populate("user");
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     } else {
       pendingProduct = await Product.find({
         adType: "bidding",
         status: "Not sold",
       })
       .sort({createdAt: -1})
-        .populate("category")
-        .populate("subCategoryId")
-        .populate("subCategoryOptionId")
-        .populate("user");
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     }
     res.status(200).json({
       status: "success",

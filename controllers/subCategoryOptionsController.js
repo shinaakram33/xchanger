@@ -44,13 +44,18 @@ exports.getSubCategoryOptions = async (req, res) => {
     const subCategoryOption = await SubCategoryOptions.find({ categoryId: req.params.categoryId, subCategoryId: req.params.subCategoryId })
     .populate('categoryId')
     .populate('subCategoryId');
-    await subCategoryOption.sort((a, b) => {
-      if(a.name === 'Other')
-        return 1;
-      else if(a.name < b.name)
-        return -1
-      else return 1;
-    });
+
+    let other;
+    if(subCategoryOption.findIndex((object => {return object.name === 'Other'})) >= 0)
+      other = subCategoryOption.splice(subCategoryOption.findIndex((object => {return object.name === 'Other'})), 1);
+    
+    subCategoryOption.sort(function(a, b) {
+      if(a.name < b.name) return -1;
+      if(b.name < a.name) return 1;  
+    })
+    
+    if(other)
+      subCategoryOption.push(other[0]);
     res.status(200).json({
       status: 'success',
       length: subCategoryOption.length,

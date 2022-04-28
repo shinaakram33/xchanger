@@ -27,13 +27,17 @@ exports.createSubject = async (req, res) => {
 exports.getSubjects = async (req, res) => {
   try {
     const allSubjects = await Subject.find();
-    await allSubjects.sort((a, b) => {
-      if(a.name === 'Other')
-        return 1;
-      else if(a.name < b.name)
-        return -1
-      else return 1;
-    });
+    console.log(allSubjects.findIndex((object => {return object.name === 'Other'})));
+    let other;
+    if(allSubjects.findIndex((object => {return object.name === 'Other'})) >= 0)
+      other = allSubjects.splice(allSubjects.findIndex((object => {return object.name === 'Other'})), 1);
+    console.log(other[0]);
+    allSubjects.sort(function(a, b) {
+      if(a.name < b.name) return -1;
+      if(b.name < a.name) return 1;  
+    })
+    if(other)
+      allSubjects.push(other[0]);
     res.status(200).json({
       status: 'success',
       length: allSubjects.length,
@@ -55,15 +59,20 @@ exports.getSubjectsBySubCategory = async (req, res) => {
         message: 'SubcategoryId is required',
       });
     }
-    console.log(req.params.subCategoryId);
     const allSubjects = await Subject.find({subCategoryId: req.params.subCategoryId });
-    await allSubjects.sort((a, b) => {
-      if(a.name === 'Other')
-        return 1;
-      else if(a.name < b.name)
-        return -1
-      else return 1;
-    });
+
+    console.log(allSubjects.findIndex((object => {return object.name === 'Other'})));
+    let other;
+    if(allSubjects.findIndex((object => {return object.name === 'Other'})) >= 0)
+      other = allSubjects.splice(allSubjects.findIndex((object => {return object.name === 'Other'})), 1);
+    console.log(other[0]);
+    allSubjects.sort(function(a, b) {
+      if(a.name < b.name) return -1;
+      if(b.name < a.name) return 1;  
+    })
+    if(other)
+      allSubjects.push(other[0]);
+
     return res.status(200).json({
       status: 'success',
       length: allSubjects.length,
@@ -72,7 +81,7 @@ exports.getSubjectsBySubCategory = async (req, res) => {
   } catch (err) {
     return res.status(400).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
