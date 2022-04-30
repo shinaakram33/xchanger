@@ -69,16 +69,16 @@ io.on("connection", (socket) => {
     ids[1]=chatMessage.user.chatroomId.slice((chatMessage.user.chatroomId.length)/2)
     console.log(ids);
     let receiver;
-    receiver = JSON.stringify(data.user.id) === JSON.stringify(ids[0])? ids[1]: ids[0];
+    receiver = JSON.stringify(chatMessage.user.id) === JSON.stringify(ids[0])? ids[1]: ids[0];
     console.log('receiver', receiver);
-    let sender = await User.findById(data.user.id);
+    let sender = await User.findById(chatMessage.user.id);
     // console.log('sender', sender.id);
     let textNotificaton = {
       user: sender.id,
       text: `${sender.name} sent you a message`,
       chat_room_id: chatMessage.user.chatroomId,
       message: true,
-      sender: data.user.id,
+      sender: chatMessage.user.id,
     };
     // console.log('TNT',textNotificaton)
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
