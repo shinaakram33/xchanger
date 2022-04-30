@@ -58,23 +58,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chatroomMessage", async (data) => {
-    console.log("hello #####", data);
     const chatMessage = data[0];
-    console.log('ajdisj', chatMessage.user._id);
-
-    // console.log(chatMessage);
-    // console.log(chatMessage.user.chatroomId, "RoomId");
-    // console.log('receved', chatMessage.user.ownerId);
 
     let ids = [];
     ids[0] = chatMessage.user.chatroomId.slice(0, (chatMessage.user.chatroomId.length)/2);
     ids[1]=chatMessage.user.chatroomId.slice((chatMessage.user.chatroomId.length)/2)
-    console.log(ids);
     let receiver;
     receiver = JSON.stringify(chatMessage.user._id) === JSON.stringify(ids[0])? ids[1]: ids[0];
-    console.log('receiver', receiver);
     let sender = await User.findById(chatMessage.user._id);
-    // console.log('sender', sender.id);
     let textNotificaton = {
       user: receiver,
       text: `${sender.name} sent you a message`,
@@ -82,40 +73,28 @@ io.on("connection", (socket) => {
       message: true,
       sender: sender.id,
     };
-    // console.log('TNT',textNotificaton)
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
       method: "POST",
       body: JSON.stringify(textNotificaton),
       headers: { "Content-Type": "application/json" },
     })
-      // .then((res) => res.json())
-      // .then((json) => console.log(json));
       .then(async (res) => {
         try {
-          // console.log("res ", res);
           const dataa = await res.json();
-          // console.log("response data?", dataa);
         } catch (err) {
-          // console.log("error");
-          // console.log(err);
         }
       })
-      // .then((json) => console.log("json ", json))
       .catch((error) => {
-        // console.log(error);
       });
 
     if (chatMessage.text.trim().length > 0) {
-      // console.log(data);
       const user = await User.findOne({ _id: chatMessage.user._id });
       const newMessage = new Chat({
-        // _id: chatMessage._id,
         chat_room_id: chatMessage.user.chatroomId,
         user: chatMessage.user,
         text: chatMessage.text,
       });
       const obj = await newMessage.save();
-      // console.log(obj);
       io.to(obj.chat_room_id).emit("newMessage", {
         obj,
       });
