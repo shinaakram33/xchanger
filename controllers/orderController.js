@@ -196,6 +196,8 @@ exports.createOrder = async (req, res) => {
     await createOrderTable.save().then(o => o.populate({path: "productId", populate: "user"}).execPopulate());
     console.log(cart);
 
+    
+
     return res.status(200).json({
       status: "success",
       message: "Product is ordered successfully",
