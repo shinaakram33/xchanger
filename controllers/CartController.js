@@ -126,22 +126,22 @@ exports.selectedProductFromCart = async (req, res, next) => {
         message: 'You dont have an access to perform this action',
       });
     }
-    // let soldProducts = [];
-    // req.body.selectedProducts.forEach(async (p) => {
-    //   console.log(p);
-    //   let product = await Product.findById(p)
-    //   if(product.status === 'Sold') {
-    //     console.log('status sold');
-    //     soldProducts.push(p);
-    //   }
-    // });
-    // console.log(soldProducts.length, soldProducts);
-    // if(soldProducts.length > 0) {
-    //   return res.status(400).json({
-    //     status: 'fail',
-    //     message: `These products are already Sold: ${soldProducts}`,
-    //   });
-    // }
+    let soldProducts = [];
+    req.body.selectedProducts.forEach(async (p) => {
+      console.log(p);
+      let product = await Product.findById(p)
+      if(product.status === 'Sold') {
+        console.log('status sold');
+        soldProducts.push(p);
+      }
+    });
+    console.log(soldProducts.length, soldProducts);
+    if(soldProducts.length > 0) {
+      return res.status(400).json({
+        status: 'fail',
+        message: `These products are already Sold: ${soldProducts}`,
+      });
+    }
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = req.body.selectedProducts;
