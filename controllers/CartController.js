@@ -11,6 +11,12 @@ exports.createCart = async (req, res, next) => {
         message: 'This product does not exist',
      });
     }
+    if(product.status === 'Sold') {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'This product is Sold',
+     });
+    }
     if(JSON.stringify(req.user.id) === JSON.stringify(product.user)) {
       console.log("in");
       return res.status(400).json({
@@ -115,11 +121,27 @@ exports.selectedProductFromCart = async (req, res, next) => {
     console.log(req.body);
     const cart = await Cart.findOne({ user: req.user.id });
     if (cart._id.toString() !== req.params.cartId) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'You dont have an access to perform this action',
       });
     }
+    // let soldProducts = [];
+    // req.body.selectedProducts.forEach(async (p) => {
+    //   console.log(p);
+    //   let product = await Product.findById(p)
+    //   if(product.status === 'Sold') {
+    //     console.log('status sold');
+    //     soldProducts.push(p);
+    //   }
+    // });
+    // console.log(soldProducts.length, soldProducts);
+    // if(soldProducts.length > 0) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: `These products are already Sold: ${soldProducts}`,
+    //   });
+    // }
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     cart.selectedProducts = req.body.selectedProducts;
