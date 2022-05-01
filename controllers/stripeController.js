@@ -5,15 +5,23 @@ exports.createNewAccount = async (req, res) => {
     try{
         const user = await User.findById(req.user.id);
         console.log(user);
-        if(user.connAccount.id && user.connAccount.flag === false){
-            console.log('In if');
-            const accountLink = await this.createAccountLink(user.connAccount.id);
-            console.log(accountLink);
-            return res.send({
-                status: 'fail',
-                message: 'User already contains an account. Use the link below to complete information',
-                link: accountLink.url,
-            })
+        if(user.connAccount.id){
+            if(user.connAccount.flag === false) {
+                console.log('In if');
+                const accountLink = await this.createAccountLink(user.connAccount.id);
+                console.log(accountLink);
+                return res.send({
+                    status: 'fail',
+                    message: 'User already contains an account. Use the link below to complete information',
+                    link: accountLink.url,
+                })
+            } else if (user.connAccount.flag === true) {
+                console.log('In else');
+                return res.send({
+                    status: 'Success',
+                    message: 'User account is complete',
+                })
+            }
         }
         const account = await stripe.accounts.create({
             type: 'express',
@@ -46,15 +54,14 @@ exports.createNewAccount = async (req, res) => {
     }
 }
 
-exports.updateAccount = async (req, res) => {
+exports.getAccountLink = async (req, res) => {
     try{
         let accountLink;
-        const accountId = req.params.accountId;
-        console.log(req.params.accountId, typeof(req.params.accountId));
+        let user = await User.findById(req.user.id);
 
-        let account = await this.retrieveAccount(accountId);
-        if (account.requirements.currently_due.length > 0) {
-            accountLink = await this.createAccountLink(accountId);
+        let account = await this.retrieveAccount(user.connAccount.id);
+        if (account.requirements.currently_due.length > 0 || user.connAccount.flag === false) {
+            accountLink = await this.createAccountLink(user.connAccount.id);
             return res.send({
                 status: 'Success',
                 link: accountLink, 
@@ -63,7 +70,7 @@ exports.updateAccount = async (req, res) => {
         else {
             return res.send({
                 status: 'Success',
-                message: 'Account updated'
+                message: 'Your account is complete'
             });
         }
     } catch (err) {
