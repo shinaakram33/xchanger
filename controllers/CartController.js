@@ -64,6 +64,71 @@ exports.createCart = async (req, res, next) => {
     });
   }
 };
+
+
+exports.createAnotherCart = async (req, res, next) => {
+  try {
+    let check;
+    const product = await Product.findById(req.body.products);
+    if(!product) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'This product does not exist',
+     });
+    }
+    if(product.status === 'Sold') {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'This product is Sold',
+     });
+    }
+    if(JSON.stringify(req.body.userId) === JSON.stringify(product.user)) {
+      console.log("in");
+      return res.status(400).json({
+        status: 'fail',
+        message: 'You do not have permission to do this',
+     });
+    }
+    const alreadyExist = await Cart.findOne({ user: req.body.userId });
+    if (!alreadyExist) {
+      console.log('creating new cart');
+      await Cart.create({
+        user: req.body.userId,
+        products: req.body.products,
+      });
+    } else {
+      console.log('matching items of  cart');
+      check = alreadyExist.products.find((i) => {
+        if(i.toString() === req.body.products)
+          return true;
+        else return false;
+      });
+      if (check) {
+        return res.status(400).json({
+              status: 'fail',
+              message: 'This product is already exist in the Cart',
+        });
+      } else{
+        await Cart.updateOne(
+          {
+            user: req.body.userId,
+          },
+          { $push: { products: req.body.products } }
+        );
+      }
+    }
+    return res.status(201).json({
+      status: 'success',
+      message: 'Added into Cart successfully',
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
   
 
 exports.getAllCartProducts = async (req, res) => {

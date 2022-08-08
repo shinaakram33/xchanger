@@ -6,10 +6,12 @@ const {
   removeProductFromCart,
   selectedProductFromCart,
   getSelectedProductFromCart,
+  createAnotherCart,
 } = require('../controllers/CartController');
 
 const router = express.Router();
 
+router.route('/anotherCart').post(protected, createAnotherCart)
 router
   .route('/')
   .post(protected, createCart)

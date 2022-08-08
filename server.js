@@ -72,7 +72,8 @@ io.on("connection", (socket) => {
       chat_room_id: chatMessage.user.chatroomId,
       message: true,
       sender: sender.id,
-      product_id: chatMessage?.user?.product_id || ''
+      product_id: chatMessage?.user?.product_id || '',
+      newPrice: chatMessage?.user?.newPrice || '',
     };
     fetch("https://x-changer.herokuapp.com/api/v1/notification", {
       method: "POST",
