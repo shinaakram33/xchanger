@@ -1329,8 +1329,8 @@ exports.updateProducts = async (req, res) => {
       
 
       updates.price = {
-        ...updates.price,
-        updates
+        ...product.price,
+        orignalPrice: updates.price.orignalPrice
       };
     }
 
