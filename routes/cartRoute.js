@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.route('/anotherCart').post(protected, createAnotherCart)
+router.route('/anotherCart').post( createAnotherCart)
 router
   .route('/')
   .post(protected, createCart)
