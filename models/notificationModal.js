@@ -30,7 +30,7 @@ const notificationSchema = new mongoose.Schema(
       default: false
     },
     product_id: {
-      type: string,
+      type: String,
     },
     sender: {
       type: mongoose.Schema.ObjectId,
