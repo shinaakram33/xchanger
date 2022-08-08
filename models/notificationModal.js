@@ -29,6 +29,9 @@ const notificationSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    product_id: {
+      type: string,
+    },
     sender: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
