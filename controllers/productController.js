@@ -1325,6 +1325,15 @@ exports.updateProducts = async (req, res) => {
       updates.rating = newRating;
     }
 
+    if (updates.price) {
+      
+
+      updates.price = {
+        ...updates.price,
+        updates
+      };
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       updates,

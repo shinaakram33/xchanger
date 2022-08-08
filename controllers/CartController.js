@@ -82,13 +82,6 @@ exports.createAnotherCart = async (req, res, next) => {
         message: 'This product is Sold',
      });
     }
-    if(JSON.stringify(req.body.userId) === JSON.stringify(product.user)) {
-      console.log("in");
-      return res.status(400).json({
-        status: 'fail',
-        message: 'You do not have permission to do this',
-     });
-    }
     const alreadyExist = await Cart.findOne({ user: req.body.userId });
     if (!alreadyExist) {
       console.log('creating new cart');
