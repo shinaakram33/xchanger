@@ -13,10 +13,7 @@ const Wishlist = require("../models/wishlistModal");
 
 exports.createOrder = async (req, res) => {
   try {
-    console.log("req.boy", req.body);
-    console.log("params ", req.params.cartId);
     const cart = await Cart.findById(req.params.cartId);
-    console.log(JSON.stringify(cart));
     if (cart.selectedProducts.length === 0) {
       return res.status(400).json({
         status: "fail",
@@ -52,13 +49,29 @@ exports.createOrder = async (req, res) => {
         // token: token.id,
       },
     });
-    console.log("paymentMethod ", paymentMethod);
 
     if (!paymentMethod.created)
       return res.status(403).send("Payment method not created");
 
+    let ownMoney = 0
+    if (parseInt(req.body.price) > 0 && parseInt(req.body.price) <=150) {
+      ownMoney = parseInt(((4/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 150 && parseInt(req.body.price) <= 1000) {
+      ownMoney = parseInt(((7/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 1000 && parseInt(req.body.price) <= 2000) {
+      ownMoney = parseInt(((6/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 1000 && parseInt(req.body.price) <= 2000) {
+      ownMoney = parseInt(((6/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 2000 && parseInt(req.body.price) <= 4000) {
+      ownMoney = parseInt(((5.5/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 4000 && parseInt(req.body.price) <= 10000) {
+      ownMoney = parseInt(((5/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 10000) {
+      ownMoney = parseInt(((4/100) * parseInt(req.body.price)) + 11.5)
+    }
+    // console.log('ownMoney', ownMoney)
     let string = (new Date()).toISOString();
-    console.log(string, typeof string);
+    // console.log(string, typeof string);
 
     // let shippingFee;
     //   const { pakageSize } = await cart.selectedProducts.reduce(async function(a, b) {
@@ -78,7 +91,7 @@ exports.createOrder = async (req, res) => {
     //   console.log(pakageSize.price);
 
     // shippingFee = pakageSize.price;
-
+    // console.log('Math.round((req.body.price + req.body.shippingFee) * 100)', Math.round((req.body.price + req.body.shippingFee) * 100))
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round((req.body.price + req.body.shippingFee) * 100),
       currency: 'CHF',
@@ -86,7 +99,18 @@ exports.createOrder = async (req, res) => {
       payment_method: paymentMethod.id,
       confirm: true,
       capture_method: "manual",
-      transfer_group: string
+      transfer_group: string,
+      transfer_data: {
+        amount: Math.round((ownMoney + req.body.shippingFee) * 100),
+        destination: "acct_1LU5BKQdU47nz4ap",
+      },
+    });
+
+    const transfer = await stripe.transfers.create({
+      amount: Math.round((ownMoney + req.body.shippingFee) * 100),
+      currency: 'CHF',
+      destination: 'acct_1LU5BKQdU47nz4ap',
+      transfer_group: string,
     });
 
     // const charge = await stripe.charges.create({
@@ -96,8 +120,6 @@ exports.createOrder = async (req, res) => {
     // });
 
     if (paymentIntent.created) {
-      console.log("payment created", paymentIntent);
-      console.log('=====', paymentIntent.charges);
     
     let orderNumber = Math.random().toString(36).slice(5)
     let checkExistingOrderNumber = await Order.findOne({orderNumber: orderNumber})
@@ -120,19 +142,14 @@ exports.createOrder = async (req, res) => {
       orderNumber: orderNumber,
       shippingFee: req.body.shippingFee,
     });
-    console.log("createdOrderTable");
 
     cart.selectedProducts.map(async (i) => {
-      console.log("map", i);
       let updatedProduct = await Product.findByIdAndUpdate(
         i,
         { status: "Pending" },
         { new: true }
       );
-      console.log("product updated", updatedProduct);
-
       createOrderTable.productId.push(updatedProduct.id);
-      console.log("product array ", createOrderTable.productId);
 
       cart.products.splice(cart.products.indexOf(i), 1);
       // await Cart.updateOne(
@@ -141,7 +158,6 @@ exports.createOrder = async (req, res) => {
       //   },
       //   { $pull: { products: { $in: cart.selectedProducts } } }
       // );
-      console.log('selected products', cart.selectedProducts)
       cart.selectedProducts = undefined;
       
       let data = {
@@ -149,8 +165,7 @@ exports.createOrder = async (req, res) => {
         product: updatedProduct.id,
         text: `Your product ${updatedProduct.title} has been sold to: ${createOrderTable.name}.`,
       };
-      console.log("check2", data);
-      console.log("check2", updatedProduct);
+
       fetch("https://x-changer.herokuapp.com/api/v1/notification", {
         method: "POST",
         body: JSON.stringify(data),
@@ -170,7 +185,6 @@ exports.createOrder = async (req, res) => {
         .catch((error) => {
           console.log(error);
         });
-      console.log("status ", paymentIntent.status);
     });
     await cart.save({ validateBeforeSave: false });
     let recentView = await RecentView.findOne({ user: req.user.id });
@@ -273,8 +287,6 @@ exports.createImmediateOrder = async (req, res) => {
   let updatedProduct;
   try {
 
-    console.log(req.user.id);
-
     if (!req.body.source) {
       return res.status(400).json({
         status: "fail",
@@ -282,6 +294,36 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
 
+
+    let ownMoney = 0
+    if (parseInt(req.body.price) > 0 && parseInt(req.body.price) <=150) {
+      ownMoney = parseInt(((4/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 150 && parseInt(req.body.price) <= 1000) {
+      ownMoney = parseInt(((7/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 1000 && parseInt(req.body.price) <= 2000) {
+      ownMoney = parseInt(((6/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 1000 && parseInt(req.body.price) <= 2000) {
+      ownMoney = parseInt(((6/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 2000 && parseInt(req.body.price) <= 4000) {
+      ownMoney = parseInt(((5.5/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 4000 && parseInt(req.body.price) <= 10000) {
+      ownMoney = parseInt(((5/100) * parseInt(req.body.price)) + 11.5)
+    } else if (parseInt(req.body.price) > 10000) {
+      ownMoney = parseInt(((4/100) * parseInt(req.body.price)) + 11.5)
+    }
+
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: "card",
+      card: {
+        token: req.body.source,
+        // token: token.id,
+      },
+    });
+
+    if (!paymentMethod.created)
+      return res.status(403).send("Payment method not created");
+
+    let string = (new Date()).toISOString();
     // const token = await stripe.tokens.create({
     //   card: {
     //     number: "4242424242424242",
@@ -291,12 +333,33 @@ exports.createImmediateOrder = async (req, res) => {
     //   },
     // });
 
-    const charge = await stripe.charges.create({
-      amount: (req.body.price + req.body.shippingFee) * 100,
-      currency: "CHF",
-      source: req.body.source,
-      // source: token.id,
+    const charge = await stripe.paymentIntents.create({
+      amount: Math.round((req.body.price + req.body.shippingFee) * 100),
+      currency: 'CHF',
+      payment_method_types: ["card"],
+      payment_method: paymentMethod.id,
+      confirm: true,
+      capture_method: "manual",
+      transfer_group: string,
+      transfer_data: {
+        amount: Math.round((ownMoney + req.body.shippingFee) * 100),
+        destination: "acct_1LU5BKQdU47nz4ap",
+      },
     });
+
+    const transfer = await stripe.transfers.create({
+      amount: Math.round((ownMoney + req.body.shippingFee) * 100),
+      currency: 'CHF',
+      destination: 'acct_1LU5BKQdU47nz4ap',
+      transfer_group: string,
+    });
+
+    // const charge = await stripe.charges.create({
+    //   amount: (req.body.price + req.body.shippingFee) * 100,
+    //   currency: "CHF",
+    //   source: req.body.source,
+    //   // source: token.id,
+    // });
 
     if (!charge) {
       return res.status(403).send({
