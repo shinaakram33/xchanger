@@ -17,23 +17,23 @@ exports.createProduct = async (req, res) => {
   try {
     const obj = {
       Small: {
-        type: 'S',
+        type: "S",
         // price: 7,
         price: 6.7,
-        maxWeight: 2
+        maxWeight: 2,
       },
       Medium: {
-        type: 'M',
+        type: "M",
         // price: 9.7,
         price: 9.29,
-        maxWeight: 10
+        maxWeight: 10,
       },
       Large: {
-        type: 'L',
+        type: "L",
         // price: 20.5,
         price: 19.63,
-        maxWeight: 30
-      }
+        maxWeight: 30,
+      },
     };
 
     if (!req.body) {
@@ -74,7 +74,7 @@ exports.createProduct = async (req, res) => {
     //   }
     // } else {
 
-    console.log('here', req.body, req.params);
+    console.log("here", req.body, req.params);
     // const obj_ = {
     //   price: req.body.price,
     //   priceNegotiation: req.body.priceNegotiation,
@@ -99,7 +99,7 @@ exports.createProduct = async (req, res) => {
     // console.log('after object');
     // console.log(obj_);
     console.log(req.user.id);
-    
+
     const pkgSize = obj[req.body.pakageSize];
     console.log(pkgSize);
     const newProduct = await Product.create({
@@ -210,13 +210,13 @@ exports.getCategoryFilteredProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.color.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       console.log(array);
-      searchCriteria.color = {$in: array};
+      searchCriteria.color = { $in: array };
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.subject.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -227,7 +227,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       );
     }
 
-    if(req.query.flag) {
+    if (req.query.flag) {
       searchCriteria.flag = req.query.flag;
     }
 
@@ -251,7 +251,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         sortingQuery = {
           createdAt: -1,
         };
-      } 
+      }
       // else if (req.query.sortingOrder.toLowerCase() === "sale") {
       // }
     }
@@ -359,12 +359,12 @@ exports.getCategoryProduct = async (req, res) => {
     }
 
     if (req.query.color) {
-      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.color.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       searchCriteria.color = array;
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.subject.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -374,8 +374,8 @@ exports.getCategoryProduct = async (req, res) => {
         "i"
       );
     }
-    
-    if(req.query.flag) {
+
+    if (req.query.flag) {
       searchCriteria.flag = req.query.flag;
     }
 
@@ -399,7 +399,7 @@ exports.getCategoryProduct = async (req, res) => {
         sortingQuery = {
           createdAt: -1,
         };
-      } 
+      }
       // else if (req.query.sortingOrder.toLowerCase() === "sale") {
       // }
     }
@@ -410,7 +410,7 @@ exports.getCategoryProduct = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
-      console.log(searchCriteria, sortingQuery)
+      console.log(searchCriteria, sortingQuery);
       products = await Product.find(searchCriteria)
         .populate("category")
         .populate("subCategoryId")
@@ -421,13 +421,13 @@ exports.getCategoryProduct = async (req, res) => {
       products = await Product.find({
         category: req.params.categoryId,
         status: "Not sold",
-        adType: {$in: ['normal', 'featured']}
+        adType: { $in: ["normal", "featured"] },
       })
-      .sort({adType: 1, createdAt: -1})
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
+        .sort({ adType: 1, createdAt: -1 })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
     }
 
     res.status(200).json({
@@ -447,20 +447,20 @@ exports.createBiddingProduct = async (req, res) => {
   try {
     const obj = {
       Small: {
-        type: 'S',
+        type: "S",
         price: 6.7,
-        maxWeight: 2
+        maxWeight: 2,
       },
       Medium: {
-        type: 'M',
+        type: "M",
         price: 9.29,
-        maxWeight: 10
+        maxWeight: 10,
       },
       Large: {
-        type: 'L',
+        type: "L",
         price: 19.63,
-        maxWeight: 30
-      }
+        maxWeight: 30,
+      },
     };
     const pkgSize = obj[req.body.pakageSize];
     console.log(pkgSize);
@@ -479,7 +479,7 @@ exports.createBiddingProduct = async (req, res) => {
       description: req.body.description,
       date_for_auction: {
         starting_date: req.body.date_for_auction.starting_date,
-        ending_date: req.body.date_for_auction.ending_date
+        ending_date: req.body.date_for_auction.ending_date,
       },
       category: req.params.categoryId,
       categoryName: req.body.categoryName,
@@ -492,219 +492,223 @@ exports.createBiddingProduct = async (req, res) => {
     });
 
     console.log(newProduct.date_for_auction);
-  
+
     let min = moment(newProduct.date_for_auction.ending_date).minutes();
     let hour = moment(newProduct.date_for_auction.ending_date).hours();
-    let day = moment(newProduct.date_for_auction.ending_date).format('D');
-    let month = moment(newProduct.date_for_auction.ending_date).format('M');
-    let year = moment(newProduct.date_for_auction.ending_date).format('Y');
+    let day = moment(newProduct.date_for_auction.ending_date).format("D");
+    let month = moment(newProduct.date_for_auction.ending_date).format("M");
+    let year = moment(newProduct.date_for_auction.ending_date).format("Y");
 
-    console.log(min, hour, day, month, year)
-    let newJob = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
-      console.log('Cron job executed.');
-      let allBidsOfProduct = await PlaceBid.find({product: newProduct.id})
-      .sort({price: -1, createdAt: -1});
-      console.log(allBidsOfProduct.length, allBidsOfProduct);
-
-      if(allBidsOfProduct.length <=0) {
-        newProduct.status = 'Dismissed';
-        await newProduct.save();
-        console.log(newProduct);
-      } else {
-        let highestBid = allBidsOfProduct.shift();
-        console.log('highest', highestBid);
-        highestBid.succeeded = true;
-        highestBid.status = 'Succeeded'
-        await highestBid.save();
-        console.log('highest after save', highestBid);
-
-
-        const paymentIntentCapture = await stripe.paymentIntents.capture(
-          highestBid.intentId
-        );
-        if (paymentIntentCapture.status === "succeeded") {
-  
-          console.log("status ", paymentIntentCapture.status);
-                        
-          const order = await Order.create({
-            name: highestBid.orderDetails.name,
-            email: (highestBid.orderDetails.email).trim().toLowerCase(),
-            phoneNumber: highestBid.orderDetails.phoneNumber,
-            location: highestBid.orderDetails.location,
-            user: req.user.id,
-            checkoutId: highestBid.intentId,
-            status: "Complete",
-            accepted: true,
-            price: highestBid.price,
-            productId: newProduct.id,
-            shippingFee: highestBid.orderDetails.shippingFee,
-          }).then(o => o.populate("productId").execPopulate());
-          console.log("Order", order);
-          newProduct.status = 'Sold';
-          await newProduct.save();
-
-          let cart = await Cart.findOne({ user: req.user.id });
-          if(cart){
-            await Cart.updateOne(
-              {
-                user: req.user.id,
-              },
-              { $pull: { products: { $in: order.productId } } }
-            );
-          }
-
-          let recentView = await RecentView.findOne({ user: req.user.id });
-          if(recentView){
-            console.log('updating');
-            await RecentView.updateOne(
-              {
-                user: req.user.id,
-              },
-              { $pull: { products: { $in: order.productId } } }
-            );
-          }
-
-          let wishList = await Wishlist.findOne({ user: req.user.id });
-          if(wishList){
-            await Wishlist.updateOne(
-              {
-                user: req.user.id,
-              },
-              { $pull: { products: { $in: order.productId } } }
-            );
-          }
-          console.log('after save', newProduct.status);
-
-          let userData = {
-            user: highestBid.user,
-            product: newProduct.id,
-            text: `Your bid on product ${newProduct.title} has been successful.`,
-          };
-
-          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-            method: "POST",
-            body: JSON.stringify(userData),
-            headers: { "Content-Type": "application/json" },
-          })
-            .then(async (res) => {
-              try {
-                const dataa = await res.json();
-                console.log("response data?", dataa);
-              } catch (err) {
-                console.log("error");
-                console.log(err);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          console.log(paymentIntentCapture);
-
-          //make payment to seller
-          const productSeller = await User.findById(newProduct.user);
-          console.log(productSeller);
-
-          // try{
-          //       let transfer = await stripe.transfers.create({
-          //       amount: Math.round(highestBid.price * 100),
-          //       currency: 'CHF',
-          //       destination: productSeller.connAccount.id,
-          //       source_transaction: paymentIntentCapture.charges.data[0].id,
-          //     });
-          //     console.log(transfer);
-          //   } catch (err) {
-          //     console.log(err);
-          // let admin = User.findOne({roles: 'admin'});
-          //   let data = {
-          //     user: admin.id,
-          //     product: newProduct.id,
-          //     text: `Transfer unsuccessful: Seller: ${newProduct.user}, Amount: ${newProduct.price}, Order: ${order.id}`,
-          //   };
-      
-          //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-          //     method: "POST",
-          //     body: JSON.stringify(data),
-          //     headers: { "Content-Type": "application/json" },
-          //   })
-          //     .then(async (res) => {
-          //       try {
-          //         const dataa = await res.json();
-          //         console.log("response data?", dataa);
-          //       } catch (err) {
-          //         console.log("error");
-          //         console.log(err);
-          //       }
-          //     })
-          //     .catch((error) => {
-          //       console.log(error);
-          //     });
-          // }
-
-          let sellerData = {
-            user: newProduct.user,
-            product: newProduct.id,
-            text: `Your product ${newProduct.title} has been sold to: ${order.name}.`,
-          };
-
-          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-            method: "POST",
-            body: JSON.stringify(sellerData),
-            headers: { "Content-Type": "application/json" },
-          })
-            .then(async (res) => {
-              try {
-                const dataa = await res.json();
-                console.log("response data?", dataa);
-              } catch (err) {
-                console.log("error");
-                console.log(err);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        } else {
-          return res.status(400).json({
-            status: "fail",
-            message: "Stripe error",
-          });
-        }
-      }
-      allBidsOfProduct.forEach(async (bid) => {
-        await stripe.paymentIntents.cancel(bid.intentId);
-        bid.status = 'Failed';
-        await bid.save();
-      });
-      
-      //send notification to other users
-      let failedBidUsers = await PlaceBid.distinct('user', {"product": newProduct.id});
-      console.log('failedBidUsers', failedBidUsers);
-      failedBidUsers.forEach((user) => {
-        let data = {
-          user: user,
+    console.log(min, hour, day, month, year);
+    let newJob = schedule.scheduleJob(
+      `${min} ${hour} ${day} ${month} *`,
+      async () => {
+        console.log("Cron job executed.");
+        let allBidsOfProduct = await PlaceBid.find({
           product: newProduct.id,
-          text: `Your bid on product ${newProduct.title} failed. The product has been sold`,
-        };
+        }).sort({ price: -1, createdAt: -1 });
+        console.log(allBidsOfProduct.length, allBidsOfProduct);
 
-        fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" },
-        })
-          .then(async (res) => {
-            try {
-              const dataa = await res.json();
-              console.log("response data?", dataa);
-            } catch (err) {
-              console.log("error");
-              console.log(err);
+        if (allBidsOfProduct.length <= 0) {
+          newProduct.status = "Dismissed";
+          await newProduct.save();
+          console.log(newProduct);
+        } else {
+          let highestBid = allBidsOfProduct.shift();
+          console.log("highest", highestBid);
+          highestBid.succeeded = true;
+          highestBid.status = "Succeeded";
+          await highestBid.save();
+          console.log("highest after save", highestBid);
+
+          const paymentIntentCapture = await stripe.paymentIntents.capture(
+            highestBid.intentId
+          );
+          if (paymentIntentCapture.status === "succeeded") {
+            console.log("status ", paymentIntentCapture.status);
+
+            const order = await Order.create({
+              name: highestBid.orderDetails.name,
+              email: highestBid.orderDetails.email.trim().toLowerCase(),
+              phoneNumber: highestBid.orderDetails.phoneNumber,
+              location: highestBid.orderDetails.location,
+              user: req.user.id,
+              checkoutId: highestBid.intentId,
+              status: "Complete",
+              accepted: true,
+              price: highestBid.price,
+              productId: newProduct.id,
+              shippingFee: highestBid.orderDetails.shippingFee,
+            }).then((o) => o.populate("productId").execPopulate());
+            console.log("Order", order);
+            newProduct.status = "Sold";
+            await newProduct.save();
+
+            let cart = await Cart.findOne({ user: req.user.id });
+            if (cart) {
+              await Cart.updateOne(
+                {
+                  user: req.user.id,
+                },
+                { $pull: { products: { $in: order.productId } } }
+              );
             }
+
+            let recentView = await RecentView.findOne({ user: req.user.id });
+            if (recentView) {
+              console.log("updating");
+              await RecentView.updateOne(
+                {
+                  user: req.user.id,
+                },
+                { $pull: { products: { $in: order.productId } } }
+              );
+            }
+
+            let wishList = await Wishlist.findOne({ user: req.user.id });
+            if (wishList) {
+              await Wishlist.updateOne(
+                {
+                  user: req.user.id,
+                },
+                { $pull: { products: { $in: order.productId } } }
+              );
+            }
+            console.log("after save", newProduct.status);
+
+            let userData = {
+              user: highestBid.user,
+              product: newProduct.id,
+              text: `Your bid on product ${newProduct.title} has been successful.`,
+            };
+
+            fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+              method: "POST",
+              body: JSON.stringify(userData),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(async (res) => {
+                try {
+                  const dataa = await res.json();
+                  console.log("response data?", dataa);
+                } catch (err) {
+                  console.log("error");
+                  console.log(err);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            console.log(paymentIntentCapture);
+
+            //make payment to seller
+            const productSeller = await User.findById(newProduct.user);
+            console.log(productSeller);
+
+            // try{
+            //       let transfer = await stripe.transfers.create({
+            //       amount: Math.round(highestBid.price * 100),
+            //       currency: 'CHF',
+            //       destination: productSeller.connAccount.id,
+            //       source_transaction: paymentIntentCapture.charges.data[0].id,
+            //     });
+            //     console.log(transfer);
+            //   } catch (err) {
+            //     console.log(err);
+            // let admin = User.findOne({roles: 'admin'});
+            //   let data = {
+            //     user: admin.id,
+            //     product: newProduct.id,
+            //     text: `Transfer unsuccessful: Seller: ${newProduct.user}, Amount: ${newProduct.price}, Order: ${order.id}`,
+            //   };
+
+            //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+            //     method: "POST",
+            //     body: JSON.stringify(data),
+            //     headers: { "Content-Type": "application/json" },
+            //   })
+            //     .then(async (res) => {
+            //       try {
+            //         const dataa = await res.json();
+            //         console.log("response data?", dataa);
+            //       } catch (err) {
+            //         console.log("error");
+            //         console.log(err);
+            //       }
+            //     })
+            //     .catch((error) => {
+            //       console.log(error);
+            //     });
+            // }
+
+            let sellerData = {
+              user: newProduct.user,
+              product: newProduct.id,
+              text: `Your product ${newProduct.title} has been sold to: ${order.name}.`,
+            };
+
+            fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+              method: "POST",
+              body: JSON.stringify(sellerData),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(async (res) => {
+                try {
+                  const dataa = await res.json();
+                  console.log("response data?", dataa);
+                } catch (err) {
+                  console.log("error");
+                  console.log(err);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            return res.status(400).json({
+              status: "fail",
+              message: "Stripe error",
+            });
+          }
+        }
+        allBidsOfProduct.forEach(async (bid) => {
+          await stripe.paymentIntents.cancel(bid.intentId);
+          bid.status = "Failed";
+          await bid.save();
+        });
+
+        //send notification to other users
+        let failedBidUsers = await PlaceBid.distinct("user", {
+          product: newProduct.id,
+        });
+        console.log("failedBidUsers", failedBidUsers);
+        failedBidUsers.forEach((user) => {
+          let data = {
+            user: user,
+            product: newProduct.id,
+            text: `Your bid on product ${newProduct.title} failed. The product has been sold`,
+          };
+
+          fetch("https://x-changer.herokuapp.com/api/v1/notification", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json" },
           })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-    });
+            .then(async (res) => {
+              try {
+                const dataa = await res.json();
+                console.log("response data?", dataa);
+              } catch (err) {
+                console.log("error");
+                console.log(err);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
+      }
+    );
 
     return res.status(201).json({
       status: "success",
@@ -721,7 +725,10 @@ exports.createBiddingProduct = async (req, res) => {
 
 exports.getBiddingPendingProduct = async (req, res) => {
   try {
-    const pendingProduct = await Product.find({ status: "Pending", flag: "Approved" })
+    const pendingProduct = await Product.find({
+      status: "Pending",
+      flag: "Approved",
+    })
       .populate("category")
       .populate("subCategoryId")
       .populate("subCategoryOptionId")
@@ -819,12 +826,12 @@ exports.getBiddingProducts = async (req, res) => {
     }
 
     if (req.query.color) {
-      var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.color.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       searchCriteria.color = array;
     }
 
     if (req.query.subject) {
-      var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+      var array = req.query.subject.replace(/[\[\]]+/g, "").split(/[\s,]+/);
       searchCriteria.subject = array;
     }
 
@@ -834,8 +841,8 @@ exports.getBiddingProducts = async (req, res) => {
         "i"
       );
     }
-    
-    if(req.query.flag) {
+
+    if (req.query.flag) {
       searchCriteria.flag = req.query.flag;
     }
 
@@ -871,21 +878,21 @@ exports.getBiddingProducts = async (req, res) => {
     }
     if (Object.keys(req.query).length !== 0) {
       pendingProduct = await Product.find(searchCriteria)
-      .sort({createdAt: -1})
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
     } else {
       pendingProduct = await Product.find({
         adType: "bidding",
         status: "Not sold",
       })
-      .sort({createdAt: -1})
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
     }
     res.status(200).json({
       status: "success",
@@ -932,71 +939,78 @@ exports.createFeaturedProduct = async (req, res) => {
         status: "fail",
         message: "Product does not exist",
       });
-    }
-    else {
-      if(!req.body.id) {
+    } else {
+      if (!req.body.id) {
         return res.status(400).json({
           status: "fail",
           message: "Please provide pakage id",
         });
       }
       // let response;
-      let response = await fetch("https://x-changer.herokuapp.com/api/v1/featureAd/pakages", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then(async (res) => {
-        try {
-          return await res.json();
-        } catch (err) {
-          console.log("error");
-          console.log(err);
+      let response = await fetch(
+        "https://x-changer.herokuapp.com/api/v1/featureAd/pakages",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
         }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      let pakages =  response.data;
-      console.log('pakages',  pakages);
+      )
+        .then(async (res) => {
+          try {
+            return await res.json();
+          } catch (err) {
+            console.log("error");
+            console.log(err);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      let pakages = response.data;
+      console.log("pakages", pakages);
       const adPakage = pakages.find((pakage) => {
-        if(pakage.id === req.body.id)
-          return pakage
-        
-      })
+        if (pakage.id === req.body.id) return pakage;
+      });
       console.log(adPakage);
       const featureAd = await FeatureAd.create({
         user: req.user.id,
         AddTitle: adPakage.title,
         description: adPakage.description,
         price: adPakage.price,
-        noOfDays: adPakage.days
+        noOfDays: adPakage.days,
       });
-      featureAd.expirationDate = (moment(featureAd.createdAt).add(featureAd.noOfDays, 'd')).toDate();
+      featureAd.expirationDate = moment(featureAd.createdAt)
+        .add(featureAd.noOfDays, "d")
+        .toDate();
       console.log(featureAd.expirationDate);
       await featureAd.save();
       product.featureAd = featureAd.id;
-      product.adType = 'featured';
-      await product.save().then(product => product.populate("featureAd").execPopulate());
+      product.adType = "featured";
+      await product
+        .save()
+        .then((product) => product.populate("featureAd").execPopulate());
 
-      let min = moment(featureAd.expirationDate, 'HH:MM').minutes();
-      let hour = moment(featureAd.expirationDate, 'HH:MM').hours();
-      let day = moment(featureAd.expirationDate).format('D');
-      let month = moment(featureAd.expirationDate).format('M');
-      let year = moment(featureAd.expirationDate).format('Y');
+      let min = moment(featureAd.expirationDate, "HH:MM").minutes();
+      let hour = moment(featureAd.expirationDate, "HH:MM").hours();
+      let day = moment(featureAd.expirationDate).format("D");
+      let month = moment(featureAd.expirationDate).format("M");
+      let year = moment(featureAd.expirationDate).format("Y");
 
-      console.log(min, (hour), day, month, year)
+      console.log(min, hour, day, month, year);
 
-      let modifyAd = schedule.scheduleJob(`${min} ${hour} ${day} ${month} *`, async () => {
-          console.log('Cron job executed.')
+      let modifyAd = schedule.scheduleJob(
+        `${min} ${hour} ${day} ${month} *`,
+        async () => {
+          console.log("Cron job executed.");
           const ad = await FeatureAd.findByIdAndDelete(featureAd.id);
-          product.adType = 'normal';
+          product.adType = "normal";
           product.featureAd = undefined;
           await product.save();
-          });
-    return res.status(200).json({
-        status: 'success',
-        message: 'Product is featured',
-        data: product
+        }
+      );
+      return res.status(200).json({
+        status: "success",
+        message: "Product is featured",
+        data: product,
       });
     }
   } catch (err) {
@@ -1008,7 +1022,7 @@ exports.createFeaturedProduct = async (req, res) => {
 };
 
 exports.getFeaturedPosts = async (req, res) => {
-  try{
+  try {
     const featuredPosts = await Product.aggregate([
       {
         $lookup: {
@@ -1016,24 +1030,23 @@ exports.getFeaturedPosts = async (req, res) => {
           localField: "featureAd",
           foreignField: "_id",
           as: "featureAd",
-        }
+        },
       },
       {
-        $unwind: "$featureAd"
+        $unwind: "$featureAd",
       },
       {
         $sort: {
-          createdAt: -1
-        }
-      }                               
+          createdAt: -1,
+        },
+      },
     ]);
     // await Product.populate(featuredPosts, {path: "user", path: "category"});
 
-    if(!featuredPosts || featuredPosts.length < 1)
-    {
+    if (!featuredPosts || featuredPosts.length < 1) {
       return res.status(400).json({
         status: "fail",
-        message: 'No featured posts to show',
+        message: "No featured posts to show",
       });
     }
     console.log(featuredPosts.length);
@@ -1042,7 +1055,6 @@ exports.getFeaturedPosts = async (req, res) => {
       status: "success",
       data: featuredPosts,
     });
-
   } catch (err) {
     return res.status(400).json({
       status: "fail",
@@ -1052,25 +1064,23 @@ exports.getFeaturedPosts = async (req, res) => {
 };
 
 exports.getUserProducts = async (req, res) => {
-  try { 
-    let userPosts;   
-    if(req.query.flag) {
+  try {
+    let userPosts;
+    if (req.query.flag) {
       let flag = req.query.flag;
       userPosts = await Product.find({ user: { $in: req.params.userId }, flag })
-      .sort({"createdAt": -1})
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
-      
-    }
-    else 
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
+    } else
       userPosts = await Product.find({ user: { $in: req.params.userId } })
-      .sort({"createdAt": -1})
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
     if (!userPosts) {
       res.status(400).json({
         status: "fail",
@@ -1093,11 +1103,10 @@ exports.getUserProducts = async (req, res) => {
 exports.getAllProduct = async (req, res) => {
   let searchCriteria = {
     status: "Not sold",
-    adType: { $in: [ "normal", "featured" ]  } 
+    adType: { $in: ["normal", "featured"] },
   };
   let sortingQuery = {};
   if (req.query.title) {
-
     searchCriteria.title = new RegExp(
       ".*" + req.query.title.toLowerCase() + ".*",
       "i"
@@ -1173,12 +1182,12 @@ exports.getAllProduct = async (req, res) => {
   }
 
   if (req.query.color) {
-    var array = req.query.color.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+    var array = req.query.color.replace(/[\[\]]+/g, "").split(/[\s,]+/);
     searchCriteria.color = array;
   }
 
   if (req.query.subject) {
-    var array = req.query.subject.replace(/[\[\]]+/g,'').split(/[\s,]+/);
+    var array = req.query.subject.replace(/[\[\]]+/g, "").split(/[\s,]+/);
     searchCriteria.subject = array;
   }
 
@@ -1189,7 +1198,7 @@ exports.getAllProduct = async (req, res) => {
     );
   }
 
-  if(req.query.flag) {
+  if (req.query.flag) {
     searchCriteria.flag = req.query.flag;
   }
 
@@ -1213,7 +1222,7 @@ exports.getAllProduct = async (req, res) => {
       sortingQuery = {
         createdAt: -1,
       };
-    } 
+    }
     // else if (req.query.sortingOrder.toLowerCase() === "sale") {
     // }
   }
@@ -1223,18 +1232,18 @@ exports.getAllProduct = async (req, res) => {
     var sortingOrder = req.query.sortingOrder;
     sortingQuery[sortBy] = sortingOrder;
   } else {
-    sortingQuery = { adType:1, "createdAt": -1 }
+    sortingQuery = { adType: 1, createdAt: -1 };
   }
-  searchCriteria.adType = { $in: [ "normal", "featured" ]  }
+  searchCriteria.adType = { $in: ["normal", "featured"] };
   console.log(searchCriteria);
 
   if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria)
-    .populate("category")
-    .populate("subCategoryId")
-    .populate("subCategoryOptionId")
-    .populate("user")
-    .sort(sortingQuery);
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user")
+      .sort(sortingQuery);
     return res.status(200).json({
       status: "success",
       length: allProduct.length,
@@ -1243,13 +1252,13 @@ exports.getAllProduct = async (req, res) => {
   } else {
     const allProduct = await Product.find({
       status: "Not sold",
-      adType: { $in: [ "normal", "featured" ]  } 
+      adType: { $in: ["normal", "featured"] },
     })
-    .sort({adType: 1, createdAt: -1})
-    .populate("category")
-    .populate("subCategoryId")
-    .populate("subCategoryOptionId")
-    .populate("user");
+      .sort({ adType: 1, createdAt: -1 })
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
     if (!allProduct) {
       return res.status(400).json({
         status: "fail",
@@ -1267,11 +1276,11 @@ exports.getAllProduct = async (req, res) => {
 exports.getSpecificProductDetail = async (req, res) => {
   try {
     const specificProduct = await Product.findById(req.params.productId)
-    .populate("category")
-    .populate("subCategoryId")
-    .populate("subCategoryOptionId")
-    .populate("user");
-    
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user");
+
     if (!specificProduct) {
       return res.status(400).json({
         status: "fail",
@@ -1326,11 +1335,16 @@ exports.updateProducts = async (req, res) => {
     }
 
     if (updates.price) {
-      
-
       updates.price = {
-        ...product.price,
         orignalPrice: updates.price.orignalPrice
+          ? updates.price.orignalPrice
+          : product.price.orignalPrice,
+        sellingPrice: updates.price.sellingPrice
+          ? updates.price.sellingPrice
+          : product.price.sellingPrice,
+        immediate_purchase_price: updates.price.immediate_purchase_price
+          ? updates.price.immediate_purchase_price
+          : product.price.immediate_purchase_price,
       };
     }
 
@@ -1565,14 +1579,14 @@ exports.updateRating = async (req, res) => {
 exports.getRandomProducts = async (req, res) => {
   try {
     let product = await Product.find({ flag: "Approved" })
-    .populate("category")
-    .populate("subCategoryId")
-    .populate("subCategoryOptionId")
-    .populate("user")
-    .limit(10)
-    .sort({"createdAt": -1});
+      .populate("category")
+      .populate("subCategoryId")
+      .populate("subCategoryOptionId")
+      .populate("user")
+      .limit(10)
+      .sort({ createdAt: -1 });
 
-    if (!product || product.length<1) {
+    if (!product || product.length < 1) {
       return res.status(400).json({
         status: "fail",
         message: "No random products to show",
@@ -1599,13 +1613,13 @@ exports.getProductByTitle = async (req, res) => {
     if (req.query.flag) {
       let flag = req.query.flag;
       product = await Product.find({ title: req.params.title, flag })
-      .populate("category")
-      .populate("subCategoryId")
-      .populate("subCategoryOptionId")
-      .populate("user");
+        .populate("category")
+        .populate("subCategoryId")
+        .populate("subCategoryOptionId")
+        .populate("user");
     }
     product = await Product.find({ title: req.params.title })
-    .populate("category")
+      .populate("category")
       .populate("subCategoryId")
       .populate("subCategoryOptionId")
       .populate("user");
