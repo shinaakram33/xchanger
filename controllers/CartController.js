@@ -18,7 +18,6 @@ exports.createCart = async (req, res, next) => {
      });
     }
     if(JSON.stringify(req.user.id) === JSON.stringify(product.user)) {
-      console.log("in");
       return res.status(400).json({
         status: 'fail',
         message: 'You do not have permission to do this',
@@ -26,13 +25,11 @@ exports.createCart = async (req, res, next) => {
     }
     const alreadyExist = await Cart.findOne({ user: req.user.id });
     if (!alreadyExist) {
-      console.log('creating new cart');
       await Cart.create({
         user: req.user.id,
         products: req.body.products,
       });
     } else {
-      console.log('matching items of  cart');
       check = alreadyExist.products.find((i) => {
         if(i.toString() === req.body.products)
           return true;
@@ -57,7 +54,6 @@ exports.createCart = async (req, res, next) => {
       message: 'Added into Cart successfully',
     });
   } catch (err) {
-    console.log(err);
     return res.status(400).json({
       status: 'fail',
       message: err.message,
@@ -84,13 +80,11 @@ exports.createAnotherCart = async (req, res, next) => {
     }
     const alreadyExist = await Cart.findOne({ user: req.body.userId });
     if (!alreadyExist) {
-      console.log('creating new cart');
       await Cart.create({
         user: req.body.userId,
         products: req.body.products,
       });
     } else {
-      console.log('matching items of  cart');
       check = alreadyExist.products.find((i) => {
         if(i.toString() === req.body.products)
           return true;
@@ -115,7 +109,6 @@ exports.createAnotherCart = async (req, res, next) => {
       message: 'Added into Cart successfully',
     });
   } catch (err) {
-    console.log(err);
     return res.status(400).json({
       status: 'fail',
       message: err.message,
@@ -176,7 +169,6 @@ exports.removeProductFromCart = async (req, res) => {
 
 exports.selectedProductFromCart = async (req, res, next) => {
   try {
-    console.log(req.body);
     const cart = await Cart.findOne({ user: req.user.id });
     if (cart._id.toString() !== req.params.cartId) {
       return res.status(400).json({
@@ -186,14 +178,11 @@ exports.selectedProductFromCart = async (req, res, next) => {
     }
     let soldProducts = [];
     req.body.selectedProducts.forEach(async (p) => {
-      console.log(p);
       let product = await Product.findById(p)
       if(product.status === 'Sold') {
-        console.log('status sold');
         soldProducts.push(p);
       }
     });
-    console.log(soldProducts.length, soldProducts);
     if(soldProducts.length > 0) {
       return res.status(400).json({
         status: 'fail',
@@ -219,12 +208,6 @@ exports.selectedProductFromCart = async (req, res, next) => {
 exports.getSelectedProductFromCart = async (req, res, next) => {
   try {
     const cart = await Cart.findById(req.params.cartId).populate('selectedProducts').select('-products');
-    // if (cart.user !== req.user.id) {
-    //   return res.status(400).json({
-    //     status: 'fail',
-    //     message: 'You dont have an access to perform this action',
-    //   });
-    // }
     if (!cart) {
       return res.status(400).json({
         status: 'fail',

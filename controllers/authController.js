@@ -15,7 +15,6 @@ const signToken = (id) => {
 exports.signup = async (req, res) => {
   try {
     let email = req.body.email.trim().toLowerCase();
-    console.log(email);
     const alreadyExistEmail = await User.findOne({ email });
     if (alreadyExistEmail) {
       return res.status(404).json({
@@ -29,7 +28,6 @@ exports.signup = async (req, res) => {
         password: req.body.password
       });
       const token = signToken(newUser._id);
-      console.log(newUser);
       res.status(201).json({
         status: 'success',
         token,
@@ -73,9 +71,7 @@ exports.login = async (req, res) => {
         message: 'Please provide email and password',
       });
     }
-    console.log(email, password);
     let userEmail = req.body.email.trim().toLowerCase();
-    console.log(userEmail);
     const user = await User.findOne({ email: userEmail });
     if (!user) {
       return res.status(401).json({
@@ -84,7 +80,6 @@ exports.login = async (req, res) => {
       });
     }
     // const user = await User.findOne({ email: email }).select('password');
-    console.log(user);
     const correctPassword = await user.correctPassword(password, user.password);
     if (!correctPassword) {
       return res.status(401).json({
@@ -93,7 +88,6 @@ exports.login = async (req, res) => {
       });
     }
     const token = signToken(user._id);
-    console.log(token);
     res.status(200).json({
       status: 'success',
       token,
@@ -118,21 +112,6 @@ exports.updateUser = async (req, res) => {
         message: 'User does not exist',
       });
     }
-
-    // if(updates.sellerRating){
-    //   let dummyrating;
-    //   if(!user.sellerRating){
-    //     dummyrating = 0;
-    //   }else{
-    //     dummyrating = user.sellerRating;
-    //   }
-      
-    //   let prevRating = dummyrating;
-    
-    //   let newRating = (prevRating + updates.sellerRating)/2;
-
-    //   updates.sellerRating = newRating;
-    // }
 
     const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true
@@ -203,7 +182,6 @@ exports.restrictTo = (...roles) => {
 exports.forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
     let userEmail = req.body.email.trim().toLowerCase();
     const user = await User.findOne({ email: userEmail });
     if (!user) {
@@ -320,7 +298,6 @@ exports.resetPassword = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
-    console.log('user', user);
     if (!user) {
       return res.status(400).json({
         status: 'fail',
@@ -359,9 +336,7 @@ exports.changePassword = async (req, res) => {
 exports.updatePrivacteStatus = async (req, res) => {
   try {
     let {userId, status} = req.body;
-    console.log(userId, status);
     const user = await User.findById(userId);
-    console.log(user);
     if (!user) {
       res.status(400).json({
         status: 'fail',
@@ -370,7 +345,6 @@ exports.updatePrivacteStatus = async (req, res) => {
     }
     
     let updatedUser = await User.findOneAndUpdate(userId, { privateStatus: status });
-    console.log(updatedUser);
 
     res.send(200).json({
       status: 'successful',
@@ -513,8 +487,6 @@ exports.rateSeller = async (req, res) => {
         message: 'User does not exist',
       });
     }
-    console.log(user);
-    console.log(req.body)
 
     if (!req.body.sellerRating) {
       return res.status(400).json({

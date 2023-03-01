@@ -150,7 +150,6 @@ exports.updatebidding = async (req, res) => {
     }
 
     const updatedbidding = await Bidding.findByIdAndUpdate(biddingid, updates, options);
-    console.log('ssssssssss', updatedbidding);
     res.status(200).json({
       status: 'success',
       message: 'product is updated successfully',
@@ -233,6 +232,5 @@ exports.deletebidding = async (req, res) => {
       message: 'Product delete successfully',
     });
   } catch (error) {
-    console.log(message.error);
   }
 };

@@ -26,7 +26,6 @@ const orderSchema = new mongoose.Schema(
     cartId: {
       type: mongoose.Schema.ObjectId,
       ref: "Cart",
-      //required: [true, 'Cart id is required'],
     },
     checkoutId: {
       type: String,
@@ -56,11 +55,9 @@ const orderSchema = new mongoose.Schema(
     },
     orderNumber: {
       type : String,
-      // required: [true, "Order number is mandatory."],
     },
     shippingFee: {
       type: Number,
-      // required: [true, 'Shipping fee is required'],
     },
   },
   { timestamps: true }

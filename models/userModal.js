@@ -94,8 +94,6 @@ userSchema.methods.createResetPasswordToken = function () {
   this.passwordResetToken = resetToken;
   // this.passwordResetToken = await bycript.hash(resetToken, 12);
   this.passwordResetTokenExpire = Date.now() + 10 * 60 * 1000;
-  console.log('resetPasswordTokenBeforeHash', resetToken);
-  console.log('resetPasswordTokenAfterHash', this.passwordResetToken);
   return resetToken;
 };
 

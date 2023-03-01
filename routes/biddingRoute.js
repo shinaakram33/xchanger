@@ -21,5 +21,4 @@ router
   .route('/product/:productId')
   .put(protected, restrictTo('admin'), updateByAdmin)
   .get(protected, getAllSpecificBidProduct);
-// router.route('/status/:statusId').get(protected, getAllPostedstatus);
 module.exports = router;

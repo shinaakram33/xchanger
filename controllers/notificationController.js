@@ -37,12 +37,10 @@ exports.getAllUserNotifications = async (req, res) => {
         message: "No Notifications Found For This User",
       });
     }
-    console.log("notifications", notifications);
     let countOfFalseNotification = await Notification.countDocuments({
       status: false,
       user: userId,
     });
-    console.log("notifications ", notifications);
     res.status(200).json({
       status: "success",
       count: countOfFalseNotification,
@@ -73,7 +71,6 @@ exports.updateNotificationStatus = async (req, res) => {
       { status: true }
     );
 
-    console.log(updatedNotification);
 
     res.status(200).json({
       status: "Notification status Updated",
@@ -90,7 +87,6 @@ exports.updateNotificationStatus = async (req, res) => {
 exports.updateAllNotificationStatus = async (req, res) => {
   try {
     let notifications = req.body.notificationIds;
-    console.log(notifications);
 
     let updatedNotification = await Notification.updateMany(
       {
@@ -105,7 +101,6 @@ exports.updateAllNotificationStatus = async (req, res) => {
       }
     );
 
-    console.log(updatedNotification);
 
     res.status(200).json({
       status: "Notification status Updated",

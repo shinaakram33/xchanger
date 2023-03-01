@@ -1,0 +1,18 @@
+{
+	"info": {
+		"_postman_id": "924b112c-00e5-4c8d-a46b-6f6e6cfe5f26",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13922165"
+	},
+	"item": [
+		{
+			"name": "Get Car By ID",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

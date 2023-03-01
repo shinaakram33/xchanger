@@ -27,11 +27,10 @@ exports.createSubject = async (req, res) => {
 exports.getSubjects = async (req, res) => {
   try {
     const allSubjects = await Subject.find();
-    console.log(allSubjects.findIndex((object => {return object.name === 'Other'})));
+
     let other;
     if(allSubjects.findIndex((object => {return object.name === 'Other'})) >= 0)
       other = allSubjects.splice(allSubjects.findIndex((object => {return object.name === 'Other'})), 1);
-    console.log(other[0]);
     allSubjects.sort(function(a, b) {
       if(a.name < b.name) return -1;
       if(b.name < a.name) return 1;  
@@ -61,11 +60,9 @@ exports.getSubjectsBySubCategory = async (req, res) => {
     }
     const allSubjects = await Subject.find({subCategoryId: req.params.subCategoryId });
 
-    console.log(allSubjects.findIndex((object => {return object.name === 'Other'})));
     let other;
     if(allSubjects.findIndex((object => {return object.name === 'Other'})) >= 0)
       other = allSubjects.splice(allSubjects.findIndex((object => {return object.name === 'Other'})), 1);
-    console.log(other[0]);
     allSubjects.sort(function(a, b) {
       if(a.name < b.name) return -1;
       if(b.name < a.name) return 1;  

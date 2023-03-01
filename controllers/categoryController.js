@@ -43,7 +43,6 @@ exports.updatecategory = async (req, res) => {
     const updates = req.body;
     const options = { new: true };
     const category = await Category.findById(req.params.categoryId);
-    console.log(category);
     if (!category) {
       res.status(400).json({
         status: 'fail',
@@ -82,6 +81,5 @@ exports.deletecategory = async (req, res) => {
       message: 'category is delete successfully',
     });
   } catch (error) {
-    console.log(message.error);
   }
 };

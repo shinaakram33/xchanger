@@ -2,10 +2,6 @@ var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 const ChatSchema = new Schema({
-  // _id: {
-  //   type: String,
-  //   required: true
-  // },
   chat_room_id: {
     type: String,
     required: true,

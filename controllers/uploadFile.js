@@ -1,7 +1,6 @@
 const s3 = require('../config/s3.config');
 
 const fileFilter = (file) => {
-  console.log('file.mimetype', file.mimetype);
   if (
     file.mimetype == 'image/jpeg' ||
     file.mimetype == 'image/png' ||
@@ -15,8 +14,6 @@ const fileFilter = (file) => {
 };
 
 exports.uploadFile = async (req, res) => {
-  console.log('in file upload');
-  console.log(req.files);
   const files = req.files;
   if (!files || files.length < 1) {
     res.status(400).json({
@@ -30,11 +27,9 @@ exports.uploadFile = async (req, res) => {
     var count = 0;
     files.map(async (item) => {
       if (!fileFilter(item)) {
-        console.log('invalid file');
         count++;
         errors.push('Invalid file format, must be jpeg, jpg or png');
       } else {
-        console.log('valid file');
         var params = {
           Bucket: process.env.BUCKET,
           Key: 'app/' + item.originalname,

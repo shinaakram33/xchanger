@@ -42,66 +42,9 @@ exports.createProduct = async (req, res) => {
         message: "Please provide body of a product",
       });
     }
-    // if (req.body.adType === 'featured') {
-    //   if (!req.body.adPrice) {
-    //     return res.status(400).json({
-    //       status: 'fail',
-    //       message: 'Please provide checkout price for posting an ad',
-    //     });
-    //   }
-    //   const charge = await stripe.charges.create({
-    //     amount: req.body.adPrice * 100,
-    //     currency: 'usd',
-    //     source: req.body.source,
-    //   });
-    //   if (charge.paid) {
-    //     const newProduct = await Product.create({
-    //       name: req.body.name,
-    //       price: req.body.price,
-    //       image: req.body.image,
-    //       condition: req.body.condition,
-    //       color: req.body.color,
-    //       description: req.body.description,
-    //       adType: req.body.adType,
-    //       category: req.params.categoryId,
-    //       user: req.user.id,
-    //       checkoutId: charge.balance_transaction,
-    //     });
-    //     res.status(201).json({
-    //       status: 'success',
-    //       product: newProduct,
-    //     });
-    //   }
-    // } else {
 
-    console.log("here", req.body, req.params);
-    // const obj_ = {
-    //   price: req.body.price,
-    //   priceNegotiation: req.body.priceNegotiation,
-    //   color: req.body.color,
-    //   size: req.body.size,
-    //   country: req.body.country,
-    //   season: req.body.season,
-    //   condition: req.body.condition,
-    //   image: req.body.image,
-    //   brand: req.body.brand,
-    //   subject: req.body.subject,
-    //   title: req.body.title,
-    //   description: req.body.description,
-    //   category: req.params.categoryId,
-    //   categoryName: req.body.categoryName,
-    //   subCategoryId: req.params.subCategoryId,
-    //   subCategoryOptionId: req.params.subCategoryOptionId,
-    //   user: req.user.id,
-    //   time: req.body.time,
-    //   pakageSize: obj[req.body.pakageSize],
-    // }
-    // console.log('after object');
-    // console.log(obj_);
-    console.log(req.user.id);
 
     const pkgSize = obj[req.body.pakageSize];
-    console.log(pkgSize);
     const newProduct = await Product.create({
       price: req.body.price,
       priceNegotiation: req.body.priceNegotiation,
@@ -123,7 +66,6 @@ exports.createProduct = async (req, res) => {
       time: req.body.time,
       pakageSize: pkgSize,
     });
-    console.log(newProduct);
     res.status(201).json({
       status: "success",
       message: "Product has been Created Successfully",
@@ -139,8 +81,6 @@ exports.createProduct = async (req, res) => {
 
 exports.getCategoryFilteredProduct = async (req, res) => {
   try {
-    console.log(req.params);
-    console.log(req.query);
     let searchCriteria = {
       status: "Not sold",
     };
@@ -180,8 +120,6 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       };
     }
     if (req.query.season) {
-      // let season = (req.query.season.charAt(0).toUpperCase() + req.query.season.slice(1).toLowerCase());
-      // console.log(season);
       searchCriteria.season = new RegExp(
         ".*" + req.query.season.toLowerCase() + ".*",
         "i"
@@ -211,7 +149,6 @@ exports.getCategoryFilteredProduct = async (req, res) => {
 
     if (req.query.color) {
       var array = req.query.color.replace(/[\[\]]+/g, "").split(/[\s,]+/);
-      console.log(array);
       searchCriteria.color = { $in: array };
     }
 
@@ -252,8 +189,7 @@ exports.getCategoryFilteredProduct = async (req, res) => {
           createdAt: -1,
         };
       }
-      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
-      // }
+      
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -261,7 +197,6 @@ exports.getCategoryFilteredProduct = async (req, res) => {
       var sortingOrder = req.query.sortingOrder;
       sortingQuery[sortBy] = sortingOrder;
     }
-    console.log(searchCriteria, sortingQuery);
     if (Object.keys(req.query).length !== 0) {
       const products = await Product.find(searchCriteria)
         .populate("category")
@@ -275,7 +210,6 @@ exports.getCategoryFilteredProduct = async (req, res) => {
         data: products,
       });
     } else {
-      console.log(searchCriteria);
       const products = await Product.find({
         category: req.params.categoryId,
         subCategoryId: req.params.subCategoryId,
@@ -400,8 +334,6 @@ exports.getCategoryProduct = async (req, res) => {
           createdAt: -1,
         };
       }
-      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
-      // }
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -410,7 +342,6 @@ exports.getCategoryProduct = async (req, res) => {
       sortingQuery[sortBy] = sortingOrder;
     }
     if (Object.keys(req.query).length !== 0) {
-      console.log(searchCriteria, sortingQuery);
       products = await Product.find(searchCriteria)
         .populate("category")
         .populate("subCategoryId")
@@ -463,7 +394,6 @@ exports.createBiddingProduct = async (req, res) => {
       },
     };
     const pkgSize = obj[req.body.pakageSize];
-    console.log(pkgSize);
 
     const newProduct = await Product.create({
       price: req.body.price,
@@ -491,41 +421,32 @@ exports.createBiddingProduct = async (req, res) => {
       pakageSize: pkgSize,
     });
 
-    console.log(newProduct.date_for_auction);
-
     let min = moment(newProduct.date_for_auction.ending_date).minutes();
     let hour = moment(newProduct.date_for_auction.ending_date).hours();
     let day = moment(newProduct.date_for_auction.ending_date).format("D");
     let month = moment(newProduct.date_for_auction.ending_date).format("M");
     let year = moment(newProduct.date_for_auction.ending_date).format("Y");
 
-    console.log(min, hour, day, month, year);
     let newJob = schedule.scheduleJob(
       `${min} ${hour} ${day} ${month} *`,
       async () => {
-        console.log("Cron job executed.");
         let allBidsOfProduct = await PlaceBid.find({
           product: newProduct.id,
         }).sort({ price: -1, createdAt: -1 });
-        console.log(allBidsOfProduct.length, allBidsOfProduct);
 
         if (allBidsOfProduct.length <= 0) {
           newProduct.status = "Dismissed";
           await newProduct.save();
-          console.log(newProduct);
         } else {
           let highestBid = allBidsOfProduct.shift();
-          console.log("highest", highestBid);
           highestBid.succeeded = true;
           highestBid.status = "Succeeded";
           await highestBid.save();
-          console.log("highest after save", highestBid);
 
           const paymentIntentCapture = await stripe.paymentIntents.capture(
             highestBid.intentId
           );
           if (paymentIntentCapture.status === "succeeded") {
-            console.log("status ", paymentIntentCapture.status);
 
             const order = await Order.create({
               name: highestBid.orderDetails.name,
@@ -540,7 +461,6 @@ exports.createBiddingProduct = async (req, res) => {
               productId: newProduct.id,
               shippingFee: highestBid.orderDetails.shippingFee,
             }).then((o) => o.populate("productId").execPopulate());
-            console.log("Order", order);
             newProduct.status = "Sold";
             await newProduct.save();
 
@@ -556,7 +476,6 @@ exports.createBiddingProduct = async (req, res) => {
 
             let recentView = await RecentView.findOne({ user: req.user.id });
             if (recentView) {
-              console.log("updating");
               await RecentView.updateOne(
                 {
                   user: req.user.id,
@@ -574,7 +493,6 @@ exports.createBiddingProduct = async (req, res) => {
                 { $pull: { products: { $in: order.productId } } }
               );
             }
-            console.log("after save", newProduct.status);
 
             let userData = {
               user: highestBid.user,
@@ -590,56 +508,14 @@ exports.createBiddingProduct = async (req, res) => {
               .then(async (res) => {
                 try {
                   const dataa = await res.json();
-                  console.log("response data?", dataa);
                 } catch (err) {
-                  console.log("error");
-                  console.log(err);
                 }
               })
               .catch((error) => {
-                console.log(error);
               });
-            console.log(paymentIntentCapture);
 
             //make payment to seller
             const productSeller = await User.findById(newProduct.user);
-            console.log(productSeller);
-
-            // try{
-            //       let transfer = await stripe.transfers.create({
-            //       amount: Math.round(highestBid.price * 100),
-            //       currency: 'CHF',
-            //       destination: productSeller.connAccount.id,
-            //       source_transaction: paymentIntentCapture.charges.data[0].id,
-            //     });
-            //     console.log(transfer);
-            //   } catch (err) {
-            //     console.log(err);
-            // let admin = User.findOne({roles: 'admin'});
-            //   let data = {
-            //     user: admin.id,
-            //     product: newProduct.id,
-            //     text: `Transfer unsuccessful: Seller: ${newProduct.user}, Amount: ${newProduct.price}, Order: ${order.id}`,
-            //   };
-
-            //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-            //     method: "POST",
-            //     body: JSON.stringify(data),
-            //     headers: { "Content-Type": "application/json" },
-            //   })
-            //     .then(async (res) => {
-            //       try {
-            //         const dataa = await res.json();
-            //         console.log("response data?", dataa);
-            //       } catch (err) {
-            //         console.log("error");
-            //         console.log(err);
-            //       }
-            //     })
-            //     .catch((error) => {
-            //       console.log(error);
-            //     });
-            // }
 
             let sellerData = {
               user: newProduct.user,
@@ -655,14 +531,10 @@ exports.createBiddingProduct = async (req, res) => {
               .then(async (res) => {
                 try {
                   const dataa = await res.json();
-                  console.log("response data?", dataa);
                 } catch (err) {
-                  console.log("error");
-                  console.log(err);
                 }
               })
               .catch((error) => {
-                console.log(error);
               });
           } else {
             return res.status(400).json({
@@ -681,7 +553,6 @@ exports.createBiddingProduct = async (req, res) => {
         let failedBidUsers = await PlaceBid.distinct("user", {
           product: newProduct.id,
         });
-        console.log("failedBidUsers", failedBidUsers);
         failedBidUsers.forEach((user) => {
           let data = {
             user: user,
@@ -697,14 +568,10 @@ exports.createBiddingProduct = async (req, res) => {
             .then(async (res) => {
               try {
                 const dataa = await res.json();
-                console.log("response data?", dataa);
               } catch (err) {
-                console.log("error");
-                console.log(err);
               }
             })
             .catch((error) => {
-              console.log(error);
             });
         });
       }
@@ -867,8 +734,6 @@ exports.getBiddingProducts = async (req, res) => {
           createdAt: -1,
         };
       }
-      // else if (req.query.sortingOrder.toLowerCase() === "sale") {
-      // }
     }
 
     if (req.query.sortBy && req.query.sortingOrder) {
@@ -958,19 +823,14 @@ exports.createFeaturedProduct = async (req, res) => {
           try {
             return await res.json();
           } catch (err) {
-            console.log("error");
-            console.log(err);
           }
         })
         .catch((error) => {
-          console.log(error);
         });
       let pakages = response.data;
-      console.log("pakages", pakages);
       const adPakage = pakages.find((pakage) => {
         if (pakage.id === req.body.id) return pakage;
       });
-      console.log(adPakage);
       const featureAd = await FeatureAd.create({
         user: req.user.id,
         AddTitle: adPakage.title,
@@ -981,7 +841,6 @@ exports.createFeaturedProduct = async (req, res) => {
       featureAd.expirationDate = moment(featureAd.createdAt)
         .add(featureAd.noOfDays, "d")
         .toDate();
-      console.log(featureAd.expirationDate);
       await featureAd.save();
       product.featureAd = featureAd.id;
       product.adType = "featured";
@@ -995,12 +854,10 @@ exports.createFeaturedProduct = async (req, res) => {
       let month = moment(featureAd.expirationDate).format("M");
       let year = moment(featureAd.expirationDate).format("Y");
 
-      console.log(min, hour, day, month, year);
 
       let modifyAd = schedule.scheduleJob(
         `${min} ${hour} ${day} ${month} *`,
         async () => {
-          console.log("Cron job executed.");
           const ad = await FeatureAd.findByIdAndDelete(featureAd.id);
           product.adType = "normal";
           product.featureAd = undefined;
@@ -1041,7 +898,7 @@ exports.getFeaturedPosts = async (req, res) => {
         },
       },
     ]);
-    // await Product.populate(featuredPosts, {path: "user", path: "category"});
+    
 
     if (!featuredPosts || featuredPosts.length < 1) {
       return res.status(400).json({
@@ -1049,7 +906,6 @@ exports.getFeaturedPosts = async (req, res) => {
         message: "No featured posts to show",
       });
     }
-    console.log(featuredPosts.length);
 
     return res.status(200).json({
       status: "success",
@@ -1111,42 +967,7 @@ exports.getAllProduct = async (req, res) => {
       ".*" + req.query.title.toLowerCase() + ".*",
       "i"
     );
-    // searchCriteria = {
-    //   $or: [
-    //     {
-    //       title: {
-    //         regex: new RegExp(
-    //           ".*" + req.query.search.toLowerCase() + ".*",
-    //           "i"
-    //         ),
-    //       },
-    //     },
-    //     {
-    //       brand: {
-    //         regex: new RegExp(
-    //           ".*" + req.query.search.toLowerCase() + ".*",
-    //           "i"
-    //         ),
-    //       },
-    //     },
-    //     {
-    //       subject: {
-    //         regex: new RegExp(
-    //           ".*" + req.query.search.toLowerCase() + ".*",
-    //           "i"
-    //         ),
-    //       },
-    //     },
-    //     {
-    //       season: {
-    //         regex: new RegExp(
-    //           ".*" + req.query.search.toLowerCase() + ".*",
-    //           "i"
-    //         ),
-    //       },
-    //     },
-    //   ],
-    // };
+    
   }
   if (req.query.condition) {
     searchCriteria = {
@@ -1223,8 +1044,6 @@ exports.getAllProduct = async (req, res) => {
         createdAt: -1,
       };
     }
-    // else if (req.query.sortingOrder.toLowerCase() === "sale") {
-    // }
   }
 
   if (req.query.sortBy && req.query.sortingOrder) {
@@ -1235,7 +1054,6 @@ exports.getAllProduct = async (req, res) => {
     sortingQuery = { adType: 1, createdAt: -1 };
   }
   searchCriteria.adType = { $in: ["normal", "featured"] };
-  console.log(searchCriteria);
 
   if (Object.keys(req.query).length !== 0) {
     const allProduct = await Product.find(searchCriteria)
@@ -1313,12 +1131,6 @@ exports.updateProducts = async (req, res) => {
         message: "product does not exist",
       });
     }
-    // if (product.user.toString() !== req.user.id) {
-    //   return res.status(400).json({
-    //     status: 'fail',
-    //     message: 'You do not have an access to update this product',
-    //   });
-    // }
 
     if (updates.rating) {
       if (!product.rating) {
@@ -1358,20 +1170,7 @@ exports.updateProducts = async (req, res) => {
       message: "Product is updated successfully",
       data: updatedProduct,
     });
-    //console.log(updatedProduct)
-    // if (updatedProduct.featureAd != null && updatedProduct.featureAd != 'undefined' && req.body.featureAd) {
-    //   const specificFeatureAd = await featureAd.findById(updatedProduct.featureAd);
-    //   const numberOfDays = specificFeatureAd.noOfDays;
-    //   const timing = `00 00 00 ${numberOfDays} * *`;
-    //   console.log(timing);
-    //   var task = cron.schedule(timing, () => {
-    //     console.log('do now something that i want!');
-    //   });
-    //   console.log('Cron-Job Task', task);
-    //   console.log(numberOfDays);
-    // } else {
-    //   console.log('my name is khan!');
-    // }
+    
   } catch (error) {
     res.status(400).json({
       status: "fail",
@@ -1411,16 +1210,13 @@ exports.deleteProducts = async (req, res) => {
 
 exports.scheduleAndAddToCart = async (req, res) => {
   try {
-    console.log("Hello");
     let { productId } = req.params;
     let product = await Product.findById(productId);
     let updatedProduct = await Product.findOneAndUpdate(req.params.productId, {
       status: "Not Sold",
     });
-    console.log(updatedProduct);
 
     let bidProducts = await PlaceBid.find({ product: productId });
-    console.log(bidProducts);
     let userId = req.user.id;
     let dateFromDb = new Date(product.time.endingTime);
 
@@ -1428,12 +1224,9 @@ exports.scheduleAndAddToCart = async (req, res) => {
     let m = dateFromDb.getMinutes();
     let d = dateFromDb.getDate();
 
-    console.log(h, m, d);
 
     let date = { date: d, hour: h, minute: m };
-    console.log(date);
     var job = schedule.scheduleJob(date, () => {
-      console.log("time");
       let max = 0;
       let IdOfMaxBidUser;
       if (bidProducts) {
@@ -1449,7 +1242,6 @@ exports.scheduleAndAddToCart = async (req, res) => {
             message: "Max Bided price is less then mininmum price",
           });
         }
-        console.log("Times Up");
         async function addToCart() {
           let alreadyExist = await Cart.findOne({ user: IdOfMaxBidUser });
           if (alreadyExist) {
@@ -1478,9 +1270,7 @@ exports.scheduleAndAddToCart = async (req, res) => {
           body: JSON.stringify(dataOfBidUser),
           headers: { "Content-Type": "application/json" },
         })
-          .then((res) => res.json())
-          .then((json) => console.log(json));
-
+          .then((res) => res.json());
         let dataOfProductOwner = {
           user: product.user,
           text: `Your product ${product.title} has been sold`,
@@ -1492,7 +1282,6 @@ exports.scheduleAndAddToCart = async (req, res) => {
           headers: { "Content-Type": "application/json" },
         })
           .then((res) => res.json())
-          .then((json) => console.log(json));
       } else {
         res.status(400).json({
           status: "Fail",
@@ -1501,7 +1290,6 @@ exports.scheduleAndAddToCart = async (req, res) => {
       }
     });
 
-    //console.log('Job', job)
 
     res.status(200).json({
       status: "successful",
@@ -1519,7 +1307,6 @@ exports.updateWishlistStatus = async (req, res) => {
   try {
     let { productId, status } = req.body;
     const product = await Product.findById(productId);
-    console.log(product);
     if (!product) {
       res.status(400).json({
         status: "fail",
@@ -1530,7 +1317,6 @@ exports.updateWishlistStatus = async (req, res) => {
     let updatedProduct = await Product.findOneAndUpdate(productId, {
       wishlistStatus: status,
     });
-    console.log(updatedProduct);
 
     res.send(200).json({
       status: "successful",
@@ -1562,7 +1348,6 @@ exports.updateRating = async (req, res) => {
     let updatedProduct = await Product.findOneAndUpdate(productId, {
       rating: newRating,
     });
-    console.log(updatedProduct);
 
     res.send(200).json({
       status: "successful",
@@ -1629,8 +1414,6 @@ exports.getProductByTitle = async (req, res) => {
         message: "product does not exist",
       });
     }
-
-    console.log(product);
 
     return res.json({
       status: "successful",

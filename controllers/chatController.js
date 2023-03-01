@@ -25,9 +25,7 @@ exports.getChatOfParticularROom = async (req, res) => {
 
   exports.createChat = async (req, res) => {
     try {
-      console.log(req.body)
       const chatRoom = await Chat.create(req.body);
-      console.log(chatRoom)
       res.status(200).json({
         status: 'success',
         user: chatRoom,

@@ -10,25 +10,19 @@ const Order = require("../models/orderModal");
 
 exports.createplaceBid = async (req, res) => {
   try {
-    console.log('in');
+
     if (!req.body) {
       return res.status(400).json({
         status: 'fail',
         message: 'provide body of product',
       });
     }
-    console.log(req.body)
     const product = await Product.findById(req.body.product);
     if (!product) {
       return res.status(400).json({
         status: 'Fail',
         message: 'Product not found',
       });
-    // } else if (product.price.immediate_purchase_price < req.body.price) {
-    //   return res.status(400).json({
-    //     status: 'fail',
-    //     message: 'Price must be greater than or equal to immediate purchase price',
-    //   });
     } else {
       if (!req.body.source) {
         return res.status(400).json({
@@ -36,15 +30,7 @@ exports.createplaceBid = async (req, res) => {
           message: "Invalid credentials",
         });
       }
-          
-      // const token = await stripe.tokens.create({
-      //     card: {
-      //       number: "4242424242424242",
-      //       exp_month: 1,
-      //       exp_year: 2023,
-      //       cvc: "314",
-      //     },
-      //   });
+        
         const paymentMethod = await stripe.paymentMethods.create({
           type: "card",
           card: {
@@ -70,8 +56,6 @@ exports.createplaceBid = async (req, res) => {
       });
   
       if (paymentIntent.created) {
-        console.log("payment created", paymentIntent);
-        console.log(req.user);
 
         const placeBid = await placebid.create({
           product: req.body.product,
@@ -101,15 +85,10 @@ exports.createplaceBid = async (req, res) => {
           .then(async (res) => {
             try {
               const dataa = await res.json();
-              console.log("response data?", dataa);
             } catch (err) {
-              console.log("error");
-              console.log(err);
             }
           })
-          // .then((json) => console.log("json ", json))
           .catch((error) => {
-            console.log(error);
           });
         
   
@@ -213,7 +192,6 @@ exports.getAllplacebid = async (req, res) => {
         $unwind: "$product"
       },
     ]);
-    console.log(getAllplacebid.length)
 
     res.status(200).json({
       status: 'success',

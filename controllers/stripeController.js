@@ -4,19 +4,15 @@ const User = require("../models/userModal");
 exports.createNewAccount = async (req, res) => {
     try{
         const user = await User.findById(req.user.id);
-        console.log(user);
         if(user.connAccount.id){
             if(user.connAccount.flag === false) {
-                console.log('In if');
                 const accountLink = await this.createAccountLink(user.connAccount.id);
-                console.log(accountLink);
                 return res.send({
                     status: 'fail',
                     message: 'User already contains an account. Use the link below to complete information',
                     link: accountLink.url,
                 })
             } else if (user.connAccount.flag === true) {
-                console.log('In else');
                 return res.send({
                     status: 'Success',
                     message: 'User account is complete',
@@ -34,12 +30,9 @@ exports.createNewAccount = async (req, res) => {
             transfers: {requested: true},
             },
         });
-        console.log(account);
-        console.log('-------------------------------------------------------------------');
         user.connAccount.id = account.id;
         await user.save();
         const accountLink = await this.createAccountLink(account.id);
-        console.log(accountLink);
         return res.send({ 
             status: 'Success',
             account: account.id, 
@@ -110,12 +103,10 @@ exports.completeAccount = async (req, res) => {
         const user = await User.findOne({'connAccount.id': req.params.accountId});
         user.connAccount.flag = true;
         await user.save();
-        console.log(user);
         return res.send({
             message: 'Your account has been created successfully. You may go back to app to post ad.'
         });
     } catch (err) {
-        console.log(req);
         return res.send({ 
             status: 'Fail',
             message: 'Something went wrong', 

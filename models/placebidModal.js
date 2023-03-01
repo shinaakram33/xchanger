@@ -5,20 +5,11 @@ const placeBidSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'price of product is required'],
     },
-    // date: {
-    //   type: Date,
-    //   default: Date(),
-    //   required: [true, 'date  is required'],
-    // },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'user data is required'],
     },
-    // time: {
-    //   type: Date,
-    //   default: Date.now(),
-    // },
     product: {
       type: mongoose.Schema.ObjectId,
       ref: 'Product',

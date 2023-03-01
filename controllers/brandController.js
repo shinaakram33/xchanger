@@ -46,7 +46,6 @@ exports.updateBrand = async (req, res) => {
     const updates = req.body;
     const options = { new: true };
     const brand = await Brand.findById(req.params.brandId);
-    console.log(brand);
     if (!brand) {
       res.status(400).json({
         status: 'fail',
@@ -83,6 +82,5 @@ exports.deletebrand = async (req, res) => {
       message: 'brand is delete successfully',
     });
   } catch (error) {
-    console.log(message.error);
   }
 };

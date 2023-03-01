@@ -14,6 +14,5 @@ router
   .get(protected, getAllWishList)
   .put(protected, removeProductFromWishList);
 
-// router.route('/:productId').post(protected, removeProductFromWishList);
 
 module.exports = router;

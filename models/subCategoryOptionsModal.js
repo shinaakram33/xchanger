@@ -5,10 +5,6 @@ const SubCategoryOptionModalSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Name of a sub-category option is required'],
   },
-  // image: {
-  //   type: String,
-  //   required: [true, 'Image of a sub-category option is requierd'],
-  // },
   categoryId: {
     type: mongoose.Schema.ObjectId,
     ref: 'Category',

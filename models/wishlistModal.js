@@ -22,12 +22,6 @@ const wishListModal = new mongoose.Schema({
     },
   ],
 });
-// wishListModal.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'products',
-//   });
-//   next();
-// });
 const WishList = mongoose.model('WishList', wishListModal);
 
 module.exports = WishList;

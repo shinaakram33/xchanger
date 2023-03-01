@@ -6,7 +6,6 @@ const productSchema = new mongoose.Schema(
     price: {
       orignalPrice: {
         type: Number,
-        // required: [true, 'Original Price of product is required'],
       },
       sellingPrice: {
         type: Number,
@@ -28,10 +27,6 @@ const productSchema = new mongoose.Schema(
     size: {
       type: String,
       required: [true, 'Size of a product is required'],
-      // enum: {
-      //   values: ['XXL', 'XL', 'L', 'M', 'S'],
-      //   message: 'Size of product must be XXL, XL, L, M or S',
-      // },
     },
     categoryName: {
       type: String,
@@ -47,7 +42,6 @@ const productSchema = new mongoose.Schema(
     },
     season: {
       type: String,
-      // required: [true, 'Season of a product is required'],
       enum: {
         values: ['Spring', 'Summer', 'Autumn', 'Winter', 'All'],
         message: 'Season must be Spring, Summer, Autumn, Winter or All',
@@ -56,11 +50,6 @@ const productSchema = new mongoose.Schema(
     condition: {
       state: {
         type: String,
-        // required: [true, 'Condition of a product is required'],
-        // enum: {
-        //   values: ['New', 'Very good', 'Good'],
-        //   message: 'Condition is either: New, Very good or Good',
-        // },
       },
       wornPriceTag: {
         type: Boolean,
@@ -113,20 +102,7 @@ const productSchema = new mongoose.Schema(
       otherPhoto: {
         type: String,
       },
-      // type: [String],
-      // required: [true, 'image of product is required'],
-      // validate: {
-      //   validator: function (val) {
-      //     if (this.image.length === 0) {
-      //       return false;
-      //     }
-      //   },
-      //   message: 'Image of a product is required',
-      // },
     },
-    // make: {
-    //   type: String,
-    // },
     status: {
       type: String,
       default: 'Not sold',
@@ -164,25 +140,9 @@ const productSchema = new mongoose.Schema(
         default: undefined,
       },
     },
-    // adPrice: {
-    //   type: String,
-    // },
     checkoutId: {
       type: String,
     },
-    // userName: {
-    //   type: String,
-    //   required: [true, 'Name of a user is required'],
-    // },
-    // userPhone: {
-    //   type: String,
-    //   required: [true, 'Phone Number of a user is required'],
-    // },
-    // userEmail: {
-    //   type: String,
-    //   required: [true, 'Email of a user is required'],
-    //   validate: [validator.isEmail, 'Please enter a valid email'],
-    // },
     category: {
       type: mongoose.Schema.ObjectId,
       ref: 'Category',
@@ -232,19 +192,5 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// productSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'category',
-//   });
-//   next();
-// });
-// productSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'user',
-//     select: '-__v -password -passwordResetToken, -passwordResetTokenExpire -roles',
-//   });
-//   next();
-// });
 const product = mongoose.model('Product', productSchema);
 module.exports = product;

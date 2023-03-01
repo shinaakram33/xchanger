@@ -22,12 +22,12 @@ const recentViewSchema = new mongoose.Schema({
     },
   ],
 });
-// wishListModal.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'products',
-//   });
-//   next();
-// });
+
+
+
+
+
+
 const RecentView = mongoose.model('RecentView', recentViewSchema);
 
 module.exports = RecentView;

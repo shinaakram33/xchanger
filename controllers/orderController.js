@@ -33,15 +33,6 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // const token = await stripe.tokens.create({
-    //   card: {
-    //     number: "4242424242424242",
-    //     exp_month: 1,
-    //     exp_year: 2023,
-    //     cvc: "314",
-    //   },
-    // });
-
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -69,30 +60,8 @@ exports.createOrder = async (req, res) => {
     } else if (parseInt(req.body.price) > 10000) {
       ownMoney = parseInt(((4/100) * parseInt(req.body.price)) + 11.5)
     }
-    // console.log('ownMoney', ownMoney)
     let string = (new Date()).toISOString();
-    // console.log(string, typeof string);
-
-    // let shippingFee;
-    //   const { pakageSize } = await cart.selectedProducts.reduce(async function(a, b) {
-    //     if(b.pakageSize && a.pakageSize === undefined){
-    //       a = await Product.findById(a);
-    //     }
-    //     else if (a.pakageSize && b.pakageSize === undefined){
-    //       b = await Product.findById(b);
-    //     }
-    //     if (a === null || a.pakageSize.price < b.pakageSize.price){
-    //       return b;
-    //     }
-    //     else{
-    //       return a;
-    //     }
-    //   }, await Product.findById(cart.selectedProducts[0]));
-    //   console.log(pakageSize.price);
-
-    // shippingFee = pakageSize.price;
-    // console.log('Math.round((req.body.price + req.body.shippingFee) * 100)', Math.round((req.body.price + req.body.shippingFee) * 100))
-    const paymentIntent = await stripe.paymentIntents.create({
+     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round((req.body.price + req.body.shippingFee) * 100),
       currency: 'CHF',
       payment_method_types: ["card"],
@@ -112,12 +81,6 @@ exports.createOrder = async (req, res) => {
       destination: 'acct_1LU5BKQdU47nz4ap',
       transfer_group: string,
     });
-
-    // const charge = await stripe.charges.create({
-    //   amount: req.body.price * 100,
-    //   currency: "usd",
-    //   source: req.body.source,
-    // });
 
     if (paymentIntent.created) {
     
@@ -152,12 +115,7 @@ exports.createOrder = async (req, res) => {
       createOrderTable.productId.push(updatedProduct.id);
 
       cart.products.splice(cart.products.indexOf(i), 1);
-      // await Cart.updateOne(
-      //   {
-      //     user: req.user.id,
-      //   },
-      //   { $pull: { products: { $in: cart.selectedProducts } } }
-      // );
+  
       cart.selectedProducts = undefined;
       
       let data = {
@@ -173,17 +131,11 @@ exports.createOrder = async (req, res) => {
       })
         .then(async (res) => {
           try {
-            console.log("res ", res);
             const dataa = await res.json();
-            console.log("response data?", dataa);
           } catch (err) {
-            console.log("error");
-            console.log(err);
           }
         })
-        // .then((json) => console.log("json ", json))
         .catch((error) => {
-          console.log(error);
         });
     });
     await cart.save({ validateBeforeSave: false });
@@ -208,7 +160,6 @@ exports.createOrder = async (req, res) => {
     cart.selectedProducts = undefined;
     await cart.save({ validateBeforeSave: false });
     await createOrderTable.save().then(o => o.populate({path: "productId", populate: "user"}).execPopulate());
-    console.log(cart);
 
     
 
@@ -225,56 +176,7 @@ exports.createOrder = async (req, res) => {
     });
   }
 
-    // const session = await stripe.customers
-    //   .create({
-    //     email: req.user.email,
-    //     // source: req.user.id,
-    //   })
-    //   .then((customer) => {
-    //     console.log('customer', customer);
-    //     stripe.checkout.sessions.create({
-    //       payment_method_types: ['card'],
-    //       amount: req.body.price * 100,
-    //       currency: 'usd',
-    //       customer: customer.id,
-    //       receipt_email: req.user.email,
-    //       description: 'Product is purchased',
-    //       shipping: {
-    //         name: req.user.name,
-    //         address: { country: req.body.country },
-    //       },
-    //     });
-    //   })
-    //   .then((result) =>
-    //     res.status(200).json({
-    //       status: 'success',
-    //       message: 'Product is purchased successfully',
-    //     })
-    //   );
-    //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    //     const session = stripe.checkout.sessions
-    //       .create({
-    //         payment_method_types: ['card'],
-    //         success_url: 'https://www.google.com',
-    //         cancel_url: 'https://www.google.com',
-    //         customer_email: req.user.email,
-    //         client_reference_id: req.params.cartId,
-    //         line_items: [
-    //           {
-    //             name: 'Aqil',
-    //             description: 'aaaaaa',
-    //             amount: req.body.price * 100,
-    //             currency: 'usd',
-    //             quantity: 1,
-    //           },
-    //         ],
-    //       })
-    //       .then(() => {
-    //         res.status(200).json({
-    //           status: 'success',
-    //           message: 'Product is purchased successfully',
-    //         });
-    //       });
+    
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -324,14 +226,6 @@ exports.createImmediateOrder = async (req, res) => {
       return res.status(403).send("Payment method not created");
 
     let string = (new Date()).toISOString();
-    // const token = await stripe.tokens.create({
-    //   card: {
-    //     number: "4242424242424242",
-    //     exp_month: 1,
-    //     exp_year: 2023,
-    //     cvc: "314",
-    //   },
-    // });
 
     const charge = await stripe.paymentIntents.create({
       amount: Math.round((req.body.price + req.body.shippingFee) * 100),
@@ -353,13 +247,6 @@ exports.createImmediateOrder = async (req, res) => {
       destination: 'acct_1LU5BKQdU47nz4ap',
       transfer_group: string,
     });
-
-    // const charge = await stripe.charges.create({
-    //   amount: (req.body.price + req.body.shippingFee) * 100,
-    //   currency: "CHF",
-    //   source: req.body.source,
-    //   // source: token.id,
-    // });
 
     if (!charge) {
       return res.status(403).send({
@@ -400,7 +287,6 @@ exports.createImmediateOrder = async (req, res) => {
 
       let recentView = await RecentView.findOne({ user: req.user.id });
       if(recentView){
-        console.log('updating');
         await RecentView.updateOne(
           {
             user: req.user.id,
@@ -420,12 +306,9 @@ exports.createImmediateOrder = async (req, res) => {
       }
       
       const productSeller = await User.findById(updatedProduct.user);
-      console.log(productSeller);
-      console.log('seller', productSeller.connAccount);
 
       let allBidsOfProduct = await placebid.find({product: updatedProduct.id})
       .sort({price: -1, createdAt: -1});
-      console.log(allBidsOfProduct.length, allBidsOfProduct);
 
       allBidsOfProduct.forEach(async (bid) => {
         await stripe.paymentIntents.cancel(bid.intentId);
@@ -449,13 +332,9 @@ exports.createImmediateOrder = async (req, res) => {
             try {
               const dataa = await res.json();
             } catch (err) {
-              console.log("error");
-              console.log(err);
             }
           })
-          // .then((json) => console.log("json ", json))
           .catch((error) => {
-            console.log(error);
           });
       })
       
@@ -474,54 +353,11 @@ exports.createImmediateOrder = async (req, res) => {
         .then(async (res) => {
           try {
             const dataa = await res.json();
-            console.log("response data?", dataa);
           } catch (err) {
-            console.log("error");
-            console.log(err);
           }
         })
-        // .then((json) => console.log("json ", json))
         .catch((error) => {
-          console.log(error);
         });
-      console.log("Check 2", updatedProduct);
-
-      console.log('--------------------------------------');
-      // try{
-      //     let transfer = await stripe.transfers.create({
-      //     amount: Math.round(updatedProduct.price.immediate_purchase_price * 100),
-      //       currency: 'CHF',
-      //       destination: productSeller.connAccount.id,
-      //       source_transaction: charge.id,
-      //     });
-      //     console.log(transfer);
-      // } catch (err) {
-      //   console.log(err);
-      //   let admin = User.findOne({roles: 'admin'});
-      //   let data = {
-      //     user: admin.id,
-      //     product: updatedProduct.id,
-      //     text: `Transfer unsuccessful: Seller: ${updatedProduct.user}, Amount: ${updatedProduct.price}, Order: ${order.id}`,
-      //   };
-  
-      //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-      //     method: "POST",
-      //     body: JSON.stringify(data),
-      //     headers: { "Content-Type": "application/json" },
-      //   })
-      //     .then(async (res) => {
-      //       try {
-      //         const dataa = await res.json();
-      //         console.log("response data?", dataa);
-      //       } catch (err) {
-      //         console.log("error");
-      //         console.log(err);
-      //       }
-      //     })
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-      // }
 
       return res.status(200).json({
         status: "success",
@@ -535,7 +371,6 @@ exports.createImmediateOrder = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err.message);
     updatedProduct.status = 'Not sold';
     await updatedProduct.save();
     return res.status(400).json({
@@ -549,10 +384,6 @@ exports.createImmediateOrder = async (req, res) => {
 exports.orderAccepted = async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    // const userId = req.user.id;
-
-    // const user = await User.findById(userId);
-    // if (!user) return res.status(401).send("User does not exist.");
 
     const order = await Order.findById(orderId);
     if (!order) {
@@ -568,79 +399,30 @@ exports.orderAccepted = async (req, res) => {
         message: "Order is already completed",
       });
     }
-    // if (order.user != user.id)
-    //   return res.status(403).send("Order ID doesn't match");
-
+    
     const accepted = req.body.accepted;
     if (accepted) {
       const paymentIntentCapture = await stripe.paymentIntents.capture(
         order.checkoutId,
       );
-      console.log(paymentIntentCapture);
       order.accepted = true;
       order.status = "Complete";
-      console.log("status ", paymentIntentCapture.status);
       if (paymentIntentCapture.status === "succeeded") {
         order.productId.map(async (i, index) => {
-          console.log("1");
           let updatedProduct = await Product.findByIdAndUpdate(
             i,
             { status: "Sold" },
             { new: true }
           );
-          console.log("2");
-          console.log('--------------------------------------------------');
           
-          console.log('user', updatedProduct.user);
           let productUser = await User.findById(updatedProduct.user);
-          console.log('account', productUser.connAccount.id);
-          console.log(updatedProduct.price);
-          console.log(paymentIntentCapture.transfer_group);
-          console.log(paymentIntentCapture.id);
-          // try{
-          //   let transfer = await stripe.transfers.create({
-          //     amount: updatedProduct.price.sellingPrice * 100,
-          //     currency: 'CHF',
-          //     destination: productUser.connAccount.id,
-          //     source_transaction: paymentIntentCapture.charges.data[0].id,
-          //     transfer_group: paymentIntentCapture.transfer_group
-          //   });
-          //   console.log(transfer);
-          // } catch (err) {
-          //   console.log(err);
-          // let admin = User.findOne({roles: 'admin'});
-          //   let data = {
-          //     user: admin.id,
-          //     product: updatedProduct.id,
-          //     text: `Transfer unsuccessful: Seller: ${updatedProduct.user}, Amount: ${updatedProduct.price}, Order: ${order.id}`,
-          //   };
-      
-          //   fetch("https://x-changer.herokuapp.com/api/v1/notification", {
-          //     method: "POST",
-          //     body: JSON.stringify(data),
-          //     headers: { "Content-Type": "application/json" },
-          //   })
-          //     .then(async (res) => {
-          //       try {
-          //         const dataa = await res.json();
-          //         console.log("response data?", dataa);
-          //       } catch (err) {
-          //         console.log("error");
-          //         console.log(err);
-          //       }
-          //     })
-          //     .catch((error) => {
-          //       console.log(error);
-          //     });
-          // }
-          console.log('--------------------------------------------------');
+          
           let data = {
             user: updatedProduct.user,
             product: updatedProduct.id,
             text: `Your product ${updatedProduct.title} has been sold to: ${order.name}.`,
           };
-          // console.log("check2", data);
-          // console.log("check2", updatedProduct);
+          
           fetch("https://x-changer.herokuapp.com/api/v1/notification", {
             method: "POST",
             body: JSON.stringify(data),
@@ -648,17 +430,12 @@ exports.orderAccepted = async (req, res) => {
           })
             .then(async (res) => {
               try {
-                // console.log("res ", res);
                 const dataa = await res.json();
-                // console.log("response data?", dataa);
               } catch (err) {
-                console.log("error");
-                console.log(err);
+                
               }
             })
-            // .then((json) => console.log("json ", json))
             .catch((error) => {
-              console.log(error);
             });
         });
         await order.save();
@@ -677,26 +454,21 @@ exports.orderAccepted = async (req, res) => {
       const paymentIntentCancel = await stripe.paymentIntents.cancel(
         order.checkoutId
       );
-      console.log("status ", paymentIntentCancel.status);
       if (paymentIntentCancel.status === "canceled") {
         order.accepted = false;
         order.status = "Rejected";
         order.productId.map(async (i, index) => {
           try {
-            console.log("1");
             let updatedProduct = await Product.findByIdAndUpdate(
               i,
               { status: "Not sold" },
               { new: true }
             );
-            console.log("2");
             let data = {
               user: updatedProduct.user,
               product: updatedProduct.id,
               text: `Your product ${updatedProduct.title} has been rejected`,
             };
-            console.log("check2", data);
-            console.log("check2", updatedProduct);
             fetch("https://x-changer.herokuapp.com/api/v1/notification", {
               method: "POST",
               body: JSON.stringify(data),
@@ -705,15 +477,10 @@ exports.orderAccepted = async (req, res) => {
               .then(async (res) => {
                 try {
                   const dataa = await res.json();
-                  console.log("response data?", dataa);
                 } catch (err) {
-                  console.log("error");
-                  console.log(err);
                 }
               })
-              // .then((json) => console.log("json ", json))
               .catch((error) => {
-                console.log(error);
               });
           } catch (err) {
             return res.status(400).json({
@@ -1011,7 +778,6 @@ exports.updateOrderStatus = async (req, res) => {
       }
       order.status = status;
       await order.save().then(o => o.populate("productId").execPopulate());
-      console.log(order);
       let userText, sellerText;
       if(status === 'Dispatched') {
         userText = `Your order ${order.id} has been dispatched.`;
@@ -1039,14 +805,10 @@ exports.updateOrderStatus = async (req, res) => {
       .then(async (res) => {
         try {
           const dataa = await res.json();
-          console.log("response data?", dataa);
         } catch (err) {
-          console.log("error");
-          console.log(err);
         }
       })
       .catch((error) => {
-        console.log(error);
       });
 
       order.productId.forEach(async (o) => {
@@ -1064,14 +826,10 @@ exports.updateOrderStatus = async (req, res) => {
         .then(async (res) => {
           try {
             const dataa = await res.json();
-            console.log("response data?", dataa);
           } catch (err) {
-            console.log("error");
-            console.log(err);
           }
         })
         .catch((error) => {
-          console.log(error);
         });
       });
       
